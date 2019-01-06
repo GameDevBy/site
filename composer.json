@@ -1,12 +1,14 @@
 {
-    "name": "drupal-composer/drupal-project",
-    "description": "Project template for Drupal 8 projects with composer",
+    "name": "GameDevBy/site",
+    "description": "Site for GameDev.by",
     "type": "project",
     "license": "GPL-2.0-or-later",
     "authors": [
         {
-            "name": "",
-            "role": ""
+            "name": "GameDev.by",
+            "homepage": "https://gamedev.by",
+            "role": "Developer",
+            "email": "admin@gamedev.by"
         }
     ],
     "repositories": [
@@ -16,18 +18,19 @@
         }
     ],
     "require": {
-        "composer/installers": "^1.2",
-        "cweagans/composer-patches": "^1.6.5",
+        "composer/installers": "^1.6",
+        "cweagans/composer-patches": "^1.6",
         "drupal-composer/drupal-scaffold": "^2.5",
-        "drupal/console": "^1.0.2",
-        "drupal/core": "^8.6.0",
-        "drush/drush": "^9.0.0",
-        "vlucas/phpdotenv": "^2.4",
-        "webflo/drupal-finder": "^1.0.0",
+        "drupal/console": "^1.8",
+        "drupal/core": "^8.6",
+        "drush/drush": "^9.5",
+        "vlucas/phpdotenv": "^3.1",
+        "webflo/drupal-finder": "^1.1",
         "webmozart/path-util": "^2.3"
     },
     "require-dev": {
-        "webflo/drupal-core-require-dev": "^8.6.0"
+        "roave/security-advisories": "dev-master",
+        "webflo/drupal-core-require-dev": "^8.6"
     },
     "conflict": {
         "drupal/drupal": "*"
@@ -51,10 +54,12 @@
             "DrupalProject\\composer\\ScriptHandler::checkComposerVersion"
         ],
         "post-install-cmd": [
-            "DrupalProject\\composer\\ScriptHandler::createRequiredFiles"
+            "DrupalProject\\composer\\ScriptHandler::createRequiredFiles",
+            "@composer drupal:scaffold"
         ],
         "post-update-cmd": [
-            "DrupalProject\\composer\\ScriptHandler::createRequiredFiles"
+            "DrupalProject\\composer\\ScriptHandler::createRequiredFiles",
+            "@composer drupal:scaffold"
         ]
     },
     "extra": {

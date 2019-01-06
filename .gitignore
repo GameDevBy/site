@@ -22,3 +22,30 @@
 
 # Ignore .env files as they are personal
 /.env
+
+# Other
+
+/init_env.bat
+
+/web/.csslintrc
+/web/.editorconfig
+/web/.eslintignore
+/web/.gitattributes
+/web/.htaccess
+/web/web.config
+/web/.eslintrc.json
+/web/.ht.router.php
+/web/autoload.php
+/web/index.php
+/web/update.php
+/web/robots.txt
+
+/web/modules/.gitkeep
+/web/themes/.gitkeep
+/web/profiles/.gitkeep
+
+/web/sites/default/default.services.yml
+/web/sites/default/default.settings.php
+/web/sites/development.services.yml
+/web/sites/example.settings.local.php
+/web/sites/example.sites.php
