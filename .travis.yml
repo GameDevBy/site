@@ -21,6 +21,7 @@ before_install:
   # Update system
   - sudo LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php -y
   - sudo apt-get update -y
+  - sudo apt-get install debdelta -y
   - sudo debdelta-upgrade -y
   - sudo apt-get upgrade -y
   - sudo apt-get autoremove -y
