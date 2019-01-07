@@ -62,6 +62,7 @@ before_install:
   # Install php 7.3
   - sudo apt-get install -y php7.3 php7.3-common php7.3-cli
   - sudo apt-get install -y php7.3-curl php7.3-gd php7.3-intl php7.3-mbstring
+  # TODO update ICU and php-intl
   # View php info
   - php -i
 
@@ -69,6 +70,7 @@ before_install:
   - curl --silent -o composer-setup.php https://getcomposer.org/installer
   - sudo php composer-setup.php --install-dir=/usr/local/bin --filename=composer
   - composer --version
+  - sudo mkdir -p ~/.composer/
   - sudo chown -R $USER ~/.composer/
   - sudo composer --no-progress --no-interaction --no-ansi global require hirak/prestissimo
 
