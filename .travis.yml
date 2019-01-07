@@ -20,11 +20,8 @@ before_install:
 
   # Update system
   - sudo LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php -y
-  - sudo add-apt-repository ppa:saiarcot895/myppa -y
   - sudo apt-get update -y
-  - sudo apt-get install debdelta apt-fast -y
-  - sudo debdelta-upgrade
-  - sudo apt-fast upgrade -y
+  - sudo apt-get upgrade -y
   - sudo apt-get autoremove -y
   - sudo apt-get autoclean -y
 
@@ -39,8 +36,8 @@ before_install:
   # Enable the repository
   - sudo percona-release setup ps80
   # Install the server package
-  - sudo apt-fast install -y percona-server-rocksdb
-  # View my.cnf
+  - sudo apt-get install -y percona-server-rocksdb
+  # View *.cnf
   - cat /etc/mysql/conf.d/mysql.cnf
   - cat /etc/mysql/mysql.conf.d/mysqld.cnf
   # Starting the service
@@ -58,12 +55,13 @@ before_install:
   # Create database
   - sudo mysql -e "CREATE DATABASE gamedevby"
   # Create user
-  - sudo mysql -e "GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER, CREATE TEMPORARY TABLES ON gamedevby.* TO 'gamedevby'@'localhost' IDENTIFIED BY 'gamedevby';"
+  - sudo mysql -e "CREATE USER 'gamedevby'@'localhost' IDENTIFIED BY 'gamedevby'"
+  - sudo mysql -e "GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER, CREATE TEMPORARY TABLES ON gamedevby.* TO 'gamedevby'@'localhost'"
   - sudo mysql -e "FLUSH PRIVILEGES"
 
   # Install php 7.3
-  - sudo apt-fast install -y php7.3 php7.3-common php7.3-cli
-  - sudo apt-fast install -y php7.3-curl php7.3-gd2 php7.3-intl php7.3-mbstring php7.3-openssl
+  - sudo apt-get install -y php7.3 php7.3-common php7.3-cli
+  - sudo apt-get install -y php7.3-curl php7.3-gd2 php7.3-intl php7.3-mbstring php7.3-openssl
 
   # Update composer.
   #- composer --verbose self-update
