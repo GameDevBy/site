@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "21ceaf6bba70a7f5d475828b3bf6537a",
+    "content-hash": "7523f07bc8794be97eb6303c4c617b7a",
     "packages": [
         {
             "name": "alchemy/zippy",
@@ -9115,7 +9115,6 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
-        "behat/mink-selenium2-driver": 20,
         "roave/security-advisories": 20,
         "drupal/phingdrushtask": 20,
         "drupal/devel": 20

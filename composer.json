@@ -52,7 +52,6 @@
         "webmozart/path-util": "^2.3"
     },
     "require-dev": {
-        "behat/mink-selenium2-driver": "dev-master#8684ee4e634db7abda9039ea53545f86fc1e105a",
         "composer/composer": "^1.8",
         "roave/security-advisories": "dev-master",
         "webflo/drupal-core-require-dev": "^8.6",
