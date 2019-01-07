@@ -2,7 +2,7 @@ language: minimal
 dist: xenial # TODO: replace to bionic when fix https://github.com/travis-ci/travis-ci/issues/9460
 
 git:
-  depth: 1
+  depth: 50
   submodules: false
 
 env:
