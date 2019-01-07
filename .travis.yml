@@ -68,12 +68,12 @@ before_install:
   - sudo apt-get install -y php7.3-curl php7.3-gd php7.3-intl php7.3-mbstring
   # TODO update ICU and php-intl
   # View php info
-  - php -i
+  - sudo php -i
 
   # Install composer
   - curl --silent -o composer-setup.php https://getcomposer.org/installer
   - sudo php composer-setup.php --install-dir=/usr/local/bin --filename=composer
-  - composer --version
+  - sudo composer --version
   - sudo mkdir -p ~/.composer/
   - sudo chown -R $USER ~/.composer/
   - sudo composer --no-progress --no-interaction --no-ansi global require hirak/prestissimo
@@ -85,10 +85,10 @@ before_install:
 
 install:
   # Install Composer dependencies.
-  - composer --verbose validate --strict
-  - symfony security:check
-  - composer --verbose --prefer-dist --no-progress --no-interaction --no-ansi --classmap-authoritative install
-  - composer clear-cache
+  - sudo composer --verbose validate --strict
+  - sudo symfony security:check
+  - sudo composer --verbose --prefer-dist --no-progress --no-interaction --no-ansi --classmap-authoritative install
+  - sudo composer clear-cache
 
 script:
   - cd $TRAVIS_BUILD_DIR/web
