@@ -15,15 +15,22 @@
         {
             "type": "composer",
             "url": "https://packages.drupal.org/8"
+        },
+        {
+            "type": "composer",
+            "url": "https://asset-packagist.org"
         }
     ],
     "require": {
+        "php": "^7.3",
+        "composer/composer": "^1.8",
         "composer/installers": "^1.6",
         "cweagans/composer-patches": "^1.6",
         "drupal-composer/drupal-scaffold": "^2.5",
         "drupal/console": "^1.8",
         "drupal/core": "^8.6",
         "drush/drush": "^9.5",
+        "oomphinc/composer-installers-extender": "^1.1",
         "vlucas/phpdotenv": "^3.1",
         "webflo/drupal-finder": "^1.1",
         "webmozart/path-util": "^2.3"
@@ -38,7 +45,11 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "config": {
-        "sort-packages": true
+        "sort-packages": true,
+        "preferred-install": "dist",
+        "platform": {
+            "php": "7.3"
+        }
     },
     "autoload": {
         "classmap": [
@@ -54,6 +65,9 @@
             "DrupalProject\\composer\\ScriptHandler::createRequiredFiles",
             "@composer drupal:scaffold"
         ],
+        "drupal:upgrade": [
+            "@composer update drupal/core webflo/drupal-core-require-dev symfony/* --with-dependencies"
+        ],
         "pre-install-cmd": [
             "@pre-cmd"
         ],
@@ -68,17 +82,27 @@
         ]
     },
     "extra": {
+        "composer-exit-on-patch-failure": true,
         "patchLevel": {
             "drupal/core": "-p2"
         },
+        "installer-types": [
+            "npm-asset",
+            "bower-asset"
+        ],
         "installer-paths": {
             "web/core": ["type:drupal-core"],
-            "web/libraries/{$name}": ["type:drupal-library"],
+            "web/libraries/{$name}": [
+                "type:drupal-library",
+                "type:npm-asset",
+                "type:bower-asset"
+            ],
             "web/modules/contrib/{$name}": ["type:drupal-module"],
             "web/profiles/contrib/{$name}": ["type:drupal-profile"],
             "web/themes/contrib/{$name}": ["type:drupal-theme"],
             "drush/Commands/{$name}": ["type:drupal-drush"]
         },
+        "enable-patching": true,
         "drupal-scaffold": {
             "initial": {
                 ".editorconfig": "../.editorconfig",

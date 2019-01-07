@@ -48,15 +48,23 @@ class ScriptHandler {
       ];
       drupal_rewrite_settings($settings, $drupalRoot . '/sites/default/settings.php');
       $fs->chmod($drupalRoot . '/sites/default/settings.php', 0666);
-      $event->getIO()->write("Create a sites/default/settings.php file with chmod 0666");
+      $event->getIO()->write('Create a sites/default/settings.php file with chmod 0666');
     }
 
     // Create the files directory with chmod 0777
     if (!$fs->exists($drupalRoot . '/sites/default/files')) {
-      $oldmask = umask(0);
-      $fs->mkdir($drupalRoot . '/sites/default/files', 0777);
-      umask($oldmask);
-      $event->getIO()->write("Create a sites/default/files directory with chmod 0777");
+      $oldMask = umask(0);
+      $fs->mkdir($drupalRoot . '/sites/default/files');
+      umask($oldMask);
+      $event->getIO()->write('Create a sites/default/files directory with chmod 0777');
+    }
+
+    // Create the config/sync directory (with chmod 0777) - ref CONFIG_SYNC_DIRECTORY above.
+    if (!$fs->exists($drupalFinder->getComposerRoot() . '/config/sync')) {
+      $oldMask = umask(0);
+      $fs->mkdir($drupalFinder->getComposerRoot() . '/config/sync');
+      umask($oldMask);
+      $event->getIO()->write('Create a ../config/sync directory with chmod 0777');
     }
   }
 
