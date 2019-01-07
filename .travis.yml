@@ -19,12 +19,13 @@ before_install:
   - sudo rm -rf /etc/mysql /var/lib/mysql
 
   # Update system
-  - sudo add-apt-repository ppa:ondrej/php
+  - sudo LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php
   - sudo apt-get update -y
   - sudo apt-get upgrade -y
   - sudo apt-get autoremove -y
   - sudo apt-get autoclean -y
 
+  # TODO: replace to docker container
   # Install Percona Server
   #   https://www.percona.com/doc/percona-server/8.0/installation/apt_repo.html
   #   https://www.percona.com/doc/percona-server/8.0/myrocks/install.html
