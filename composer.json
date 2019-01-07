@@ -19,11 +19,27 @@
         {
             "type": "composer",
             "url": "https://asset-packagist.org"
+        },
+        {
+            "type": "vcs",
+            "url": "https://git.drupal.org/project/phingdrushtask.git"
+        },
+        {
+            "type": "package",
+            "package": {
+                "name": "pfrenssen/phpcs-pre-push",
+                "version": "1.0",
+                "type": "git-hook",
+                "source": {
+                    "url": "https://gist.github.com/498fc52fea3f965f6640.git",
+                    "type": "git",
+                    "reference": "master"
+                }
+            }
         }
     ],
     "require": {
         "php": "^7.3",
-        "composer/composer": "^1.8",
         "composer/installers": "^1.6",
         "cweagans/composer-patches": "^1.6",
         "drupal-composer/drupal-scaffold": "^2.5",
@@ -36,8 +52,16 @@
         "webmozart/path-util": "^2.3"
     },
     "require-dev": {
+        "behat/mink-selenium2-driver": "dev-master#8684ee4e634db7abda9039ea53545f86fc1e105a",
+        "composer/composer": "^1.8",
         "roave/security-advisories": "dev-master",
-        "webflo/drupal-core-require-dev": "^8.6"
+        "webflo/drupal-core-require-dev": "^8.6",
+        "phing/phing": "^2.16",
+        "pfrenssen/phpcs-pre-push": "^1.0",
+        "drupal/phingdrushtask": "dev-7.x-2.x",
+        "drupal/drupal-extension": "^3.4",
+        "drupal/devel": "1.*@dev",
+        "drupal/config_update": "^1.6"
     },
     "conflict": {
         "drupal/drupal": "*"
