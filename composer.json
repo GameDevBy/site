@@ -1,5 +1,5 @@
 {
-    "name": "GameDevBy/site",
+    "name": "gamedevby/site",
     "description": "Site for GameDev.by",
     "type": "project",
     "license": "GPL-2.0-or-later",
@@ -47,19 +47,24 @@
         "files": ["load.environment.php"]
     },
     "scripts": {
-        "pre-install-cmd": [
+        "pre-cmd": [
             "DrupalProject\\composer\\ScriptHandler::checkComposerVersion"
+        ],
+        "post-cmd": [
+            "DrupalProject\\composer\\ScriptHandler::createRequiredFiles",
+            "@composer drupal:scaffold"
+        ],
+        "pre-install-cmd": [
+            "@pre-cmd"
         ],
         "pre-update-cmd": [
-            "DrupalProject\\composer\\ScriptHandler::checkComposerVersion"
+            "@pre-cmd"
         ],
         "post-install-cmd": [
-            "DrupalProject\\composer\\ScriptHandler::createRequiredFiles",
-            "@composer drupal:scaffold"
+            "@post-cmd"
         ],
         "post-update-cmd": [
-            "DrupalProject\\composer\\ScriptHandler::createRequiredFiles",
-            "@composer drupal:scaffold"
+            "@post-cmd"
         ]
     },
     "extra": {
