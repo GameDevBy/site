@@ -69,7 +69,8 @@ before_install:
   - curl --silent -o composer-setup.php https://getcomposer.org/installer
   - sudo php composer-setup.php --install-dir=/usr/local/bin --filename=composer
   - composer --version
-  - composer --no-progress --no-interaction --no-ansi global require hirak/prestissimo
+  - sudo chown -R $USER ~/.composer/
+  - sudo composer --no-progress --no-interaction --no-ansi global require hirak/prestissimo
 
 install:
   # Install Composer dependencies.
