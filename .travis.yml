@@ -13,9 +13,9 @@ mysql:
   username: root
   encoding: utf8
 
-cache:
-  directories:
-    - ~/.composer/cache/files
+# cache:
+#   directories:
+#     - ~/.composer/cache/files
 
 before_install:
   # Remove mysql
@@ -81,7 +81,7 @@ before_install:
   # Install symfony cli https://symfony.com/download
   - curl --silent https://get.symfony.com/cli/installer | sudo bash
   - sudo mv ~/.symfony/bin/symfony /usr/local/bin/symfony
-  - symfony -V
+  - sudo symfony -V
 
 install:
   # Install Composer dependencies.
