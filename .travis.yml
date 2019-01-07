@@ -20,10 +20,11 @@ before_install:
 
   # Update system
   - sudo LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php -y
+  - sudo add-apt-repository ppa:saiarcot895/myppa -y
   - sudo apt-get update -y
-  - sudo apt-get install debdelta -y
-  - sudo debdelta-upgrade -y
-  - sudo apt-get upgrade -y
+  - sudo apt-get install debdelta apt-fast -y
+  - sudo debdelta-upgrade
+  - sudo apt-fast upgrade -y
   - sudo apt-get autoremove -y
   - sudo apt-get autoclean -y
 
@@ -38,7 +39,7 @@ before_install:
   # Enable the repository
   - sudo percona-release setup ps80
   # Install the server package
-  - sudo apt-get install -y percona-server-rocksdb
+  - sudo apt-fast install -y percona-server-rocksdb
   # View my.cnf
   - ls -la /etc/mysql/conf.d/
   - ls -la /etc/mysql/mysql.conf.d/
@@ -61,8 +62,8 @@ before_install:
   - sudo mysql -e "FLUSH PRIVILEGES"
 
   # Install php 7.3
-  - sudo apt-get install -y php7.3 php7.3-common php7.3-cli
-  - sudo apt-get install -y php7.3-curl php7.3-gd2 php7.3-intl php7.3-mbstring php7.3-openssl
+  - sudo apt-fast install -y php7.3 php7.3-common php7.3-cli
+  - sudo apt-fast install -y php7.3-curl php7.3-gd2 php7.3-intl php7.3-mbstring php7.3-openssl
 
   # Update composer.
   #- composer --verbose self-update
