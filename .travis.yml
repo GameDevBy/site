@@ -80,7 +80,7 @@ before_install:
 
   # Install symfony cli https://symfony.com/download
   - curl --silent https://get.symfony.com/cli/installer | sudo bash
-  - mv ~/.symfony/bin/symfony /usr/local/bin/symfony
+  - sudo mv ~/.symfony/bin/symfony /usr/local/bin/symfony
   - symfony -V
 
 install:
