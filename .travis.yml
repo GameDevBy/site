@@ -65,7 +65,7 @@ before_install:
 
   # Install php 7.3
   - sudo apt-get install -y php7.3 php7.3-common php7.3-cli
-  - sudo apt-get install -y php7.3-curl php7.3-gd php7.3-intl php7.3-mbstring
+  - sudo apt-get install -y php7.3-curl php7.3-gd php7.3-intl php7.3-mbstring php7.3-dom php7.3-xml
   # TODO update ICU and php-intl
   # View php info
   - sudo php -i
@@ -73,10 +73,10 @@ before_install:
   # Install composer
   - curl --silent -o composer-setup.php https://getcomposer.org/installer
   - sudo php composer-setup.php --install-dir=/usr/local/bin --filename=composer
-  - sudo composer --version
+  - composer --version
   - sudo mkdir -p ~/.composer/
   - sudo chown -R $USER ~/.composer/
-  - sudo composer --no-progress --no-interaction --no-ansi global require hirak/prestissimo
+  - composer --no-progress --no-interaction --no-ansi global require hirak/prestissimo
 
   # Install symfony cli https://symfony.com/download
   - curl --silent https://get.symfony.com/cli/installer | sudo bash
@@ -85,10 +85,10 @@ before_install:
 
 install:
   # Install Composer dependencies.
-  - sudo composer --verbose validate --strict
+  - composer --verbose validate --strict
   - sudo symfony security:check
-  - sudo composer --verbose --prefer-dist --no-progress --no-interaction --no-ansi --classmap-authoritative install
-  - sudo composer clear-cache
+  - composer --verbose --prefer-dist --no-progress --no-interaction --no-ansi --classmap-authoritative install
+  - composer clear-cache
 
 script:
   - cd $TRAVIS_BUILD_DIR/web
