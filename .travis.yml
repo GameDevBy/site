@@ -21,6 +21,7 @@ before_install:
   # Update system
   - sudo LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php -y
   - sudo apt-get update -y
+  - sudo debdelta-upgrade -y
   - sudo apt-get upgrade -y
   - sudo apt-get autoremove -y
   - sudo apt-get autoclean -y
@@ -38,9 +39,10 @@ before_install:
   # Install the server package
   - sudo apt-get install -y percona-server-rocksdb
   # View my.cnf
-  - cat /etc/mysql/my.cnf
+  - ls -la /etc/mysql/conf.d/
+  - ls -la /etc/mysql/mysql.conf.d/
   # Initialize data directory
-  - sudo mysqld --verbose --initialize-insecure
+  #- sudo mysqld --verbose --initialize-insecure
   # Starting the service
   - sudo service mysql start
   # Percona Server is distributed with several useful UDF (User Defined Function) from Percona Toolkit.
