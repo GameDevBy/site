@@ -37,8 +37,10 @@ before_install:
   - sudo percona-release setup ps80
   # Install the server package
   - sudo apt-get install -y percona-server-rocksdb
+  # View my.cnf
+  - cat /etc/mysql/my.cnf
   # Initialize data directory
-  - sudo mysqld --initialize-insecure --user=root
+  - sudo mysqld --verbose --initialize-insecure
   # Starting the service
   - sudo service mysql start
   # Percona Server is distributed with several useful UDF (User Defined Function) from Percona Toolkit.
@@ -53,6 +55,7 @@ before_install:
   - sudo mysql -e "CREATE DATABASE gamedevby"
   # Create user
   - sudo mysql -e "GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER, CREATE TEMPORARY TABLES ON gamedevby.* TO 'gamedevby'@'localhost' IDENTIFIED BY 'gamedevby'"
+  - sudo mysql -e "FLUSH PRIVILEGES"
 
   # Install php 7.3
   - sudo apt-get install -y php7.3 php7.3-common php7.3-cli
