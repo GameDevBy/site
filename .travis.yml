@@ -12,12 +12,13 @@ mysql:
   database: gamedevby
   username: root
   encoding: utf8
+  port: 3306
 
 before_install:
   # Update system
-  - sudo apt-get update -y
-  - sudo apt-get upgrade -y
-  - sudo apt-get autoremove -y
+  # - sudo apt-get update -y
+  # - sudo apt-get upgrade -y
+  # - sudo apt-get autoremove -y
 
   # Config sendmail
   # - echo 'sendmail_path = /bin/true' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
@@ -36,6 +37,8 @@ before_install:
   #   https://hub.docker.com/_/percona
   #   https://dzone.com/articles/measuring-percona-server-docker-cpunetwork-overhea
   - docker run --net=host --name percona-server -e MYSQL_ALLOW_EMPTY_PASSWORD=yes -e INIT_ROCKSDB=yes -d percona:centos
+
+  - telnet localhost 3306
 
   # Percona Server is distributed with several useful UDF (User Defined Function) from Percona Toolkit.
   #   See http://www.percona.com/doc/percona-server/8.0/management/udf_percona_toolkit.html for more details
