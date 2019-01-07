@@ -18,7 +18,11 @@ before_install:
   # Update system
   # - sudo apt-get update -y
   # - sudo apt-get upgrade -y
-  # - sudo apt-get autoremove -y
+
+  - sudo apt-get purge mysql-server mysql-client mysql-common mysql-server-core-* mysql-client-core-*
+  - sudo rm -rf /etc/mysql /var/lib/mysql
+  - sudo apt-get autoremove
+  - sudo apt-get autoclean
 
   # Config sendmail
   # - echo 'sendmail_path = /bin/true' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
@@ -38,7 +42,8 @@ before_install:
   #   https://dzone.com/articles/measuring-percona-server-docker-cpunetwork-overhea
   - docker run --net=host --name percona-server -e MYSQL_ALLOW_EMPTY_PASSWORD=yes -e INIT_ROCKSDB=yes -d percona:centos
 
-  - telnet localhost 3306
+  - sudo netstat -tulpn
+  - sudo ufw status
 
   # Percona Server is distributed with several useful UDF (User Defined Function) from Percona Toolkit.
   #   See http://www.percona.com/doc/percona-server/8.0/management/udf_percona_toolkit.html for more details
