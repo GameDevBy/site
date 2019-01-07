@@ -13,6 +13,10 @@ mysql:
   username: root
   encoding: utf8
 
+cache:
+  directories:
+    - ~/.composer/cache/files
+
 before_install:
   # Remove mysql
   - sudo apt-get purge -y mysql-server mysql-client mysql-common mysql-server-core-* mysql-client-core-*
@@ -83,7 +87,7 @@ install:
   # Install Composer dependencies.
   - composer --verbose validate --strict
   - symfony security:check
-  - composer --verbose --no-progress --no-interaction --no-ansi --classmap-authoritative install
+  - composer --verbose --prefer-dist --no-progress --no-interaction --no-ansi --classmap-authoritative install
   - composer clear-cache
 
 script:
