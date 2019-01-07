@@ -65,7 +65,7 @@ before_install:
 
   # Install php 7.3
   - sudo apt-get install -y php7.3 php7.3-common php7.3-cli
-  - sudo apt-get install -y php7.3-curl php7.3-gd php7.3-intl php7.3-mbstring php7.3-dom php7.3-xml
+  - sudo apt-get install -y php7.3-curl php7.3-gd php7.3-intl php7.3-mbstring php7.3-dom php7.3-xml php7.3-zip php7.3-pdo-sqlite php7.3-pdo-mysql php7.3-xdebug php7.3-soap php7.3-uopz
   # TODO update ICU and php-intl
   # View php info
   - sudo php -i
@@ -88,7 +88,6 @@ install:
   - composer --verbose validate --strict
   - sudo symfony security:check
   - composer --verbose --prefer-dist --no-progress --no-interaction --no-ansi --classmap-authoritative install
-  - composer clear-cache
 
 script:
   - cd $TRAVIS_BUILD_DIR/web
