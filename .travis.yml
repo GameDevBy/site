@@ -74,9 +74,10 @@ before_install:
   - sudo chown -R $USER ~/.composer/
   - sudo composer --no-progress --no-interaction --no-ansi global require hirak/prestissimo
 
-  # Install symfony https://symfony.com/download
+  # Install symfony cli https://symfony.com/download
   - curl --silent https://get.symfony.com/cli/installer | sudo bash
-  - symfony --version
+  - mv ~/.symfony/bin/symfony /usr/local/bin/symfony
+  - symfony -V
 
 install:
   # Install Composer dependencies.
