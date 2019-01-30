@@ -18,7 +18,7 @@ class PolicyCommands extends DrushCommands {
    * @throws \Exception
    */
   public function sqlSyncValidate(CommandData $commandData) {
-    if ($commandData->input()->getArgument('target') == '@prod') {
+    if ($commandData->input()->getArgument('target') === '@prod') {
       throw new \Exception(dt('Per !file, you may never overwrite the production database.', ['!file' => __FILE__]));
     }
   }
