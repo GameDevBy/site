@@ -5,9 +5,6 @@ git:
   depth: 50
   submodules: false
 
-env:
-  - TEST=test
-
 mysql:
   database: gamedevby
   username: root
@@ -73,7 +70,7 @@ before_install:
   # Install composer
   - curl --silent -o composer-setup.php https://getcomposer.org/installer
   - sudo php composer-setup.php --install-dir=/usr/local/bin --filename=composer
-  - composer --version
+  - composer diagnose --no-interaction --ansi --verbose
   - sudo mkdir -p ~/.composer/
   - sudo chown -R $USER ~/.composer/
   - composer --no-progress --no-interaction --no-ansi global require hirak/prestissimo
@@ -85,19 +82,22 @@ before_install:
 
 install:
   # Validation
-  - composer --verbose validate --strict
+  - composer validate --strict --no-interaction --ansi --verbose
   - sudo symfony security:check
+  - composer licenses --no-interaction --ansi --verbose
 
-  # Install Composer dependencies.
-  - composer --verbose --prefer-dist --no-progress --no-interaction --no-ansi --classmap-authoritative install
+  # Install Composer dependencies
+  - composer --verbose --prefer-dist --no-progress --no-interaction --ansi --classmap-authoritative install
 
-  # Define build properties for the local test environment.
+  # Define build properties for the local test environment
   - echo -e "drupal.base_url = http://localhost:8888\n" > build.properties.local
 
-  # Build the project.
-  - ./vendor/bin/phing create-dev-env
+  # Build the project
+  - ./vendor/bin/phing -diagnostics
+  - ./vendor/bin/phing -verbose create-dev-env
 
 script:
+  - phpcs --colors
   - cd $TRAVIS_BUILD_DIR/web
 
 #   - ./../vendor/bin/drush site-install --verbose --yes --db-url=sqlite://tmp/site.sqlite

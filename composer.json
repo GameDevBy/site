@@ -23,19 +23,6 @@
         {
             "type": "vcs",
             "url": "https://git.drupal.org/project/phingdrushtask.git"
-        },
-        {
-            "type": "package",
-            "package": {
-                "name": "pfrenssen/phpcs-pre-push",
-                "version": "1.0",
-                "type": "git-hook",
-                "source": {
-                    "url": "https://gist.github.com/498fc52fea3f965f6640.git",
-                    "type": "git",
-                    "reference": "master"
-                }
-            }
         }
     ],
     "require": {
@@ -58,7 +45,6 @@
         "roave/security-advisories": "dev-master",
         "webflo/drupal-core-require-dev": "^8.6",
         "phing/phing": "^2.16",
-        "pfrenssen/phpcs-pre-push": "^1.0",
         "drupal/phingdrushtask": "dev-7.x-2.x",
         "drupal/drupal-extension": "^3.4",
         "drupal/devel": "1.*@dev",

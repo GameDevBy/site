@@ -7,12 +7,12 @@
 
 namespace DrupalProject\Phing;
 
-require_once 'phing/Task.php';
+use \Task;
 
 /**
  * A Phing task to generate a configuration file for PHP CodeSniffer.
  */
-class PhpCodeSnifferConfigurationTask extends \Task {
+class PhpCodeSnifferConfigurationTask extends Task {
 
   /**
    * The path to the configuration file to generate.

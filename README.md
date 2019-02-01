@@ -16,7 +16,7 @@ Prod: [![Build Status Prod](https://travis-ci.org/GameDevBy/site.svg?branch=prod
 
 Обновить зависимости:
 ```
-composer update drupal/core webflo/drupal-core-require-dev symfony/* --with-dependencies
+composer drupal:upgrade
 ```
 
 Последняя версия синхронизации с [drupal-project](https://github.com/drupal-composer/drupal-project/commit/f2b83dc777a188cc1ccc4526f947e66d70fad380).

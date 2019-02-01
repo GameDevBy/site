@@ -7,12 +7,12 @@
 
 namespace DrupalProject\Phing;
 
-require_once 'phing/Task.php';
+use \Task;
 
 /**
  * A Phing task to generate a configuration file for PHPUnit.
  */
-class PhpUnitConfigurationTask extends \Task {
+class PhpUnitConfigurationTask extends Task {
 
   /**
    * The path to the template that is used as a basis for the generated file.
