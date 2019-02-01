@@ -84,10 +84,18 @@ before_install:
   - sudo symfony -V
 
 install:
-  # Install Composer dependencies.
+  # Validation
   - composer --verbose validate --strict
   - sudo symfony security:check
+
+  # Install Composer dependencies.
   - composer --verbose --prefer-dist --no-progress --no-interaction --no-ansi --classmap-authoritative install
+
+  # Define build properties for the local test environment.
+  - echo -e "drupal.base_url = http://localhost:8888\n" > build.properties.local
+
+  # Build the project.
+  - ./vendor/bin/phing create-dev-env
 
 script:
   - cd $TRAVIS_BUILD_DIR/web

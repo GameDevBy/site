@@ -15,7 +15,12 @@ use Webmozart\PathUtil\Path;
 
 class ScriptHandler {
 
-  public static function createRequiredFiles(Event $event) {
+  /**
+   * @param \Composer\Script\Event $event
+   *
+   * @throws \Exception
+   */
+  public static function createRequiredFiles(Event $event): void {
     $fs = new Filesystem();
     $drupalFinder = new DrupalFinder();
     $drupalFinder->locateRoot(getcwd());
@@ -81,8 +86,10 @@ class ScriptHandler {
    * downloading the Composer dependencies.
    *
    * @see https://github.com/composer/composer/pull/5035
+   *
+   * @param \Composer\Script\Event $event
    */
-  public static function checkComposerVersion(Event $event) {
+  public static function checkComposerVersion(Event $event): void {
     $composer = $event->getComposer();
     $io = $event->getIO();
 
