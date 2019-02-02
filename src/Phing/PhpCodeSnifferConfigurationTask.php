@@ -1,13 +1,8 @@
 <?php
 
-/**
- * @file
- * Contains \DrupalProject\build\Phing\PhpCodeSnifferConfigurationTask.
- */
-
 namespace DrupalProject\Phing;
 
-use \Task;
+use Task;
 
 /**
  * A Phing task to generate a configuration file for PHP CodeSniffer.

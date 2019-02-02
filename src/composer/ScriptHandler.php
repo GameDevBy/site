@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \DrupalProject\composer\ScriptHandler.
- */
-
 namespace DrupalProject\composer;
 
 use Composer\Script\Event;
@@ -13,10 +8,16 @@ use DrupalFinder\DrupalFinder;
 use Symfony\Component\Filesystem\Filesystem;
 use Webmozart\PathUtil\Path;
 
+/**
+ * Composer classmap.
+ */
 class ScriptHandler {
 
   /**
+   * Create required files.
+   *
    * @param \Composer\Script\Event $event
+   *   Event.
    *
    * @throws \Exception
    */
@@ -32,15 +33,15 @@ class ScriptHandler {
       'themes',
     ];
 
-    // Required for unit testing
+    // Required for unit testing.
     foreach ($dirs as $dir) {
-      if (!$fs->exists($drupalRoot . '/'. $dir)) {
-        $fs->mkdir($drupalRoot . '/'. $dir);
-        $fs->touch($drupalRoot . '/'. $dir . '/.gitkeep');
+      if (!$fs->exists($drupalRoot . '/' . $dir)) {
+        $fs->mkdir($drupalRoot . '/' . $dir);
+        $fs->touch($drupalRoot . '/' . $dir . '/.gitkeep');
       }
     }
 
-    // Prepare the settings file for installation
+    // Prepare the settings file for installation.
     if (!$fs->exists($drupalRoot . '/sites/default/settings.php') and $fs->exists($drupalRoot . '/sites/default/default.settings.php')) {
       $fs->copy($drupalRoot . '/sites/default/default.settings.php', $drupalRoot . '/sites/default/settings.php');
       require_once $drupalRoot . '/core/includes/bootstrap.inc';
@@ -56,7 +57,7 @@ class ScriptHandler {
       $event->getIO()->write('Create a sites/default/settings.php file with chmod 0666');
     }
 
-    // Create the files directory with chmod 0777
+    // Create the files directory with chmod 0777.
     if (!$fs->exists($drupalRoot . '/sites/default/files')) {
       $oldMask = umask(0);
       $fs->mkdir($drupalRoot . '/sites/default/files');
@@ -64,7 +65,8 @@ class ScriptHandler {
       $event->getIO()->write('Create a sites/default/files directory with chmod 0777');
     }
 
-    // Create the config/sync directory (with chmod 0777) - ref CONFIG_SYNC_DIRECTORY above.
+    // Create the config/sync directory (with chmod 0777)
+    // ref CONFIG_SYNC_DIRECTORY above.
     if (!$fs->exists($drupalFinder->getComposerRoot() . '/config/sync')) {
       $oldMask = umask(0);
       $fs->mkdir($drupalFinder->getComposerRoot() . '/config/sync');
@@ -85,9 +87,10 @@ class ScriptHandler {
    * installation after going through the lengthy process of compiling and
    * downloading the Composer dependencies.
    *
-   * @see https://github.com/composer/composer/pull/5035
-   *
    * @param \Composer\Script\Event $event
+   *   Event.
+   *
+   * @see https://github.com/composer/composer/pull/5035
    */
   public static function checkComposerVersion(Event $event): void {
     $composer = $event->getComposer();

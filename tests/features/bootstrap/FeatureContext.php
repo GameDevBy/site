@@ -17,6 +17,7 @@ class FeatureContext extends RawDrupalContext implements SnippetAcceptingContext
    * Checks that a 403 Access Denied error occurred.
    *
    * @Then I should get an access denied error
+   *
    * @throws \Behat\Mink\Exception\ExpectationException
    */
   public function assertAccessDenied() {
@@ -27,6 +28,7 @@ class FeatureContext extends RawDrupalContext implements SnippetAcceptingContext
    * Checks that a given image is present in the page.
    *
    * @Then I (should )see the image :filename
+   *
    * @throws \Behat\Mink\Exception\ElementNotFoundException
    */
   public function assertImagePresent($filename) {
@@ -43,6 +45,7 @@ class FeatureContext extends RawDrupalContext implements SnippetAcceptingContext
    * Checks that a given image is not present in the page.
    *
    * @Then I should not see the image :filename
+   *
    * @throws \Behat\Mink\Exception\ExpectationException
    */
   public function assertImageNotPresent($filename) {
