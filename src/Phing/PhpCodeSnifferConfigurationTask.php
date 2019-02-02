@@ -103,6 +103,7 @@ class PhpCodeSnifferConfigurationTask extends Task {
 
     // Add the files to check.
     foreach ($this->files as $file) {
+      $file = str_replace('\\', '/', $file);
       $element = $document->createElement('file', $file);
       $root_element->appendChild($element);
     }
@@ -115,6 +116,7 @@ class PhpCodeSnifferConfigurationTask extends Task {
 
     // Add ignore patterns.
     foreach ($this->ignorePatterns as $pattern) {
+      $pattern = str_replace('\\', '/', $pattern);
       $element = $document->createElement('exclude-pattern', $pattern);
       $root_element->appendChild($element);
     }

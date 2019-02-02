@@ -112,10 +112,10 @@ phpcs.config = ${project.basedir}/phpcs.xml
 phpcs.standard = ${project.basedir}/phpcs-ruleset.xml.dist
 
 # Paths to check, delimited by semicolons.
-phpcs.files = ${website.modules.dir};${website.profiles.dir};${website.themes.dir}
+phpcs.files = ${website.modules.dir};${website.profiles.dir};${website.themes.dir};${project.basedir}/drush;${project.basedir}/src;${project.basedir}/tests
 
 # Paths to ignore, delimited by semicolons.
-phpcs.ignore = ${website.modules.dir}/contrib
+phpcs.ignore = ${website.modules.dir}/contrib;${website.profiles.dir}/contrib;${website.themes.dir}/contrib
 
 # The report format. For example 'full', 'summary', 'diff', 'xml', 'json'.
 phpcs.report = full
