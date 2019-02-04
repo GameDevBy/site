@@ -22,28 +22,25 @@
     </exec>
   </target>
 
-  <includepath classpath="src/Phing" />
+  <includepath classpath="src/Phing"/>
 
-  <echo msg="Loading Drush task." />
-  <taskdef name="drush" classname="\Phing\Drush\Task" />
+  <echo msg="Loading Drush task."/>
+  <taskdef name="drush" classname="\Phing\Drush\Task"/>
 
-  <echo msg="Loading PHP Codesniffer Configuration task." />
-  <taskdef name="phpcodesnifferconfiguration" classname="\DrupalProject\Phing\PhpCodeSnifferConfigurationTask" />
-
-  <echo msg="Loading PHPUnit Configuration task." />
-  <taskdef name="phpunitconfiguration" classname="\DrupalProject\Phing\PhpUnitConfigurationTask" />
+  <echo msg="Loading PHPUnit Configuration task."/>
+  <taskdef name="phpunitconfiguration" classname="\DrupalProject\Phing\PhpUnitConfigurationTask"/>
 
   <!-- Make the settings folder writable so that the installer can copy settings.php. -->
   <target name="writable-settings-folder">
-    <chmod mode="0755" failonerror="true" verbose="true" quiet="false" file="${website.settings.dir}" />
+    <chmod mode="0755" failonerror="true" verbose="true" quiet="false" file="${website.settings.dir}"/>
   </target>
 
   <!-- Make settings.php writable so that the installer can write to it. -->
   <target name="writable-settings-php">
     <if>
-      <available file="${website.settings.php}" type="file" property="website.settings.php.available" />
+      <available file="${website.settings.php}" type="file" property="website.settings.php.available"/>
       <then>
-        <chmod mode="0644" failonerror="false" verbose="true" quiet="false" file="${website.settings.php}" />
+        <chmod mode="0644" failonerror="false" verbose="true" quiet="false" file="${website.settings.php}"/>
       </then>
     </if>
   </target>
@@ -56,67 +53,38 @@
       root="${website.drupal.dir}"
       bin="${drush.bin}"
       verbose="${drush.verbose}">
-      <option name="db-url" value="${drupal.db.url}" />
-      <option name="site-name" value="${website.site.name}" />
-      <option name="account-name" value="${drupal.admin.username}" />
-      <option name="account-pass" value="${drupal.admin.password}" />
-      <option name="account-mail" value="${drupal.admin.email}" />
+      <option name="db-url" value="${drupal.db.url}"/>
+      <option name="site-name" value="${website.site.name}"/>
+      <option name="account-name" value="${drupal.admin.username}"/>
+      <option name="account-pass" value="${drupal.admin.password}"/>
+      <option name="account-mail" value="${drupal.admin.email}"/>
       <param>${website.profile.name}</param>
       <!-- Disable sending of e-mails during installation. -->
       <param>install_configure_form.update_status_module='array(FALSE,FALSE)'</param>
     </drush>
   </target>
 
-  <!-- Set up PHP CodeSniffer. -->
-  <target name="setup-php-codesniffer" description="Generate the configuration file for PHP CodeSniffer.">
-    <if>
-      <available file="${phpcs.config}" type="file" property="phpcs.config.available" />
-      <then>
-        <echo message="Deleting existing PHP Codesniffer default configuration file." />
-        <delete file="${phpcs.config}" failonerror="false" />
-      </then>
-    </if>
-    <if>
-      <available file="${phpcs.global.config}" type="file" property="phpcs.global.config.available" />
-      <then>
-        <echo message="Deleting existing PHP Codesniffer global configuration file." />
-        <delete file="${phpcs.global.config}" failonerror="false" />
-      </then>
-    </if>
-    <echo message="Generating PHP Codesniffer configuration files." />
-    <phpcodesnifferconfiguration
-      configFile="${phpcs.config}"
-      extensions="${phpcs.extensions}"
-      files="${phpcs.files}"
-      globalConfig="${phpcs.global.config}"
-      ignorePatterns="${phpcs.ignore}"
-      report="${phpcs.report}"
-      showProgress="${phpcs.progress}"
-      showSniffCodes="${phpcs.sniffcodes}"
-      standard="${phpcs.standard}" />
-  </target>
-
   <!-- Set up Behat. -->
   <target name="setup-behat" description="Generate the configuration file for Behat.">
     <if>
-      <available file="${behat.yml.path}" type="file" property="behat.yml.available" />
+      <available file="${behat.yml.path}" type="file" property="behat.yml.available"/>
       <then>
-        <echo message="Deleting existing behat.yml configuration file" />
-        <delete file="${behat.yml.path}" failonerror="false" />
+        <echo message="Deleting existing behat.yml configuration file"/>
+        <delete file="${behat.yml.path}" failonerror="false"/>
       </then>
     </if>
-    <echo message="Creating behat.yml configuration file" />
-    <loadfile property="behat.yml.content" file="${behat.yml.template}" />
-    <echo message="${behat.yml.content}" file="${behat.yml.path}" />
+    <echo message="Creating behat.yml configuration file"/>
+    <loadfile property="behat.yml.content" file="${behat.yml.template}"/>
+    <echo message="${behat.yml.content}" file="${behat.yml.path}"/>
   </target>
 
   <!-- Set up PHPUnit. -->
   <target name="setup-phpunit" description="Generate the configuration file for PHPUnit.">
     <if>
-      <available file="${phpunit.config}" type="file" property="phpunit.config.available" />
+      <available file="${phpunit.config}" type="file" property="phpunit.config.available"/>
       <then>
-        <echo message="Deleting existing PHPUnit configuration file." />
-        <delete file="${phpunit.config}" failonerror="false" />
+        <echo message="Deleting existing PHPUnit configuration file."/>
+        <delete file="${phpunit.config}" failonerror="false"/>
       </then>
     </if>
     <phpunitconfiguration
@@ -128,16 +96,16 @@
       baseUrl="${phpunit.base_url}"
       dbUrl="${phpunit.db_url}"
       browserTestOutputDirectory="${phpunit.browser_test_output_dir}"
-      browserTestOutputFile="${phpunit.browser_test_output_file}" />
+      browserTestOutputFile="${phpunit.browser_test_output_file}"/>
 
     <!-- Create the directory and file for browsertest output. -->
-    <mkdir dir="${phpunit.browser_test_output_dir}" />
-    <touch file="${phpunit.browser_test_output_file}" />
+    <mkdir dir="${phpunit.browser_test_output_dir}"/>
+    <touch file="${phpunit.browser_test_output_file}"/>
   </target>
 
   <!-- Create demo users. -->
   <target name="create-demo-users" description="Create demo users.">
-    <foreach list="${drupal.demo.users}" param="drupal.demo.user" target="create-demo-user" delimiter="," />
+    <foreach list="${drupal.demo.users}" param="drupal.demo.user" target="create-demo-user" delimiter=","/>
     <!-- Create a user with only "authenticated user" role assigned. -->
     <drush
       command="user-create"
@@ -145,8 +113,8 @@
       root="${website.drupal.dir}"
       bin="${drush.bin}"
       verbose="${drush.verbose}">
-      <option name="mail" value="user@example.com" />
-      <option name="password" value="user" />
+      <option name="mail" value="user@example.com"/>
+      <option name="password" value="user"/>
       <param>user</param>
     </drush>
   </target>
@@ -159,8 +127,8 @@
       root="${website.drupal.dir}"
       bin="${drush.bin}"
       verbose="${drush.verbose}">
-      <option name="mail" value="${drupal.demo.user}@example.com" />
-      <option name="password" value="${drupal.demo.user}" />
+      <option name="mail" value="${drupal.demo.user}@example.com"/>
+      <option name="password" value="${drupal.demo.user}"/>
       <param>${drupal.demo.user}</param>
     </drush>
     <drush
@@ -176,40 +144,40 @@
 
   <!-- Set up development configuration, including on-screen error logging and debugging options. -->
   <target name="enable-dev-settings">
-    <phingcall target="include-local-settings" />
+    <phingcall target="include-local-settings"/>
     <!-- Copy settings file containing development values, but preserve any existing local settings. -->
-    <copy file="${website.settings.local.php.example}" tofile="${website.settings.local.php}" overwrite="false" />
+    <copy file="${website.settings.local.php.example}" tofile="${website.settings.local.php}" overwrite="false"/>
   </target>
 
   <!-- Create an empty local settings file, if it doesn't exist yet. -->
   <target name="create-local-settings">
     <if>
       <not>
-        <available file="${website.settings.local.php}" type="file" property="website.settings.local.php.available" />
+        <available file="${website.settings.local.php}" type="file" property="website.settings.local.php.available"/>
       </not>
       <then>
-        <phingcall target="writable-settings-folder" />
+        <phingcall target="writable-settings-folder"/>
         <echo
           message="&lt;?php${line.separator}"
-          file="${website.settings.local.php}" />
+          file="${website.settings.local.php}"/>
       </then>
     </if>
   </target>
 
   <!-- Uncomment the inclusion of the local settings file in settings.php. -->
   <target name="include-local-settings">
-    <phingcall target="writable-settings-folder" />
-    <phingcall target="writable-settings-php" />
+    <phingcall target="writable-settings-folder"/>
+    <phingcall target="writable-settings-php"/>
     <reflexive>
       <fileset dir="${website.settings.dir}">
-        <include pattern="settings.php" />
+        <include pattern="settings.php"/>
       </fileset>
       <filterchain>
         <replaceregexp>
           <regexp
             pattern="^# (if \(file_exists\(\$app_root \. '\/' \. \$site_path \. '\/settings\.local\.php'\)\) \{\n)# (  include \$app_root \. '\/' \. \$site_path \. '\/settings\.local\.php';\n)# (\})"
             replace="\1\2\3"
-            modifiers="m" />
+            modifiers="m"/>
         </replaceregexp>
       </filterchain>
     </reflexive>
@@ -217,7 +185,7 @@
 
   <!-- Enable development modules. -->
   <target name="enable-dev-modules">
-    <foreach list="${drupal.modules.dev}" param="module" target="enable-module" delimiter=" " />
+    <foreach list="${drupal.modules.dev}" param="module" target="enable-module" delimiter=" "/>
   </target>
 
   <!-- Enable a module. -->
@@ -235,35 +203,35 @@
   <target name="redirect-outgoing-email">
     <reflexive>
       <fileset dir="${website.settings.dir}">
-        <include pattern="settings.local.php" />
+        <include pattern="settings.local.php"/>
       </fileset>
       <filterchain>
         <replaceregexp>
           <regexp
             pattern="(\n)?\$config\['system.mail'\]\['interface'\]\['default'\] = 'devel_mail_log';(\n)?"
-            replace="" />
+            replace=""/>
           <regexp
             pattern="(\n)?\$config\['mailsystem.settings'\]\['defaults'\]\['sender'\] = 'devel_mail_log';(\n)?"
             replace="${line.separator}"
-            modifiers="" />
+            modifiers=""/>
         </replaceregexp>
       </filterchain>
     </reflexive>
     <if>
-      <equals arg1="${drupal.redirect.email}" arg2="yes" />
+      <equals arg1="${drupal.redirect.email}" arg2="yes"/>
       <then>
         <phingcall target="enable-module">
-          <property name="module" value="devel" />
+          <property name="module" value="devel"/>
         </phingcall>
         <append
           destFile="${website.settings.local.php}"
-          text="${line.separator}$config['system.mail']['interface']['default'] = 'devel_mail_log';${line.separator}" />
+          text="${line.separator}$config['system.mail']['interface']['default'] = 'devel_mail_log';${line.separator}"/>
         <append
           destFile="${website.settings.local.php}"
-          text="$config['mailsystem.settings']['defaults']['sender'] = 'devel_mail_log';${line.separator}" />
+          text="$config['mailsystem.settings']['defaults']['sender'] = 'devel_mail_log';${line.separator}"/>
       </then>
       <else>
-        <echo message="Skipping redirection of outgoing e-mail. Set 'drupal.redirect.email = yes' to enable." />
+        <echo message="Skipping redirection of outgoing e-mail. Set 'drupal.redirect.email = yes' to enable."/>
       </else>
     </if>
   </target>
@@ -272,10 +240,10 @@
   <target name="create-services-yml">
     <if>
       <not>
-        <available file="${website.services.yml}" type="file" property="website.services.yml.available" />
+        <available file="${website.services.yml}" type="file" property="website.services.yml.available"/>
       </not>
       <then>
-        <copy file="${website.services.yml.default}" tofile="${website.services.yml}" />
+        <copy file="${website.services.yml.default}" tofile="${website.services.yml}"/>
       </then>
     </if>
   </target>
@@ -285,9 +253,9 @@
     name="writable-services-yml"
     depends="create-services-yml">
     <if>
-      <available file="${website.services.yml}" type="file" property="website.services.yml.available" />
+      <available file="${website.services.yml}" type="file" property="website.services.yml.available"/>
       <then>
-        <chmod mode="0644" failonerror="false" verbose="true" quiet="false" file="${website.services.yml}" />
+        <chmod mode="0644" failonerror="false" verbose="true" quiet="false" file="${website.services.yml}"/>
       </then>
     </if>
   </target>
@@ -295,16 +263,16 @@
   <target
     name="create-dev-env"
     description="Build a development environment."
-    depends="setup-behat, setup-php-codesniffer, setup-phpunit" />
+    depends="setup-behat, setup-phpunit"/>
 
   <target
     name="setup-dev"
     description="Set up 'development mode' for an installed website."
-    depends="enable-dev-settings, redirect-outgoing-email, enable-dev-modules" />
+    depends="enable-dev-settings, redirect-outgoing-email, enable-dev-modules"/>
 
   <target
     name="install-dev"
     description="Install the website and set up the development environment."
-    depends="create-dev-env, install, create-demo-users" />
+    depends="create-dev-env, install, create-demo-users"/>
 
 </project>

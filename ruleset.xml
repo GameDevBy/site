@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<ruleset name="PHPMD rule set"
+         xmlns="http://pmd.sf.net/ruleset/1.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://pmd.sf.net/ruleset/1.0.0 http://pmd.sf.net/ruleset_xml_schema.xsd"
+         xsi:noNamespaceSchemaLocation="http://pmd.sf.net/ruleset_xml_schema.xsd">
+    <description>PHPMD rule set</description>
+    
+    <!-- more info https://phpmd.org/documentation/creating-a-ruleset.html and https://phpmd.org/rules/index.html -->
+
+    <!-- Import Clean Code Rules https://phpmd.org/rules/cleancode.html -->
+    <rule ref="rulesets/cleancode.xml">
+      <exclude name="StaticAccess" />
+    </rule>
+
+    <!-- Import Unused Code Rules https://phpmd.org/rules/unusedcode.html -->
+    <rule ref="rulesets/unusedcode.xml" />
+
+    <!-- Import Code Size Rules https://phpmd.org/rules/codesize.html -->
+    <rule ref="rulesets/codesize.xml" />
+    
+    <!-- Import Controversial Rules https://phpmd.org/rules/controversial.html -->
+    <rule ref="rulesets/controversial.xml" />
+    
+    <!-- Import Design Rules https://phpmd.org/rules/design.html -->
+    <rule ref="rulesets/design.xml" />
+    
+    <!-- Import Naming Rules https://phpmd.org/rules/naming.html -->
+    <rule ref="rulesets/naming.xml">
+      <exclude name="LongVariable" />
+    </rule>
+
+    <rule ref="rulesets/naming.xml/LongVariable">
+      <properties>
+        <property name="maximum" value="30" />
+      </properties>
+    </rule>
+
+</ruleset>

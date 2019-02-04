@@ -22,7 +22,7 @@ class ScriptHandler {
    * @throws \Exception
    */
   public static function createRequiredFiles(Event $event): void {
-    $fs = new Filesystem();
+    $fileSystem = new Filesystem();
     $drupalFinder = new DrupalFinder();
     $drupalFinder->locateRoot(getcwd());
     $drupalRoot = $drupalFinder->getDrupalRoot();
@@ -35,15 +35,15 @@ class ScriptHandler {
 
     // Required for unit testing.
     foreach ($dirs as $dir) {
-      if (!$fs->exists($drupalRoot . '/' . $dir)) {
-        $fs->mkdir($drupalRoot . '/' . $dir);
-        $fs->touch($drupalRoot . '/' . $dir . '/.gitkeep');
+      if (!$fileSystem->exists($drupalRoot . '/' . $dir)) {
+        $fileSystem->mkdir($drupalRoot . '/' . $dir);
+        $fileSystem->touch($drupalRoot . '/' . $dir . '/.gitkeep');
       }
     }
 
     // Prepare the settings file for installation.
-    if (!$fs->exists($drupalRoot . '/sites/default/settings.php') and $fs->exists($drupalRoot . '/sites/default/default.settings.php')) {
-      $fs->copy($drupalRoot . '/sites/default/default.settings.php', $drupalRoot . '/sites/default/settings.php');
+    if (!$fileSystem->exists($drupalRoot . '/sites/default/settings.php') and $fileSystem->exists($drupalRoot . '/sites/default/default.settings.php')) {
+      $fileSystem->copy($drupalRoot . '/sites/default/default.settings.php', $drupalRoot . '/sites/default/settings.php');
       require_once $drupalRoot . '/core/includes/bootstrap.inc';
       require_once $drupalRoot . '/core/includes/install.inc';
       $settings['config_directories'] = [
@@ -53,25 +53,34 @@ class ScriptHandler {
         ],
       ];
       drupal_rewrite_settings($settings, $drupalRoot . '/sites/default/settings.php');
-      $fs->chmod($drupalRoot . '/sites/default/settings.php', 0666);
+      $fileSystem->chmod($drupalRoot . '/sites/default/settings.php', 0666);
       $event->getIO()->write('Create a sites/default/settings.php file with chmod 0666');
     }
 
     // Create the files directory with chmod 0777.
-    if (!$fs->exists($drupalRoot . '/sites/default/files')) {
+    if (!$fileSystem->exists($drupalRoot . '/sites/default/files')) {
       $oldMask = umask(0);
-      $fs->mkdir($drupalRoot . '/sites/default/files');
+      $fileSystem->mkdir($drupalRoot . '/sites/default/files');
       umask($oldMask);
       $event->getIO()->write('Create a sites/default/files directory with chmod 0777');
     }
 
     // Create the config/sync directory (with chmod 0777)
     // ref CONFIG_SYNC_DIRECTORY above.
-    if (!$fs->exists($drupalFinder->getComposerRoot() . '/config/sync')) {
+    if (!$fileSystem->exists($drupalFinder->getComposerRoot() . '/config/sync')) {
       $oldMask = umask(0);
-      $fs->mkdir($drupalFinder->getComposerRoot() . '/config/sync');
+      $fileSystem->mkdir($drupalFinder->getComposerRoot() . '/config/sync');
       umask($oldMask);
       $event->getIO()->write('Create a ../config/sync directory with chmod 0777');
+    }
+
+    $globalCodeSnifferConfigPath = $drupalFinder->getComposerRoot() . '/vendor/squizlabs/php_codesniffer/CodeSniffer.conf';
+    if (!$fileSystem->exists($globalCodeSnifferConfigPath)) {
+      $configFile = $drupalFinder->getComposerRoot() . '/phpcs.xml';
+      $configFile = str_replace('\\', '/', $configFile);
+      $globalConfig = '<?php' . PHP_EOL . '$phpCodeSnifferConfig=[\'default_standard\'=>\'' . $configFile . '\'];' . PHP_EOL;
+      $fileSystem->dumpFile($globalCodeSnifferConfigPath, $globalConfig);
+      $event->getIO()->write('Create a codesniffer global config file');
     }
   }
 
@@ -94,7 +103,7 @@ class ScriptHandler {
    */
   public static function checkComposerVersion(Event $event): void {
     $composer = $event->getComposer();
-    $io = $event->getIO();
+    $output = $event->getIO();
 
     $version = $composer::VERSION;
 
@@ -107,11 +116,12 @@ class ScriptHandler {
     // If Composer is installed through git we have no easy way to determine if
     // it is new enough, just display a warning.
     if ($version === '@package_version@' || $version === '@package_branch_alias_version@') {
-      $io->writeError('<warning>You are running a development version of Composer. If you experience problems, please update Composer to the latest stable version.</warning>');
+      $output->writeError('<warning>You are running a development version of Composer. If you experience problems, please update Composer to the latest stable version.</warning>');
     }
     elseif (Comparator::lessThan($version, '1.0.0')) {
-      $io->writeError('<error>Drupal-project requires Composer version 1.0.0 or higher. Please update your Composer before continuing</error>.');
-      exit(1);
+      $msg = '<error>Drupal-project requires Composer version 1.0.0 or higher. Please update your Composer before continuing</error>.';
+      $output->writeError($msg);
+      throw new \RuntimeException($msg);
     }
   }
 

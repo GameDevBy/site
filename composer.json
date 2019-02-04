@@ -45,6 +45,7 @@
         "roave/security-advisories": "dev-master",
         "webflo/drupal-core-require-dev": "^8.6",
         "phing/phing": "^2.16",
+        "phpmd/phpmd": "^2.6",
         "drupal/phingdrushtask": "dev-7.x-2.x",
         "drupal/drupal-extension": "^3.4",
         "drupal/devel": "1.*@dev",
@@ -80,8 +81,11 @@
             "DrupalProject\\composer\\ScriptHandler::createRequiredFiles",
             "@composer drupal:scaffold"
         ],
-        "drupal:upgrade": [
+        "drupal:update": [
             "@composer update drupal/core webflo/drupal-core-require-dev symfony/* --with-dependencies"
+        ],
+        "drupal:phpmd": [
+            "phpmd ./drush,./src,./tests,./web/themes,./web/profiles,./web/modules text ./ruleset.xml --exclude web/modules/contrib/*,web\\modules\\contrib\\*,web/themes/contrib/*,web\\themes\\contrib\\*,web/profiles/contrib/*,web\\profiles\\contrib\\*"
         ],
         "pre-install-cmd": [
             "@pre-cmd"

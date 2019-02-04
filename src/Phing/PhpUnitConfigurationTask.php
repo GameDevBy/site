@@ -98,24 +98,24 @@ class PhpUnitConfigurationTask extends Task {
     $this->setEnvironmentVariable('BROWSERTEST_OUTPUT_FILE', $this->browserTestOutputFile, $document);
 
     // Add a test suite for the Drupal project.
-    $test_suite = $document->createElement('testsuite');
-    $test_suite->setAttribute('name', $this->testSuiteName);
+    $testSuite = $document->createElement('testsuite');
+    $testSuite->setAttribute('name', $this->testSuiteName);
 
     // Append the list of test files.
     foreach ($this->files as $file) {
       $element = $document->createElement('file', $file);
-      $test_suite->appendChild($element);
+      $testSuite->appendChild($element);
     }
 
     // Append the list of test directories.
     foreach ($this->directories as $directory) {
       $element = $document->createElement('directory', $directory);
-      $test_suite->appendChild($element);
+      $testSuite->appendChild($element);
     }
 
     // Insert the test suite in the list of test suites.
-    $test_suites = $document->getElementsByTagName('testsuites')->item(0);
-    $test_suites->appendChild($test_suite);
+    $testSuites = $document->getElementsByTagName('testsuites')->item(0);
+    $testSuites->appendChild($testSuite);
 
     // Save the file.
     file_put_contents($this->configFile, $document->saveXML());
@@ -148,10 +148,10 @@ class PhpUnitConfigurationTask extends Task {
    *   Thrown when a required property is not present.
    */
   protected function checkRequirements(): void {
-    $required_properties = ['configFile', 'distFile'];
-    foreach ($required_properties as $required_property) {
-      if (empty($this->$required_property)) {
-        throw new \BuildException("Missing required property '$required_property'.");
+    $requiredProperties = ['configFile', 'distFile'];
+    foreach ($requiredProperties as $requiredProperty) {
+      if (empty($this->$requiredProperty)) {
+        throw new \BuildException("Missing required property '$requiredProperty'.");
       }
     }
   }
@@ -241,21 +241,21 @@ class PhpUnitConfigurationTask extends Task {
   /**
    * Sets the path to the browser test output directory.
    *
-   * @param string $browserTestOutputDirectory
+   * @param string $outputDirectory
    *   The path to the directory.
    */
-  public function setBrowserTestOutputDirectory($browserTestOutputDirectory): void {
-    $this->browserTestOutputDirectory = $browserTestOutputDirectory;
+  public function setBrowserTestOutputDirectory($outputDirectory): void {
+    $this->browserTestOutputDirectory = $outputDirectory;
   }
 
   /**
    * Sets the path to the browser test output file.
    *
-   * @param string $browserTestOutputFile
+   * @param string $outputFile
    *   The path to the file.
    */
-  public function setBrowserTestOutputFile($browserTestOutputFile): void {
-    $this->browserTestOutputFile = $browserTestOutputFile;
+  public function setBrowserTestOutputFile($outputFile): void {
+    $this->browserTestOutputFile = $outputFile;
   }
 
 }

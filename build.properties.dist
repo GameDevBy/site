@@ -79,7 +79,7 @@ behat.yml.path = ${behat.dir}/behat.yml
 behat.base_url = ${drupal.base_url}
 
 # The browser to use for testing, either 'firefox' or 'chrome'.
-behat.browser_name = chrome
+behat.browser_name = firefox
 
 # The port of the webdriver host (e.g. Selenium or PhantomJS).
 behat.webdriver_port = 4444
@@ -95,39 +95,6 @@ behat.formatter.name = progress
 
 # The location of the test files.
 behat.files.path = ${behat.dir}/fixtures/files
-
-
-# PHP CodeSniffer configuration
-# -----------------------------
-
-# The file extensions to test.
-phpcs.extensions = php inc module install info test profile theme css js
-
-# The default configuration file to generate.
-phpcs.config = ${project.basedir}/phpcs.xml
-
-# The coding standard to use. If you want to customize the rules, make a copy of
-# the file and name it 'phpcs-ruleset.xml'. Then copy this property to your
-# build.properties file and remove the '.dist' suffix.
-phpcs.standard = ${project.basedir}/phpcs-ruleset.xml.dist
-
-# Paths to check, delimited by semicolons.
-phpcs.files = ${website.modules.dir};${website.profiles.dir};${website.themes.dir};${project.basedir}/drush;${project.basedir}/src;${project.basedir}/tests
-
-# Paths to ignore, delimited by semicolons.
-phpcs.ignore = ${website.modules.dir}/contrib;${website.profiles.dir}/contrib;${website.themes.dir}/contrib
-
-# The report format. For example 'full', 'summary', 'diff', 'xml', 'json'.
-phpcs.report = full
-
-# Whether or not to show sniff codes in the report.
-phpcs.sniffcodes = 0
-
-# Whether or not to show the progress of the run.
-phpcs.progress = 1
-
-# The location of the file containing the global configuration options.
-phpcs.global.config = ${project.basedir}/vendor/squizlabs/php_codesniffer/CodeSniffer.conf
 
 
 # PHPUnit configuration
