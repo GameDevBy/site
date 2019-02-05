@@ -273,6 +273,6 @@
   <target
     name="install-dev"
     description="Install the website and set up the development environment."
-    depends="create-dev-env, install, create-demo-users"/>
+    depends="install, create-demo-users"/>
 
 </project>

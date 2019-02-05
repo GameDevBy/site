@@ -32,7 +32,6 @@
 # Ignore environment specific settings
 /build.local.xml
 /build.properties.local
-/phpcs.xml
 /tests/behat.yml
 /web/phpunit.xml
 /web/sites/default/services.yml

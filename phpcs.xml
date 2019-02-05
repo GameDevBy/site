@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!-- PHP_CodeSniffer standard for Drupal projects. -->
+<!-- See http://pear.php.net/manual/en/package.php.php-codesniffer.annotated-ruleset.php -->
+<ruleset name="Drupal Project">
+    <description>Drupal coding standard</description>
+
+    <!-- Exclude unsupported file types. -->
+    <exclude-pattern>*.gif</exclude-pattern>
+    <exclude-pattern>*.less</exclude-pattern>
+    <exclude-pattern>*.png</exclude-pattern>
+
+    <!-- Minified files don't have to comply with coding standards. -->
+    <exclude-pattern>*.min.css</exclude-pattern>
+    <exclude-pattern>*.min.js</exclude-pattern>
+
+    <rule ref="./vendor/drupal/coder/coder_sniffer/Drupal" />
+
+  <file>./web/modules</file>
+  <file>./web/profiles</file>
+  <file>./web/themes</file>
+  <file>./drush</file>
+  <file>./src</file>
+  <file>./tests</file>
+  <arg name="extensions" value="php,inc,module,install,info,test,profile,theme,css,js,txt,md,xml,feature,yml,dist,bat,json"/>
+  <exclude-pattern>./web/modules/contrib</exclude-pattern>
+  <exclude-pattern>./web/profiles/contrib</exclude-pattern>
+  <exclude-pattern>./web/themes/contrib</exclude-pattern>
+  <arg name="report" value="full"/>
+  <arg value="p"/>
+
+</ruleset>
