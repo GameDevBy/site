@@ -36,6 +36,7 @@
 /web/phpunit.xml
 /web/sites/default/services.yml
 /init_env.bat
+/node_modules/
 
 
 # Ignore drupal auto-download files

@@ -85,6 +85,42 @@ class ScriptHandler {
   }
 
   /**
+   * Run nmp install
+   *
+   * @param \Composer\Script\Event $event
+   *   Event.
+   *
+   * @throws \Exception
+   */
+  public static function npmInstall(Event $event): void {
+    $devMode = $event->isDevMode();
+
+    $fileSystem = new Filesystem();
+    $drupalFinder = new DrupalFinder();
+    $drupalFinder->locateRoot(getcwd());
+
+    $npmPath = $drupalFinder->getComposerRoot() . '/vendor/bin/npm';
+    if (stripos(PHP_OS, 'WIN') === 0) {
+      $npmPath .= '.bat';
+    }
+    $npmPath = str_replace('\\', '/', $npmPath);
+    if ($fileSystem->exists($npmPath)) {
+      $event->getIO()->write('NPM find by: ' . $npmPath);
+      if ($devMode) {
+        $event->getIO()->write('Call npm install (with dev dependencies)');
+        shell_exec('npm install');
+      }
+      else {
+        $event->getIO()->write('Call npm install (without dev dependencies)');
+        shell_exec('npm install --only=prod');
+      }
+    }
+    else {
+      $event->getIO()->write('Do nothing.');
+    }
+  }
+
+  /**
    * Checks if the installed version of Composer is compatible.
    *
    * Composer 1.0.0 and higher consider a `composer install` without having a

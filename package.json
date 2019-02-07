@@ -1,0 +1,36 @@
+{
+  "name": "gamedevby-site",
+  "description": "Site for GameDev.by",
+  "type": "project",
+  "license": "GPL-2.0-or-later",
+  "version": "0.0.1",
+  "author": {
+    "name": "GameDev.by",
+    "web": "https://gamedev.by",
+    "email": "admin@gamedev.by"
+  },
+  "keywords": [
+    "gamedev"
+  ],
+  "homepage": "https://gamedev.by",
+  "dependencies": {},
+  "engines": {},
+  "bugs": {
+    "url": "https://github.com/GameDevBy/site/issues",
+    "email": "admin@gamedev.by"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GameDevBy/site.git"
+  },
+  "contributors": [
+    {
+      "name": "GameDev.by",
+      "url": "https://gamedev.by",
+      "email": "admin@gamedev.by"
+    }
+  ],
+  "devDependencies": {
+    "eslint": "^5.13.0"
+  }
+}

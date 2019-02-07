@@ -14,18 +14,22 @@
     <exclude-pattern>*.min.js</exclude-pattern>
 
     <rule ref="./vendor/drupal/coder/coder_sniffer/Drupal" />
+    <rule ref="./vendor/drupal/coder/coder_sniffer/DrupalPractice" />
 
-  <file>./web/modules</file>
-  <file>./web/profiles</file>
-  <file>./web/themes</file>
-  <file>./drush</file>
-  <file>./src</file>
-  <file>./tests</file>
-  <arg name="extensions" value="php,inc,module,install,info,test,profile,theme,css,js,txt,md,xml,feature,yml,dist,bat,json"/>
-  <exclude-pattern>./web/modules/contrib</exclude-pattern>
-  <exclude-pattern>./web/profiles/contrib</exclude-pattern>
-  <exclude-pattern>./web/themes/contrib</exclude-pattern>
-  <arg name="report" value="full"/>
-  <arg value="p"/>
+    <file>./web/modules</file>
+    <file>./web/profiles</file>
+    <file>./web/themes</file>
+    <file>./drush</file>
+    <file>./src</file>
+    <file>./tests</file>
+    
+    <arg name="extensions" value="php,inc,module,install,info,test,profile,theme,css,js,txt,md,xml,feature,yml,dist,bat,json"/>
+    
+    <exclude-pattern>./web/modules/contrib</exclude-pattern>
+    <exclude-pattern>./web/profiles/contrib</exclude-pattern>
+    <exclude-pattern>./web/themes/contrib</exclude-pattern>
+    
+    <arg name="report" value="full"/>
+    <arg value="p"/>
 
 </ruleset>

@@ -101,7 +101,7 @@ install:
   - composer drupal:phpmd --no-interaction --ansi --verbose
 
   # Install site
-  - ./vendor/bin/phing install-dev
+  # - ./vendor/bin/phing install-dev
 
   # Start a web server on port 8888 in the background.
   #- cd $TRAVIS_BUILD_DIR/web
