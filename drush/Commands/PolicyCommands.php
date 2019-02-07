@@ -6,35 +6,43 @@ use Consolidation\AnnotatedCommand\CommandData;
 
 /**
  * Edit this file to reflect your organization's needs.
+ *
+ * @noinspection PhpUndefinedClassInspection
  */
 class PolicyCommands extends DrushCommands {
 
   /**
-   * Prevent catastrophic braino.
+   * Prevent catastrophic braino when syncing databases.
    *
    * This file has to be local to the machine
    * that initiates the sql:sync command.
+   *
+   * @param \Consolidation\AnnotatedCommand\CommandData $commandData
+   *   Command data.
    *
    * @hook validate sql:sync
    *
    * @throws \Exception
    */
-  public function sqlSyncValidate(CommandData $commandData) {
+  public function sqlSyncValidate(CommandData $commandData): void {
     if ($commandData->input()->getArgument('target') === '@prod') {
-      throw new \Exception(dt('Per !file, you may never overwrite the production database.', ['!file' => __FILE__]));
+      throw new \RuntimeException(dt('Per !file, you may never overwrite the production database.', ['!file' => __FILE__]));
     }
   }
 
   /**
    * Limit rsync operations to production site.
    *
+   * @param \Consolidation\AnnotatedCommand\CommandData $commandData
+   *   Command data.
+   *
    * @hook validate core:rsync
    *
    * @throws \Exception
    */
-  public function rsyncValidate(CommandData $commandData) {
-    if (preg_match("/^@prod/", $commandData->input()->getArgument('target'))) {
-      throw new \Exception(dt('Per !file, you may never rsync to the production site.', ['!file' => __FILE__]));
+  public function rsyncValidate(CommandData $commandData): void {
+    if (preg_match('/^@prod/', $commandData->input()->getArgument('target'))) {
+      throw new \RuntimeException(dt('Per !file, you may never rsync to the production site.', ['!file' => __FILE__]));
     }
   }
 
