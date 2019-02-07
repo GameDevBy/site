@@ -30,6 +30,6 @@
     <exclude-pattern>./web/themes/contrib</exclude-pattern>
     
     <arg name="report" value="full"/>
-    <arg value="p"/>
+    <arg name="cache" value=".phpcscache" />
 
 </ruleset>

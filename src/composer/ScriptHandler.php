@@ -135,18 +135,6 @@ class ScriptHandler {
   }
 
   /**
-   * Run Phpcs check.
-   */
-  public static function runPhpcsCheck(): void {
-    if (stripos(PHP_OS, 'WIN') === 0) {
-      shell_exec('phpcs');
-      return;
-    }
-
-    shell_exec('phpcs --colors');
-  }
-
-  /**
    * Run nmp install.
    *
    * @param \Composer\Script\Event $event

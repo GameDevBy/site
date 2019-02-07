@@ -39,7 +39,13 @@
 /init_env
 /init_env.bat
 /node_modules/
-.eslintcache
+
+
+# Ignore checker caches
+/.eslintcache
+/.stylelintcache
+/.phpcscache
+
 
 # Ignore drupal auto-download files
 

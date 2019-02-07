@@ -85,14 +85,38 @@
         "drupal:update": [
             "@composer update drupal/core webflo/drupal-core-require-dev symfony/* --with-dependencies"
         ],
-        "drupal:phpmd": [
+        "drupal:check-phpmd": [
             "phpmd ./drush,./src,./tests,./web/themes,./web/profiles,./web/modules text ./ruleset.xml --exclude web/modules/contrib/*,web\\modules\\contrib\\*,web/themes/contrib/*,web\\themes\\contrib\\*,web/profiles/contrib/*,web\\profiles\\contrib\\*"
         ],
-        "drupal:phpcs": [
-            "DrupalProject\\composer\\ScriptHandler::runPhpcsCheck"
+        "drupal:check-phpcs": [
+            "phpcs"
         ],
-        "drupal:eslint": [
+        "drupal:check-eslint": [
             "eslint --cache -c ./web/core/.eslintrc.json ."
+        ],
+        "drupal:fix-eslint": [
+            "eslint --cache -c ./web/core/.eslintrc.json --fix ."
+        ],
+        "drupal:check-stylelint": [
+            "stylelint --cache --config ./web/core/.stylelintrc.json \"**/*.css\" \"**/*.scss\" \"**/*.sass\"  \"**/*.less\" \"**/*.sss\""
+        ],
+        "drupal:fix-stylelint": [
+            "stylelint --cache --config ./web/core/.stylelintrc.json --fix \"**/*.css\" \"**/*.scss\" \"**/*.sass\"  \"**/*.less\" \"**/*.sss\""
+        ],
+        "drupal:fix-phpcs": [
+            "phpcbf"
+        ],
+        "drupal:check": [
+            "pjv -w -r",
+            "@drupal:check-phpcs",
+            "@drupal:check-phpmd",
+            "@drupal:check-eslint",
+            "@drupal:check-stylelint"
+        ],
+        "drupal:fix": [
+            "@drupal:fix-phpcs",
+            "@drupal:fix-eslint",
+            "@drupal:fix-stylelint"
         ],
         "pre-install-cmd": [
             "@pre-cmd"
@@ -107,12 +131,6 @@
         "post-update-cmd": [
             "@post-cmd",
             "npm update --no-progress"
-        ],
-        "drupal:check": [
-            "pjv -w -r",
-            "@drupal:phpcs",
-            "@drupal:phpmd",
-            "@drupal:eslint"
         ]
     },
     "extra": {

@@ -1,0 +1,14 @@
+.git/**/*
+.idea/**/*
+node_modules/**/*
+vendor/**/*
+web/core/**/*
+web/libraries/**/*
+web/sites/**/files/**/*
+web/sites/**/libraries/**/*
+web/profiles/**/libraries/**/*
+web/modules/contrib/**/*
+web/themes/contrib/**/*
+web/profiles/contrib/**/*
+**/js_test_files/**/*
+**/node_modules/**/*
