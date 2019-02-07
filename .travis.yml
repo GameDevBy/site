@@ -89,6 +89,9 @@ install:
   - composer --verbose --prefer-dist --no-progress --no-interaction --ansi --classmap-authoritative install
   - composer licenses --no-interaction --ansi --verbose
 
+  # Export environment settings
+  - init_env
+
   # Check npm
   - npm audit
 

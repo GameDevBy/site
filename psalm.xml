@@ -1,4 +1,7 @@
 <?xml version="1.0"?>
+
+<!-- Read for more https://getpsalm.org/docs/configuration/ -->
+
 <psalm
     totallyTyped="false"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
