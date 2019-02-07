@@ -6,6 +6,7 @@ use Composer\Script\Event;
 use Composer\Semver\Comparator;
 use DrupalFinder\DrupalFinder;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Process\PhpExecutableFinder;
 use Webmozart\PathUtil\Path;
 
 /**
@@ -42,9 +43,11 @@ class ScriptHandler {
     }
 
     // Prepare the settings file for installation.
-    if (!$fileSystem->exists($drupalRoot . '/sites/default/settings.php') and $fileSystem->exists($drupalRoot . '/sites/default/default.settings.php')) {
+    if (!$fileSystem->exists($drupalRoot . '/sites/default/settings.php') && $fileSystem->exists($drupalRoot . '/sites/default/default.settings.php')) {
       $fileSystem->copy($drupalRoot . '/sites/default/default.settings.php', $drupalRoot . '/sites/default/settings.php');
+      /* @noinspection PhpIncludeInspection */
       require_once $drupalRoot . '/core/includes/bootstrap.inc';
+      /* @noinspection PhpIncludeInspection */
       require_once $drupalRoot . '/core/includes/install.inc';
       $settings['config_directories'] = [
         CONFIG_SYNC_DIRECTORY => (object) [
@@ -82,15 +85,72 @@ class ScriptHandler {
       $fileSystem->dumpFile($globalCodeSnifferConfigPath, $globalConfig);
       $event->getIO()->write('Create a codesniffer global config file');
     }
+
+    self::createInitEnvFile($fileSystem, $drupalFinder, $event);
   }
 
   /**
-   * Run nmp install
+   * Create init environment file.
+   *
+   * @param \Symfony\Component\Filesystem\Filesystem $fileSystem
+   *   File system.
+   * @param \DrupalFinder\DrupalFinder $drupalFinder
+   *   Drupal finder.
+   * @param \Composer\Script\Event $event
+   *   Event.
+   */
+  private static function createInitEnvFile(Filesystem $fileSystem, DrupalFinder $drupalFinder, Event $event): void {
+    $initEnvPath = $drupalFinder->getComposerRoot() . '/init_env';
+    $initEnvPath = str_replace('\\', '/', $initEnvPath);
+    $isWindows = (stripos(PHP_OS, 'WIN') === 0);
+    if ($isWindows) {
+      $initEnvPath .= '.bat';
+    }
+    if (!$fileSystem->exists($initEnvPath)) {
+      return;
+    }
+
+    if (!($phpPath = (new PhpExecutableFinder())->find())) {
+      throw new \RuntimeException('The php executable could not be found, add it to your PATH environment variable and try again');
+    }
+    $phpPath = dirname($phpPath);
+
+    $initEnvContent = $isWindows ?
+      'set PATH='
+        . $drupalFinder->getComposerRoot() . '\vendor\bin;'
+        . $drupalFinder->getComposerRoot() . '\node_modules\.bin;'
+        . $phpPath . ';%PATH%' . PHP_EOL :
+      'export PATH="'
+        . $drupalFinder->getComposerRoot() . '/vendor/bin:'
+        . $drupalFinder->getComposerRoot() . '/node_modules/.bin:'
+        . $phpPath . '$PATH"' . PHP_EOL;
+
+    $fileSystem->dumpFile($initEnvPath, $initEnvContent);
+
+    if (!$isWindows) {
+      chmod($initEnvPath, 755);
+    }
+
+    $event->getIO()->write('Create init environment file');
+  }
+
+  /**
+   * Run Phpcs check.
+   */
+  public static function runPhpcsCheck(): void {
+    if (stripos(PHP_OS, 'WIN') === 0) {
+      shell_exec('phpcs');
+      return;
+    }
+
+    shell_exec('phpcs --colors');
+  }
+
+  /**
+   * Run nmp install.
    *
    * @param \Composer\Script\Event $event
    *   Event.
-   *
-   * @throws \Exception
    */
   public static function npmInstall(Event $event): void {
     $devMode = $event->isDevMode();
@@ -104,20 +164,20 @@ class ScriptHandler {
       $npmPath .= '.bat';
     }
     $npmPath = str_replace('\\', '/', $npmPath);
-    if ($fileSystem->exists($npmPath)) {
-      $event->getIO()->write('NPM find by: ' . $npmPath);
-      if ($devMode) {
-        $event->getIO()->write('Call npm install (with dev dependencies)');
-        shell_exec('npm install');
-      }
-      else {
-        $event->getIO()->write('Call npm install (without dev dependencies)');
-        shell_exec('npm install --only=prod');
-      }
-    }
-    else {
+    if (!$fileSystem->exists($npmPath)) {
       $event->getIO()->write('Do nothing.');
+      return;
     }
+
+    $event->getIO()->write('NPM find by: ' . $npmPath);
+    if ($devMode) {
+      $event->getIO()->write('Call npm install (with dev dependencies)');
+      shell_exec('npm install --no-progress');
+      return;
+    }
+
+    $event->getIO()->write('Call npm install (without dev dependencies)');
+    shell_exec('npm install --only=prod --no-progress');
   }
 
   /**
@@ -153,8 +213,10 @@ class ScriptHandler {
     // it is new enough, just display a warning.
     if ($version === '@package_version@' || $version === '@package_branch_alias_version@') {
       $output->writeError('<warning>You are running a development version of Composer. If you experience problems, please update Composer to the latest stable version.</warning>');
+      return;
     }
-    elseif (Comparator::lessThan($version, '1.0.0')) {
+
+    if (Comparator::lessThan($version, '1.0.0')) {
       $msg = '<error>Drupal-project requires Composer version 1.0.0 or higher. Please update your Composer before continuing</error>.';
       $output->writeError($msg);
       throw new \RuntimeException($msg);

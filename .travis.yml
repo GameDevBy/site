@@ -88,17 +88,19 @@ install:
   # Install Composer dependencies
   - composer --verbose --prefer-dist --no-progress --no-interaction --ansi --classmap-authoritative install
   - composer licenses --no-interaction --ansi --verbose
-  
-  # Define build properties for the local test environment
-  - echo -e "drupal.base_url = http://localhost:8888\n" > build.properties.local
 
-  # Create development environment
-  - ./vendor/bin/phing -diagnostics
-  - ./vendor/bin/phing -verbose create-dev-env
+  # Check npm
+  - npm audit
 
   # Check code style
-  - ./vendor/bin/phpcs --colors
-  - composer drupal:phpmd --no-interaction --ansi --verbose
+  - composer drupal:check --no-interaction --ansi --verbose
+
+  # Define build properties for the local test environment
+  # - echo -e "drupal.base_url = http://localhost:8888\n" > build.properties.local
+
+  # Create development environment
+  # - ./vendor/bin/phing -diagnostics
+  # - ./vendor/bin/phing -verbose create-dev-env
 
   # Install site
   # - ./vendor/bin/phing install-dev

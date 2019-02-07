@@ -88,6 +88,12 @@
         "drupal:phpmd": [
             "phpmd ./drush,./src,./tests,./web/themes,./web/profiles,./web/modules text ./ruleset.xml --exclude web/modules/contrib/*,web\\modules\\contrib\\*,web/themes/contrib/*,web\\themes\\contrib\\*,web/profiles/contrib/*,web\\profiles\\contrib\\*"
         ],
+        "drupal:phpcs": [
+            "DrupalProject\\composer\\ScriptHandler::runPhpcsCheck"
+        ],
+        "drupal:eslint": [
+            "eslint --cache -c ./web/core/.eslintrc.json ."
+        ],
         "pre-install-cmd": [
             "@pre-cmd"
         ],
@@ -100,7 +106,13 @@
         ],
         "post-update-cmd": [
             "@post-cmd",
-            "npm update"
+            "npm update --no-progress"
+        ],
+        "drupal:check": [
+            "pjv -w -r",
+            "@drupal:phpcs",
+            "@drupal:phpmd",
+            "@drupal:eslint"
         ]
     },
     "extra": {

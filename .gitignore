@@ -6,6 +6,7 @@
 /web/themes/contrib/
 /web/profiles/contrib/
 /web/libraries/
+/config/
 
 
 # Ignore sensitive information
@@ -35,9 +36,10 @@
 /tests/behat.yml
 /web/phpunit.xml
 /web/sites/default/services.yml
+/init_env
 /init_env.bat
 /node_modules/
-
+.eslintcache
 
 # Ignore drupal auto-download files
 
