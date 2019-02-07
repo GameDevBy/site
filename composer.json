@@ -106,12 +106,20 @@
         "drupal:fix-phpcs": [
             "phpcbf"
         ],
+        "drupal:check-json": [
+            "DrupalProject\\composer\\ScriptHandler::runJsonLint"
+        ],
+        "drupal:check-yml": [
+            "yamllint \"./**/*.yaml\" \"./**/*.yml\""
+        ],
         "drupal:check": [
             "pjv -w -r",
             "@drupal:check-phpcs",
             "@drupal:check-phpmd",
             "@drupal:check-eslint",
-            "@drupal:check-stylelint"
+            "@drupal:check-stylelint",
+            "@drupal:check-json",
+            "@drupal:check-yml"
         ],
         "drupal:fix": [
             "@drupal:fix-phpcs",

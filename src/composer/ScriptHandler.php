@@ -6,6 +6,7 @@ use Composer\Script\Event;
 use Composer\Semver\Comparator;
 use DrupalFinder\DrupalFinder;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Webmozart\PathUtil\Path;
 
@@ -132,6 +133,32 @@ class ScriptHandler {
     }
 
     $event->getIO()->write('Create init environment file');
+  }
+
+  /**
+   * Run check with json lint.
+   *
+   * @see https://www.npmjs.com/package/jsonlint
+   */
+  public static function runJsonLint(): void {
+    $drupalFinder = new DrupalFinder();
+    $drupalFinder->locateRoot(getcwd());
+    $finder = new Finder();
+    $finder->files()
+      ->in($drupalFinder->getComposerRoot())
+      ->exclude('.git')
+      ->exclude('.idea')
+      ->exclude('node_modules')
+      ->exclude('vendor')
+      ->exclude('web/core/modules/system/tests/fixtures/HtaccessTest')
+      // ->exclude('web/core')
+      // ->exclude('web/modules/contrib')
+      // ->exclude('web/themes/contrib')
+      // ->exclude('web/profiles/contrib')
+      ->name('*.json');
+    foreach ($finder as $file) {
+      shell_exec('jsonlint ' . $file->getRealPath());
+    }
   }
 
   /**

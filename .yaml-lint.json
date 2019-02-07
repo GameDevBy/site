@@ -1,0 +1,10 @@
+{
+  "schema": "DEFAULT_SAFE_SCHEMA",
+  "ignore": [
+        ".git/**/*",
+        ".idea/**/*",
+        "node_modules/**/*",
+        "vendor/**/*",
+        "web/core/tests/Drupal/Tests/Core/Asset/library_test_files/invalid_file.libraries.yml"
+   ]
+}
