@@ -22,6 +22,9 @@ class ScriptHandler {
    *   Event.
    *
    * @throws \Exception
+   *
+   * @psalm-suppress UnresolvableInclude
+   * @psalm-suppress UndefinedConstant
    */
   public static function createRequiredFiles(Event $event): void {
     $fileSystem = new Filesystem();
@@ -157,7 +160,7 @@ class ScriptHandler {
       // ->exclude('web/profiles/contrib')
       ->name('*.json');
     foreach ($finder as $file) {
-      shell_exec('jsonlint ' . $file->getRealPath());
+      exec('jsonlint ' . $file->getRealPath());
     }
   }
 
@@ -187,12 +190,12 @@ class ScriptHandler {
     $event->getIO()->write('NPM find by: ' . $npmPath);
     if ($devMode) {
       $event->getIO()->write('Call npm install (with dev dependencies)');
-      shell_exec('npm install --no-progress');
+      exec('npm install --no-progress');
       return;
     }
 
     $event->getIO()->write('Call npm install (without dev dependencies)');
-    shell_exec('npm install --only=prod --no-progress');
+    exec('npm install --only=prod --no-progress');
   }
 
   /**

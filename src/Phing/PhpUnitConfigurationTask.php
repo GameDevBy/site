@@ -115,6 +115,7 @@ class PhpUnitConfigurationTask extends Task {
 
     // Insert the test suite in the list of test suites.
     $testSuites = $document->getElementsByTagName('testsuites')->item(0);
+    assert($testSuites !== NULL);
     $testSuites->appendChild($testSuite);
 
     // Save the file.

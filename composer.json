@@ -42,16 +42,17 @@
     },
     "require-dev": {
         "composer/composer": "^1.8",
-        "roave/security-advisories": "dev-master",
-        "webflo/drupal-core-require-dev": "^8.6",
+        "drupal/config_update": "^1.6",
+        "drupal/devel": "1.*@dev",
+        "drupal/drupal-extension": "^3.4",
+        "drupal/phingdrushtask": "dev-7.x-2.x",
+        "mouf/nodejs-installer": "^1.0",
         "phing/phing": "^2.16",
         "phpmd/phpmd": "^2.6",
-        "drupal/phingdrushtask": "dev-7.x-2.x",
-        "drupal/drupal-extension": "^3.4",
-        "drupal/devel": "1.*@dev",
-        "drupal/config_update": "^1.6",
-        "mouf/nodejs-installer": "^1.0",
-        "sclable/xml-lint": "^0.2.4"
+        "roave/security-advisories": "dev-master",
+        "sclable/xml-lint": "^0.2.4",
+        "vimeo/psalm": "^3.0",
+        "webflo/drupal-core-require-dev": "^8.6"
     },
     "conflict": {
         "drupal/drupal": "*"
@@ -116,6 +117,9 @@
         "drupal:check-xml": [
             "xmllint -e vendor ."
         ],
+        "drupal:check-psalm": [
+            "psalm --diff --diff-methods"
+        ],
         "drupal:check": [
             "pjv -w -r",
             "@drupal:check-phpcs",
@@ -124,7 +128,8 @@
             "@drupal:check-stylelint",
             "@drupal:check-json",
             "@drupal:check-yml",
-            "@drupal:check-xml"
+            "@drupal:check-xml",
+            "@drupal:check-psalm"
         ],
         "drupal:fix": [
             "@drupal:fix-phpcs",
