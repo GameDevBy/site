@@ -50,7 +50,8 @@
         "drupal/drupal-extension": "^3.4",
         "drupal/devel": "1.*@dev",
         "drupal/config_update": "^1.6",
-        "mouf/nodejs-installer": "^1.0"
+        "mouf/nodejs-installer": "^1.0",
+        "sclable/xml-lint": "^0.2.4"
     },
     "conflict": {
         "drupal/drupal": "*"
@@ -112,6 +113,9 @@
         "drupal:check-yml": [
             "yamllint \"./**/*.yaml\" \"./**/*.yml\""
         ],
+        "drupal:check-xml": [
+            "xmllint -e vendor ."
+        ],
         "drupal:check": [
             "pjv -w -r",
             "@drupal:check-phpcs",
@@ -119,7 +123,8 @@
             "@drupal:check-eslint",
             "@drupal:check-stylelint",
             "@drupal:check-json",
-            "@drupal:check-yml"
+            "@drupal:check-yml",
+            "@drupal:check-xml"
         ],
         "drupal:fix": [
             "@drupal:fix-phpcs",
@@ -163,7 +168,8 @@
             "web/themes/contrib/{$name}": ["type:drupal-theme"],
             "drush/Commands/{$name}": ["type:drupal-drush"],
             "web/modules/custom/{$name}": ["type:drupal-custom-module"],
-            "web/themes/custom/{$name}": ["type:drupal-custom-theme"]
+            "web/themes/custom/{$name}": ["type:drupal-custom-theme"],
+            "web/profiles/custom/{$name}": ["type:drupal-custom-profile"]
         },
         "enable-patching": true,
         "drupal-scaffold": {

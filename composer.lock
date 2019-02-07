@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "da74a2ea23ca63a9b6d1cc755dbf4bbc",
+    "content-hash": "b43d3a4f0abad8b55060c93d85527f5c",
     "packages": [
         {
             "name": "alchemy/zippy",
@@ -3011,57 +3011,6 @@
             "time": "2018-12-04T20:46:45+00:00"
         },
         {
-            "name": "hirak/prestissimo",
-            "version": "0.3.8",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/hirak/prestissimo.git",
-                "reference": "7cc32689810e604f95f9eadb3c5074135aa872f1"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/hirak/prestissimo/zipball/7cc32689810e604f95f9eadb3c5074135aa872f1",
-                "reference": "7cc32689810e604f95f9eadb3c5074135aa872f1",
-                "shasum": ""
-            },
-            "require": {
-                "composer-plugin-api": "^1.0.0",
-                "ext-curl": "*",
-                "php": "^5.3.2 || ^7.0"
-            },
-            "require-dev": {
-                "composer/composer": "1.0.0",
-                "phpunit/phpunit": "^4.8",
-                "squizlabs/php_codesniffer": "^2.5"
-            },
-            "type": "composer-plugin",
-            "extra": {
-                "class": "Hirak\\Prestissimo\\Plugin"
-            },
-            "autoload": {
-                "psr-4": {
-                    "Hirak\\Prestissimo\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Hiraku NAKANO",
-                    "email": "hiraku@tojiru.net"
-                }
-            ],
-            "description": "composer parallel install plugin",
-            "keywords": [
-                "install",
-                "parallel",
-                "speedup"
-            ],
-            "time": "2018-08-21T22:35:06+00:00"
-        },
-        {
             "name": "jakub-onderka/php-console-color",
             "version": "v0.2",
             "source": {
@@ -3732,6 +3681,57 @@
             ],
             "description": "A polyfill for getallheaders.",
             "time": "2016-02-11T07:05:27+00:00"
+        },
+        {
+            "name": "sclable/xml-lint",
+            "version": "0.2.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/sclable/xml-lint.git",
+                "reference": "6a9e88dec4b3960f1afc3a9ab96d31be94d10b2f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/sclable/xml-lint/zipball/6a9e88dec4b3960f1afc3a9ab96d31be94d10b2f",
+                "reference": "6a9e88dec4b3960f1afc3a9ab96d31be94d10b2f",
+                "shasum": ""
+            },
+            "require": {
+                "symfony/console": "^2.7|3.*|4.*",
+                "symfony/finder": "^2.7|3.*|4.*"
+            },
+            "require-dev": {
+                "behat/behat": "^3.0",
+                "phpunit/phpunit": "^4.8"
+            },
+            "bin": [
+                "bin/xmllint"
+            ],
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "sclable\\xmlLint\\": "src/php/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Michael Rutz",
+                    "email": "michael.rutz@sclable.com"
+                }
+            ],
+            "description": "A php cli tool to lint and validate xml files.",
+            "keywords": [
+                "cli",
+                "lint",
+                "xml",
+                "xml schema",
+                "xsd"
+            ],
+            "time": "2018-03-22T08:31:23+00:00"
         },
         {
             "name": "stack/builder",
@@ -7224,6 +7224,57 @@
                 "scraper"
             ],
             "time": "2018-06-29T15:13:57+00:00"
+        },
+        {
+            "name": "hirak/prestissimo",
+            "version": "0.3.8",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/hirak/prestissimo.git",
+                "reference": "7cc32689810e604f95f9eadb3c5074135aa872f1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/hirak/prestissimo/zipball/7cc32689810e604f95f9eadb3c5074135aa872f1",
+                "reference": "7cc32689810e604f95f9eadb3c5074135aa872f1",
+                "shasum": ""
+            },
+            "require": {
+                "composer-plugin-api": "^1.0.0",
+                "ext-curl": "*",
+                "php": "^5.3.2 || ^7.0"
+            },
+            "require-dev": {
+                "composer/composer": "1.0.0",
+                "phpunit/phpunit": "^4.8",
+                "squizlabs/php_codesniffer": "^2.5"
+            },
+            "type": "composer-plugin",
+            "extra": {
+                "class": "Hirak\\Prestissimo\\Plugin"
+            },
+            "autoload": {
+                "psr-4": {
+                    "Hirak\\Prestissimo\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Hiraku NAKANO",
+                    "email": "hiraku@tojiru.net"
+                }
+            ],
+            "description": "composer parallel install plugin",
+            "keywords": [
+                "install",
+                "parallel",
+                "speedup"
+            ],
+            "time": "2018-08-21T22:35:06+00:00"
         },
         {
             "name": "instaclick/php-webdriver",
