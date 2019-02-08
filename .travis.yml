@@ -176,7 +176,6 @@ before_install:
   - |
     if [ ! -f "$DOWNLOADS_CACHE_DIR/symfony-setup" ]; then
       curl -o $DOWNLOADS_CACHE_DIR/symfony-setup https://get.symfony.com/cli/installer
-      curl https://get.symfony.com/cli/installer | sudo bash
     fi
   - sudo bash $DOWNLOADS_CACHE_DIR/symfony-setup
   - sudo mv ~/.symfony/bin/symfony /usr/local/bin/symfony
