@@ -22,22 +22,9 @@ before_install:
   - sudo apt-get purge -y mysql-server mysql-client mysql-common mysql-server-core-* mysql-client-core-*
   - sudo rm -rf /etc/mysql /var/lib/mysql
 
-  # Cache app-get
-  - echo "Print content of ~/apt-cache"
-  - ls ~/apt-cache
-  - echo "Check whether apt-get has no cache"
-  - ls /var/cache/apt/archives
-  - echo "Start loading apt cache"
-  - |
-    exist() {
-        [ -e "$1" ]
-    }
-  - |
-    if exist ~/apt-cache/*.deb
-    then
-        sudo mv ~/apt-cache/*.deb /var/cache/apt/archives/
-        ls /var/cache/apt/archives
-    fi
+  # Loading apt cache
+  - export APT_CACHE_DIR="~/apt-cache"
+  - sudo cp -V -p $APT_CACHE_DIR/*.deb /var/cache/apt/archives/
 
   # Update system
   - sudo LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php -y
@@ -102,8 +89,8 @@ before_install:
 
   # Updating apt cache
   - echo "Start updating apt cache"
-  - rm -rf ~/apt-cache/*.deb
-  - cp /var/cache/apt/archives/*deb ~/apt-cache
+  - rm -rf $APT_CACHE_DIR/*.deb
+  - cp -V -p /var/cache/apt/archives/*deb $APT_CACHE_DIR
 
 install:
   # Validation
@@ -115,14 +102,13 @@ install:
   - composer licenses --no-interaction --ansi --verbose
 
   # Export environment settings
-  - ls -la
   - sudo ./init_env
 
   # Check npm
-  - npm audit
+  - sudo npm audit
 
   # Check code style
-  - composer drupal:check --no-interaction --ansi --verbose
+  - sudo composer drupal:check --no-interaction --ansi --verbose
 
   # Define build properties for the local test environment
   # - echo -e "drupal.base_url = http://localhost:8888\n" > build.properties.local
