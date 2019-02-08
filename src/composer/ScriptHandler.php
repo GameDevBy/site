@@ -150,7 +150,7 @@ class ScriptHandler {
       . 'export PATH="'
         . $drupalFinder->getComposerRoot() . '/vendor/bin:'
         . $drupalFinder->getComposerRoot() . '/node_modules/.bin:'
-        . $phpPath . '$PATH"' . PHP_EOL;
+        . $phpPath . ':$PATH"' . PHP_EOL;
 
     $fileSystem->dumpFile($initEnvPath, $initEnvContent);
 
