@@ -119,7 +119,7 @@ install:
   - ls -la /home/travis/build/GameDevBy/site/vendor/bin
   - ls -la /home/travis/build/GameDevBy/site/node_modules/.bin
 
-  - sudo pjv -w -r
+  - pjv -w -r
   # Check npm
   - npm audit
 
