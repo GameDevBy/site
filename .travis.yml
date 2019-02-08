@@ -107,7 +107,7 @@ before_install:
       popd
     fi
   - sudo cp -v -p $PHP_AST_EXT_PATH $PHP_EXTENSIONS_PATH/$PHP_AST_EXT_FILE
-  - sudo echo "extension=$PHP_AST_EXT_FILE" >> /etc/php/7.3/cli/conf.d/20-ast.ini
+  - echo "extension=$PHP_AST_EXT_FILE" | sudo tee --append /etc/php/7.3/cli/conf.d/20-ast.ini
   - php -r 'function_exists("ast\parse_code") || (print("Failed to enable php-ast\n") && exit(1));'
 
   # TODO update ICU and php-intl
