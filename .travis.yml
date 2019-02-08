@@ -108,6 +108,7 @@ install:
 
   # Export environment settings
   - sudo ./init_env
+  - cat ./init_env
 
   # Check npm
   - sudo npm audit
