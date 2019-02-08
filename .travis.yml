@@ -143,11 +143,8 @@ before_install:
       pushd $DOWNLOADS_CACHE_DIR/php-intl
       PHP_SHORT_VERSION=$(echo $PHP_VERSION | grep -P '^[0-9]+\.[0-9]+\.[0-9]+' -o)
       INTL_DOWNLOAD_URL="https://github.com/php/php-src/archive/php-$PHP_SHORT_VERSION.tar.gz"
-      echo "$INTL_DOWNLOAD_URL"
-      curl -o ./php-intl.tar.gz $INTL_DOWNLOAD_URL
-      file ./php-intl.tar.gz
-      cat ./php-intl.tar.gz
-      tar -xvzf ./php-intl.tar.gz
+      curl -L -o ./php-intl.tar.gz $INTL_DOWNLOAD_URL
+      tar -zxf ./php-intl.tar.gz
       cd ./php-src-php-$PHP_SHORT_VERSION/ext/intl
       export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/icu5c/lib
       export TEST_PHP_ARGS="-q"
