@@ -93,6 +93,7 @@ install:
   - composer licenses --no-interaction --ansi --verbose
 
   # Export environment settings
+  - ls -la
   - init_env
 
   # Check npm
