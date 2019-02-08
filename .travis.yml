@@ -16,7 +16,7 @@ cache:
     - $HOME/.composer/cache/files
     - $HOME/.cache/phan-ast/build
     - $HOME/.npm
-    - $HOME/.downloads
+    - $HOME/.build-downloads
     - $TRAVIS_BUILD_DIR/.eslintcache
     - $TRAVIS_BUILD_DIR/.phpcscache
     - $TRAVIS_BUILD_DIR/.stylelintcache
@@ -25,7 +25,7 @@ cache:
 before_install:
   - pwd
   - export APT_CACHE_DIR="$HOME/apt-cache"
-  - export DOWNLOADS_CACHE_DIR="$HOME/.downloads"
+  - export DOWNLOADS_CACHE_DIR="$HOME/.build-downloads"
 
   # Remove mysql
   - sudo apt-get purge -y mysql-server mysql-client mysql-common mysql-server-core-* mysql-client-core-*
@@ -80,6 +80,30 @@ before_install:
   # Install php 7.3
   - sudo apt-get install -y php7.3 php7.3-common php7.3-cli
   - sudo apt-get install -y php7.3-curl php7.3-gd php7.3-intl php7.3-mbstring php7.3-xml php7.3-zip php7.3-sqlite3 php7.3-mysql php-xdebug php7.3-soap
+  - sudo php -v
+
+  # Build php-ast
+  - export PHP_EXTENSIONS_PATH=$(php -i | grep -P 'extension_dir => [^=]*=>[ \t]*([^\n\t]*)' -o)
+  - export PHP_VERSION=$(php -version | grep -P '(?<=PHP )([0-9]+\.[0-9]+\.[0-9]+)' -o)
+  - export PHP_AST_EXT_FILE="php-ast-$PHP_VERSION.so"
+  - export PHP_AST_EXT_PATH="$DOWNLOADS_CACHE_DIR/$PHP_AST_EXT_FILE"
+  - |
+    if [ ! -f "$PHP_AST_EXT_PATH" ]; then
+      mkdir -p $DOWNLOADS_CACHE_DIR/build
+      git clone --depth 1 https://github.com/nikic/php-ast.git $DOWNLOADS_CACHE_DIR/php-ast
+      export CFLAGS="-O3"
+      pushd $DOWNLOADS_CACHE_DIR/php-ast
+      phpize
+      ./configure
+      make
+      mv modules/ast.so "$PHP_AST_EXT_PATH"
+      rm -rf $DOWNLOADS_CACHE_DIR/php-ast $DOWNLOADS_CACHE_DIR/build
+      popd
+    fi
+  - sudo cp -v -p $PHP_AST_EXT_PATH $PHP_EXTENSIONS_PATH/$PHP_AST_EXT_FILE
+  - echo "extension=$PHP_AST_EXT_FILE" >> /etc/php/7.3/cli/conf.d/20-ast.ini
+  - php -r 'function_exists("ast\parse_code") || (print("Failed to enable php-ast\n") && exit(1));'
+
   # TODO update ICU and php-intl
   # View php info
   - sudo php -i
@@ -99,7 +123,7 @@ before_install:
   - |
     if [ ! -f "$DOWNLOADS_CACHE_DIR/symfony" ]; then
       curl --silent https://get.symfony.com/cli/installer | sudo bash
-      mv ~/.symfony/bin/symfony $DOWNLOADS_CACHE_DIR/symfony
+      sudo mv ~/.symfony/bin/symfony $DOWNLOADS_CACHE_DIR/symfony
     fi
   - sudo cp -v -p $DOWNLOADS_CACHE_DIR/symfony /usr/local/bin/symfony
   - sudo symfony -V
