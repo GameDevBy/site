@@ -23,7 +23,6 @@ cache:
     - $TRAVIS_BUILD_DIR/.psalm-cache
 
 before_install:
-  - set -e
   - pwd
   - export APT_CACHE_DIR="$HOME/apt-cache"
   - export DOWNLOADS_CACHE_DIR="$HOME/.build-downloads"
@@ -136,8 +135,6 @@ before_install:
   - cp -v -p /var/cache/apt/archives/*deb $APT_CACHE_DIR
 
 install:
-  - set -e
-
   # Validation
   - composer validate --strict --no-interaction --ansi --verbose
   - sudo symfony security:check
