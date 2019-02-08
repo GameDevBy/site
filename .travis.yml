@@ -24,6 +24,7 @@ before_install:
 
   # Loading apt cache
   - export APT_CACHE_DIR="~/apt-cache"
+  - "[ -d $APT_CACHE_DIR ] || mkdir $APT_CACHE_DIR"
   - sudo cp -v -p $APT_CACHE_DIR/*.deb /var/cache/apt/archives/
 
   # Update system
