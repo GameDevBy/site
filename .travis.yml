@@ -113,11 +113,13 @@ install:
 
   # Export environment settings
   - source ./init_env
-  - cat ./init_env
   - echo $PATH
 
+  - ls -la /home/travis/build/GameDevBy/site/vendor/bin
+  - ls -la /home/travis/build/GameDevBy/site/node_modules/.bin
+
   # Check npm
-  - sudo npm audit
+  #- sudo npm audit
 
   # Check code style
   - sudo composer drupal:check --no-interaction --ansi --verbose
