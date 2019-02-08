@@ -49,9 +49,9 @@ before_install:
   #   https://www.percona.com/doc/percona-server/8.0/installation/apt_repo.html
   #   https://www.percona.com/doc/percona-server/8.0/myrocks/install.html
   # Fetch the repository packages from Percona web
-  - wget https://repo.percona.com/apt/percona-release_latest.$(lsb_release -sc)_all.deb
+  - curl -o ./percona-release_latest_all.deb https://repo.percona.com/apt/percona-release_latest.$(lsb_release -sc)_all.deb
   # Install the downloaded package with dpkg. To do that, run the following commands as root or with sudo
-  - sudo dpkg -i percona-release_latest.$(lsb_release -sc)_all.deb
+  - sudo dpkg -i ./percona-release_latest_all.deb
   # Enable the repository
   - sudo percona-release setup ps80
   # Install the server package
@@ -142,8 +142,8 @@ before_install:
       mkdir -p $DOWNLOADS_CACHE_DIR/php-intl
       pushd $DOWNLOADS_CACHE_DIR/php-intl
       PHP_SHORT_VERSION=$(echo $PHP_VERSION | grep -P '^[0-9]+\.[0-9]+\.[0-9]+' -o)
-      curl -o ./php-intl.tgz https://github.com/php/php-src/archive/php-$PHP_SHORT_VERSION.tar.gz
-      tar -zxf ./php-intl.tgz
+      curl -o ./php-intl.tar.gz https://github.com/php/php-src/archive/php-$PHP_SHORT_VERSION.tar.gz
+      tar -zxf ./php-intl.tar.gz
       cd ./php-src-php-$PHP_SHORT_VERSION/ext/intl
       export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/icu5c/lib
       export TEST_PHP_ARGS="-q"
@@ -158,6 +158,7 @@ before_install:
     fi
   - sudo cp -v -p $PHP_INTL_EXT_PATH $PHP_EXTENSIONS_PATH/$PHP_INTL_EXT_FILE
   - echo "extension=$PHP_INTL_EXT_FILE" | sudo tee --append /etc/php/7.3/cli/conf.d/20-intl.ini
+  - php -r 'function_exists("intl_error_name") || (print("Failed to enable php-intl\n") && exit(1));'
 
   # View php detailed info
   - ls -la $PHP_EXTENSIONS_PATH
