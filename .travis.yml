@@ -25,7 +25,7 @@ before_install:
   # Loading apt cache
   - export APT_CACHE_DIR="$HOME/apt-cache"
   - "[ -d $APT_CACHE_DIR ] || sudo mkdir -p $APT_CACHE_DIR"
-  - sudo cp -v -p $APT_CACHE_DIR/*.deb /var/cache/apt/archives/
+  - sudo [ -f $APT_CACHE_DIR/*.deb ] && cp -v -p $APT_CACHE_DIR/*.deb /var/cache/apt/archives/
 
   # Update system
   - sudo LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php -y
