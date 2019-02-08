@@ -114,17 +114,17 @@ install:
 
   # Export environment settings
   - source ./init_env
-  - echo $PATH
 
+  # Info for debug
+  - echo $PATH
   - ls -la /home/travis/build/GameDevBy/site/vendor/bin
   - ls -la /home/travis/build/GameDevBy/site/node_modules/.bin
 
-  - pjv -w -r
   # Check npm
   - npm audit
 
   # Check code style
-  # - composer drupal:check --no-interaction --ansi --verbose
+  - composer drupal:check --no-interaction --ansi --verbose
 
   # Define build properties for the local test environment
   # - echo -e "drupal.base_url = http://localhost:8888\n" > build.properties.local
