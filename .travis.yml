@@ -12,7 +12,8 @@ mysql:
 
 cache:
   directories:
-    - $HOME/.composer/cache
+    - $HOME/.cache/composer/files
+    - $HOME/.composer/cache/files
     - $HOME/.cache/phan-ast/build
     - $HOME/.npm
     - $HOME/apt-cache
@@ -26,7 +27,7 @@ before_install:
 
   # Loading apt cache
   - export APT_CACHE_DIR="$HOME/apt-cache"
-  - mkdir -p $APT_CACHE_DIR
+  - ls -la $APT_CACHE_DIR
   - |
     for i in $APT_CACHE_DIR/*.deb; do
       if [ -f "$i" ]; then cp -v -p $APT_CACHE_DIR/*.deb /var/cache/apt/archives/; fi
@@ -113,10 +114,10 @@ install:
   - echo $PATH
 
   # Check npm
-  - sudo npm audit
+  #- sudo npm audit
 
   # Check code style
-  - sudo composer drupal:check --no-interaction --ansi --verbose
+  #- sudo composer drupal:check --no-interaction --ansi --verbose
 
   # Define build properties for the local test environment
   # - echo -e "drupal.base_url = http://localhost:8888\n" > build.properties.local

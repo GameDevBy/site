@@ -147,10 +147,11 @@ class ScriptHandler {
         . $drupalFinder->getComposerRoot() . '\node_modules\.bin;'
         . $phpPath . ';%PATH%' . PHP_EOL :
       'export PHAN_DISABLE_XDEBUG_WARN=1' . PHP_EOL
-      . 'export PATH="'
+      . 'PATH="'
         . $drupalFinder->getComposerRoot() . '/vendor/bin:'
         . $drupalFinder->getComposerRoot() . '/node_modules/.bin:'
-        . $phpPath . ':$PATH"' . PHP_EOL;
+        . $phpPath . ':$PATH"' . PHP_EOL
+        . 'export PATH' . PHP_EOL;
 
     $fileSystem->dumpFile($initEnvPath, $initEnvContent);
 
