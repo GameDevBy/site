@@ -15,12 +15,29 @@ cache:
     - ~/.composer/cache
     - ~/.cache/phan-ast/build
     - ~/.npm
-    - /var/cache/apt/archives
+    - ~/apt-cache
 
 before_install:
   # Remove mysql
   - sudo apt-get purge -y mysql-server mysql-client mysql-common mysql-server-core-* mysql-client-core-*
   - sudo rm -rf /etc/mysql /var/lib/mysql
+
+  # Cache app-get
+  - echo "Print content of ~/apt-cache"
+  - ls ~/apt-cache
+  - echo "Check whether apt-get has no cache"
+  - ls /var/cache/apt/archives
+  - echo "Start loading apt cache"
+  - |
+    exist() {
+        [ -e "$1" ]
+    }
+  - |
+    if exist ~/apt-cache/*.deb
+    then
+        sudo mv ~/apt-cache/*.deb /var/cache/apt/archives/
+        ls /var/cache/apt/archives
+    fi
 
   # Update system
   - sudo LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php -y
@@ -83,6 +100,11 @@ before_install:
   - sudo mv ~/.symfony/bin/symfony /usr/local/bin/symfony
   - sudo symfony -V
 
+  # Updating apt cache
+  - echo "Start updating apt cache"
+  - rm -rf ~/apt-cache/*.deb
+  - cp /var/cache/apt/archives/*deb ~/apt-cache
+
 install:
   # Validation
   - composer validate --strict --no-interaction --ansi --verbose
@@ -94,7 +116,7 @@ install:
 
   # Export environment settings
   - ls -la
-  - init_env
+  - sudo ./init_env
 
   # Check npm
   - npm audit

@@ -271,12 +271,12 @@ class ScriptHandler {
     $event->getIO()->write('NPM find by: ' . $npmPath);
     if ($devMode) {
       $event->getIO()->write('Call npm install (with dev dependencies)');
-      exec('npm install --no-progress');
+      exec('npm install');
       return;
     }
 
     $event->getIO()->write('Call npm install (without dev dependencies)');
-    exec('npm install --only=prod --no-progress');
+    exec('npm install --only=prod');
   }
 
   /**
