@@ -30,7 +30,7 @@ before_install:
   - ls -la $APT_CACHE_DIR
   - |
     for i in $APT_CACHE_DIR/*.deb; do
-      if [ -f "$i" ]; then cp -v -p $APT_CACHE_DIR/*.deb /var/cache/apt/archives/; fi
+      if [ -f "$i" ]; then sudo cp -v -p $APT_CACHE_DIR/*.deb /var/cache/apt/archives/; fi
     done
 
   # Update system
