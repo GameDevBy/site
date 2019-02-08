@@ -160,6 +160,7 @@ before_install:
   - echo "extension=$PHP_INTL_EXT_FILE" | sudo tee --append /etc/php/7.3/cli/conf.d/20-intl.ini
 
   # View php detailed info
+  - ls -la $PHP_EXTENSIONS_PATH
   - sudo php -i
 
   # Install composer
