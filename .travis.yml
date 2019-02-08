@@ -27,14 +27,10 @@ before_install:
   # Loading apt cache
   - export APT_CACHE_DIR="$HOME/apt-cache"
   - mkdir -p $APT_CACHE_DIR
-  - ls -la $HOME
-  - ls -la $APT_CACHE_DIR
-  - ls -la $APT_CACHE_DIR/*.deb
   - |
-    if ls $APT_CACHE_DIR/*.deb 1> /dev/null 2>&1
-    then
-      cp -v -p $APT_CACHE_DIR/*.deb /var/cache/apt/archives/
-    fi
+    for i in $APT_CACHE_DIR/*.deb; do
+      if [ -f "$i" ]; then cp -v -p $APT_CACHE_DIR/*.deb /var/cache/apt/archives/; fi
+    done
 
   # Update system
   - sudo LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php -y
