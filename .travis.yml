@@ -38,7 +38,6 @@ before_install:
   - sudo apt-get update -y
   - sudo apt-get upgrade -y
   - sudo apt-get autoremove -y
-  - sudo apt-get autoclean -y
 
   # TODO: replace to docker container
   # Install Percona Server
@@ -97,6 +96,7 @@ before_install:
   # Updating apt cache
   - echo "Start updating apt cache"
   - rm -rf $APT_CACHE_DIR/*.deb
+  - sudo apt-get autoclean -y
   - cp -v -p /var/cache/apt/archives/*deb $APT_CACHE_DIR
 
 install:
@@ -109,7 +109,7 @@ install:
   - composer licenses --no-interaction --ansi --verbose
 
   # Export environment settings
-  - ./init_env
+  - source ./init_env
   - cat ./init_env
   - echo $PATH
 
