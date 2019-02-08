@@ -110,6 +110,30 @@ before_install:
   - echo "extension=$PHP_AST_EXT_FILE" | sudo tee --append /etc/php/7.3/cli/conf.d/20-ast.ini
   - php -r 'function_exists("ast\parse_code") || (print("Failed to enable php-ast\n") && exit(1));'
 
+  # Build ICU
+  - export ICU_VERSION="63.1"
+  - export ICU_BUILD_PATH="$DOWNLOADS_CACHE_DIR/icu/icu-$ICU_VERSION/icu/source"
+  - |
+    if [ ! -d "$ICU_BUILD_PATH" ]; then
+      rm -rf $DOWNLOADS_CACHE_DIR/icu
+      mkdir -p $DOWNLOADS_CACHE_DIR/icu/icu-$ICU_VERSION
+      pushd $DOWNLOADS_CACHE_DIR/icu/icu-$ICU_VERSION
+      ICU_VERSION_S=$(echo $ICU_VERSION | sed 's/\./_/g')
+      curl --silent -o ./icu4c.tgz http://download.icu-project.org/files/icu4c/$ICU_VERSION/icu4c-$ICU_VERSION_S-src.tgz
+      tar -zxf ./icu4c.tgz
+      cd ./icu/source
+      ./runConfigureICU Linux --prefix=/opt/icu5c
+      make
+      make test
+      popd
+    fi
+
+
+
+
+
+
+
   # TODO update ICU and php-intl
   # View php info
   - sudo php -i
@@ -161,7 +185,7 @@ install:
   - npm audit
 
   # Check code style
-  - composer drupal:check --no-interaction --ansi --verbose
+  # - composer drupal:check --no-interaction --ansi --verbose
 
   # Define build properties for the local test environment
   # - echo -e "drupal.base_url = http://localhost:8888\n" > build.properties.local

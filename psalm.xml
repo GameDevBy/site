@@ -22,7 +22,6 @@
             <directory name="node_modules" />
             <directory name=".git" />
             <directory name="web/core" />
-            <directory name="web/libraries" />
             <directory name="web/modules/contrib" />
             <directory name="web/profiles/contrib" />
             <directory name="web/themes/contrib" />
