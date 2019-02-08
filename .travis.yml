@@ -84,9 +84,9 @@ before_install:
   - sudo php -v
 
   # Build php-ast
-  - export PHP_EXTENSIONS_PATH=$(php -i | grep -P '(?<=extension_dir =>[ \t]*)([^ \n\t]*)' -o)
+  - export PHP_EXTENSIONS_PATH=$(php -i | grep -P '(?<=extension_dir => )([^ \n\t]*)' -o)
   - echo $PHP_EXTENSIONS_PATH
-  - export PHP_VERSION=$(php -version | grep -P '(?<=PHP )([0-9]+\.[0-9]+\.[0-9]+[^ ]*)' -o)
+  - export PHP_VERSION=$(php -version | grep -P '(?<=PHP )([0-9]+\.[0-9]+\.[0-9]+[^ \n\t]*)' -o)
   - echo $PHP_VERSION
   - export PHP_AST_EXT_FILE="php-ast-$PHP_VERSION.so"
   - export PHP_AST_EXT_PATH="$DOWNLOADS_CACHE_DIR/$PHP_AST_EXT_FILE"
