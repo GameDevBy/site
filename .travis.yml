@@ -27,10 +27,9 @@ before_install:
 
   # Loading apt cache
   - export APT_CACHE_DIR="$HOME/apt-cache"
-  - ls -la $APT_CACHE_DIR
   - |
     for i in $APT_CACHE_DIR/*.deb; do
-      if [ -f "$i" ]; then sudo cp -v -p $APT_CACHE_DIR/*.deb /var/cache/apt/archives/; fi
+      if [ -f "$i" ]; then sudo cp -v -p $APT_CACHE_DIR/*.deb /var/cache/apt/archives/; break; fi
     done
 
   # Update system
