@@ -17,6 +17,10 @@ cache:
     - $HOME/.cache/phan-ast/build
     - $HOME/.npm
     - $HOME/apt-cache
+    - $TRAVIS_BUILD_DIR/.eslintcache
+    - $TRAVIS_BUILD_DIR/.phpcscache
+    - $TRAVIS_BUILD_DIR/.stylelintcache
+    - $TRAVIS_BUILD_DIR/.psalm-cache
 
 before_install:
   - pwd
@@ -113,10 +117,10 @@ install:
   - echo $PATH
 
   # Check npm
-  #- sudo npm audit
+  - sudo npm audit
 
   # Check code style
-  #- sudo composer drupal:check --no-interaction --ansi --verbose
+  - sudo composer drupal:check --no-interaction --ansi --verbose
 
   # Define build properties for the local test environment
   # - echo -e "drupal.base_url = http://localhost:8888\n" > build.properties.local

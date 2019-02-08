@@ -45,6 +45,7 @@
 /.eslintcache
 /.stylelintcache
 /.phpcscache
+/.psalm-cache/
 
 
 # Ignore drupal auto-download files

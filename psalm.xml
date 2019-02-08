@@ -3,6 +3,7 @@
 <!-- Read for more https://getpsalm.org/docs/configuration/ -->
 
 <psalm
+    cacheDirectory="./.psalm-cache"
     totallyTyped="false"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns="https://getpsalm.org/schema/config"
