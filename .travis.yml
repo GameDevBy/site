@@ -10,9 +10,11 @@ mysql:
   username: root
   encoding: utf8
 
-# cache:
-#   directories:
-#     - ~/.composer/cache/files
+cache:
+  directories:
+    - ~/.composer/cache
+    - ~/.cache/phan-ast/build
+    - ~/.npm
 
 before_install:
   # Remove mysql

@@ -38,7 +38,7 @@ class PolicyCommands extends DrushCommands {
    * @hook validate core:rsync
    */
   public function rsyncValidate(CommandData $commandData): void {
-    if (preg_match('/^@prod/', $commandData->input()->getArgument('target'))) {
+    if (preg_match('/^@prod/', $commandData->input()->getArgument('target')) === 1) {
       throw new \RuntimeException(StringUtils::interpolate('Per !file, you may never rsync to the production site.', ['!file' => __FILE__]));
     }
   }

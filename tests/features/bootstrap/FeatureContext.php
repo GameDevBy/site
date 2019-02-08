@@ -1,6 +1,5 @@
 <?php
 
-use Behat\Behat\Context\Context;
 use Drupal\DrupalExtension\Context\RawDrupalContext;
 
 /**
@@ -10,7 +9,7 @@ use Drupal\DrupalExtension\Context\RawDrupalContext;
  *
  * @noinspection PhpUndefinedClassInspection
  */
-class FeatureContext extends RawDrupalContext implements Context {
+class FeatureContext extends RawDrupalContext {
 
   /**
    * Checks that a 403 Access Denied error occurred.

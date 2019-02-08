@@ -2,6 +2,7 @@
 
 namespace DrupalProject\Phing;
 
+use RuntimeException;
 use Task;
 
 /**
@@ -115,7 +116,9 @@ class PhpUnitConfigurationTask extends Task {
 
     // Insert the test suite in the list of test suites.
     $testSuites = $document->getElementsByTagName('testsuites')->item(0);
-    assert($testSuites !== NULL);
+    if ($testSuites === NULL) {
+      throw new RuntimeException('Test suites cant find.');
+    }
     $testSuites->appendChild($testSuite);
 
     // Save the file.
@@ -163,7 +166,7 @@ class PhpUnitConfigurationTask extends Task {
    * @param string $distFile
    *   The path to the template of the configuration file.
    */
-  public function setDistFile($distFile): void {
+  public function setDistFile(string $distFile): void {
     $this->distFile = $distFile;
   }
 

@@ -52,7 +52,8 @@
         "roave/security-advisories": "dev-master",
         "sclable/xml-lint": "^0.2.4",
         "vimeo/psalm": "^3.0",
-        "webflo/drupal-core-require-dev": "^8.6"
+        "webflo/drupal-core-require-dev": "^8.6",
+        "phan/phan": "^1.2"
     },
     "conflict": {
         "drupal/drupal": "*"
@@ -88,19 +89,19 @@
             "@composer update drupal/core webflo/drupal-core-require-dev symfony/* --with-dependencies"
         ],
         "drupal:check-phpmd": [
-            "phpmd ./drush,./src,./tests,./web/themes,./web/profiles,./web/modules text ./ruleset.xml --exclude web/modules/contrib/*,web\\modules\\contrib\\*,web/themes/contrib/*,web\\themes\\contrib\\*,web/profiles/contrib/*,web\\profiles\\contrib\\*"
+            "phpmd ./drush,./src,./tests,./.phan,./web/themes,./web/profiles,./web/modules text ./phpmd-ruleset.xml --exclude web/modules/contrib/*,web\\modules\\contrib\\*,web/themes/contrib/*,web\\themes\\contrib\\*,web/profiles/contrib/*,web\\profiles\\contrib\\*"
         ],
         "drupal:check-phpcs": [
-            "phpcs"
+            "DrupalProject\\composer\\ScriptHandler::runPhpcs"
         ],
         "drupal:check-eslint": [
-            "eslint --cache -c ./web/core/.eslintrc.json ."
+            "DrupalProject\\composer\\ScriptHandler::runEslint"
         ],
         "drupal:fix-eslint": [
             "eslint --cache -c ./web/core/.eslintrc.json --fix ."
         ],
         "drupal:check-stylelint": [
-            "stylelint --cache --config ./web/core/.stylelintrc.json \"**/*.css\" \"**/*.scss\" \"**/*.sass\"  \"**/*.less\" \"**/*.sss\""
+            "DrupalProject\\composer\\ScriptHandler::runStylelint"
         ],
         "drupal:fix-stylelint": [
             "stylelint --cache --config ./web/core/.stylelintrc.json --fix \"**/*.css\" \"**/*.scss\" \"**/*.sass\"  \"**/*.less\" \"**/*.sss\""
@@ -120,6 +121,9 @@
         "drupal:check-psalm": [
             "psalm --diff --diff-methods"
         ],
+        "drupal:check-phan": [
+            "DrupalProject\\composer\\ScriptHandler::runPhan"
+        ],
         "drupal:check": [
             "pjv -w -r",
             "@drupal:check-phpcs",
@@ -129,7 +133,8 @@
             "@drupal:check-json",
             "@drupal:check-yml",
             "@drupal:check-xml",
-            "@drupal:check-psalm"
+            "@drupal:check-psalm",
+            "@drupal:check-phan"
         ],
         "drupal:fix": [
             "@drupal:fix-phpcs",
