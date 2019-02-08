@@ -85,6 +85,7 @@ before_install:
 
   # Install composer
   - curl --silent -o composer-setup.php https://getcomposer.org/installer
+  #- export COMPOSER_ALLOW_SUPERUSER=1
   - sudo php composer-setup.php --install-dir=/usr/local/bin --filename=composer
   - composer diagnose --no-interaction --ansi --verbose
   - sudo mkdir -p ~/.composer/
@@ -118,11 +119,12 @@ install:
   - ls -la /home/travis/build/GameDevBy/site/vendor/bin
   - ls -la /home/travis/build/GameDevBy/site/node_modules/.bin
 
+  - sudo pjv -w -r
   # Check npm
-  #- sudo npm audit
+  - npm audit
 
   # Check code style
-  - sudo composer drupal:check --no-interaction --ansi --verbose
+  # - composer drupal:check --no-interaction --ansi --verbose
 
   # Define build properties for the local test environment
   # - echo -e "drupal.base_url = http://localhost:8888\n" > build.properties.local
