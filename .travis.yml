@@ -23,8 +23,8 @@ before_install:
   - sudo rm -rf /etc/mysql /var/lib/mysql
 
   # Loading apt cache
-  - export APT_CACHE_DIR="~/apt-cache"
-  - "[ -d $APT_CACHE_DIR ] || sudo mkdir $APT_CACHE_DIR"
+  - export APT_CACHE_DIR="$HOME/apt-cache"
+  - "[ -d $APT_CACHE_DIR ] || sudo mkdir -p $APT_CACHE_DIR"
   - sudo cp -v -p $APT_CACHE_DIR/*.deb /var/cache/apt/archives/
 
   # Update system
