@@ -27,8 +27,9 @@ before_install:
   # Loading apt cache
   - export APT_CACHE_DIR="$HOME/apt-cache"
   - mkdir -p $APT_CACHE_DIR
-  - ls $APT_CACHE_DIR
-  - ls $APT_CACHE_DIR/*.deb
+  - ls -la $HOME
+  - ls -la $APT_CACHE_DIR
+  - ls -la $APT_CACHE_DIR/*.deb
   - |
     if ls $APT_CACHE_DIR/*.deb 1> /dev/null 2>&1
     then
