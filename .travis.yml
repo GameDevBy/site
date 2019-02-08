@@ -12,10 +12,10 @@ mysql:
 
 cache:
   directories:
-    - ~/.composer/cache
-    - ~/.cache/phan-ast/build
-    - ~/.npm
-    - ~/apt-cache
+    - $HOME/.composer/cache
+    - $HOME/.cache/phan-ast/build
+    - $HOME/.npm
+    - $HOME/apt-cache
 
 before_install:
   # Remove mysql
@@ -25,6 +25,7 @@ before_install:
   # Loading apt cache
   - export APT_CACHE_DIR="$HOME/apt-cache"
   - "[ -d $APT_CACHE_DIR ] || sudo mkdir -p $APT_CACHE_DIR"
+  - ls $APT_CACHE_DIR/*.deb
   - |
     if ls $APT_CACHE_DIR/*.deb 1> /dev/null 2>&1
     then
@@ -107,7 +108,7 @@ install:
   - composer licenses --no-interaction --ansi --verbose
 
   # Export environment settings
-  - sudo ./init_env
+  - ./init_env
   - cat ./init_env
   - echo $PATH
 
