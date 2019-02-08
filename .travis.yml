@@ -15,6 +15,7 @@ cache:
     - ~/.composer/cache
     - ~/.cache/phan-ast/build
     - ~/.npm
+    - /var/cache/apt/archives
 
 before_install:
   # Remove mysql

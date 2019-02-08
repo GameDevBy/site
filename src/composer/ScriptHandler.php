@@ -110,11 +110,6 @@ class ScriptHandler {
       $fileSystem->dumpFile($globalCodeSnifferConfigPath, $globalConfig);
       $event->getIO()->write('Create a codesniffer global config file: "' . $globalCodeSnifferConfigPath . '"');
     }
-    else {
-      // TODO remove.
-      $ccc = file_get_contents($globalCodeSnifferConfigPath);
-      $event->getIO()->write('CS "' . $globalCodeSnifferConfigPath . '" EXIST: ' . PHP_EOL . $ccc);
-    }
 
     self::createInitEnvFile($fileSystem, $drupalFinder, $event);
   }
@@ -136,10 +131,7 @@ class ScriptHandler {
     if ($isWindows) {
       $initEnvPath .= '.bat';
     }
-    if (!$fileSystem->exists($initEnvPath)) {
-      // TODO remove.
-      $ccc = file_get_contents($initEnvPath);
-      $event->getIO()->write('IENV EXIST "' . $initEnvPath . '" EXIST: ' . PHP_EOL . $ccc);
+    if ($fileSystem->exists($initEnvPath)) {
       return;
     }
 
