@@ -86,7 +86,7 @@ before_install:
 
   # Install composer
   - |
-    if [ -f "$DOWNLOADS_CACHE_DIR/composer-setup.php" ]; then
+    if [ ! -f "$DOWNLOADS_CACHE_DIR/composer-setup.php" ]; then
       curl --silent -o $DOWNLOADS_CACHE_DIR/composer-setup.php https://getcomposer.org/installer
     fi
   - sudo php $DOWNLOADS_CACHE_DIR/composer-setup.php --install-dir=/usr/local/bin --filename=composer
@@ -97,7 +97,7 @@ before_install:
 
   # Install symfony cli https://symfony.com/download
   - |
-    if [ -f "$DOWNLOADS_CACHE_DIR/symfony" ]; then
+    if [ ! -f "$DOWNLOADS_CACHE_DIR/symfony" ]; then
       curl --silent https://get.symfony.com/cli/installer | sudo bash
       mv ~/.symfony/bin/symfony $DOWNLOADS_CACHE_DIR/symfony
     fi
