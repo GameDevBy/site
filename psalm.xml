@@ -20,7 +20,6 @@
         <ignoreFiles>
             <directory name="vendor" />
             <directory name="node_modules" />
-            <directory name=".idea" />
             <directory name=".git" />
             <directory name="web/core" />
             <directory name="web/libraries" />

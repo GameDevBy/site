@@ -16,7 +16,7 @@ cache:
     - $HOME/.composer/cache/files
     - $HOME/.cache/phan-ast/build
     - $HOME/.npm
-    - $HOME/apt-cache
+    - $HOME/.downloads
     - $TRAVIS_BUILD_DIR/.eslintcache
     - $TRAVIS_BUILD_DIR/.phpcscache
     - $TRAVIS_BUILD_DIR/.stylelintcache
@@ -24,13 +24,14 @@ cache:
 
 before_install:
   - pwd
+  - export APT_CACHE_DIR="$HOME/apt-cache"
+  - export DOWNLOADS_CACHE_DIR="$HOME/.downloads"
 
   # Remove mysql
   - sudo apt-get purge -y mysql-server mysql-client mysql-common mysql-server-core-* mysql-client-core-*
   - sudo rm -rf /etc/mysql /var/lib/mysql
 
   # Loading apt cache
-  - export APT_CACHE_DIR="$HOME/apt-cache"
   - |
     for i in $APT_CACHE_DIR/*.deb; do
       if [ -f "$i" ]; then sudo cp -v -p $APT_CACHE_DIR/*.deb /var/cache/apt/archives/; break; fi
@@ -84,17 +85,23 @@ before_install:
   - sudo php -i
 
   # Install composer
-  - curl --silent -o composer-setup.php https://getcomposer.org/installer
-  #- export COMPOSER_ALLOW_SUPERUSER=1
-  - sudo php composer-setup.php --install-dir=/usr/local/bin --filename=composer
+  - |
+    if [ -f "$DOWNLOADS_CACHE_DIR/composer-setup.php" ]; then
+      curl --silent -o $DOWNLOADS_CACHE_DIR/composer-setup.php https://getcomposer.org/installer
+    fi
+  - sudo php $DOWNLOADS_CACHE_DIR/composer-setup.php --install-dir=/usr/local/bin --filename=composer
   - composer diagnose --no-interaction --ansi --verbose
   - sudo mkdir -p ~/.composer/
   - sudo chown -R $USER ~/.composer/
   - composer --no-progress --no-interaction --no-ansi global require hirak/prestissimo
 
   # Install symfony cli https://symfony.com/download
-  - curl --silent https://get.symfony.com/cli/installer | sudo bash
-  - sudo mv ~/.symfony/bin/symfony /usr/local/bin/symfony
+  - |
+    if [ -f "$DOWNLOADS_CACHE_DIR/symfony" ]; then
+      curl --silent https://get.symfony.com/cli/installer | sudo bash
+      mv ~/.symfony/bin/symfony $DOWNLOADS_CACHE_DIR/symfony
+    fi
+  - sudo cp -v -p $DOWNLOADS_CACHE_DIR/symfony /usr/local/bin/symfony
   - sudo symfony -V
 
   # Updating apt cache
