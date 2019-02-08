@@ -93,6 +93,7 @@ before_install:
   - |
     if [ ! -f "$PHP_AST_EXT_PATH" ]; then
       rm -rf $DOWNLOADS_CACHE_DIR/php-ast-release
+      mkdir -p $DOWNLOADS_CACHE_DIR/php-ast-release
       mkdir -p $DOWNLOADS_CACHE_DIR/build
       git clone -b 'v1.0.0' --single-branch --depth 1 https://github.com/nikic/php-ast.git $DOWNLOADS_CACHE_DIR/php-ast
       export CFLAGS="-O3"
