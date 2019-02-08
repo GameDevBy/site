@@ -23,6 +23,7 @@ cache:
     - $TRAVIS_BUILD_DIR/.psalm-cache
 
 before_install:
+  - set -e
   - pwd
   - export APT_CACHE_DIR="$HOME/apt-cache"
   - export DOWNLOADS_CACHE_DIR="$HOME/.build-downloads"
@@ -79,7 +80,7 @@ before_install:
 
   # Install php 7.3
   - sudo apt-get install -y php7.3 php7.3-common php7.3-cli
-  - sudo apt-get install -y php7.3-curl php7.3-gd php7.3-intl php7.3-mbstring php7.3-xml php7.3-zip php7.3-sqlite3 php7.3-mysql php-xdebug php7.3-soap
+  - sudo apt-get install -y php7.3-curl php7.3-gd php7.3-intl php7.3-mbstring php7.3-xml php7.3-zip php7.3-sqlite3 php7.3-mysql php-xdebug php7.3-soap php7.3-dev
   - sudo php -v
 
   # Build php-ast
@@ -135,6 +136,8 @@ before_install:
   - cp -v -p /var/cache/apt/archives/*deb $APT_CACHE_DIR
 
 install:
+  - set -e
+
   # Validation
   - composer validate --strict --no-interaction --ansi --verbose
   - sudo symfony security:check
