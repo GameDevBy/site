@@ -26,7 +26,7 @@ before_install:
   - export APT_CACHE_DIR="$HOME/apt-cache"
   - "[ -d $APT_CACHE_DIR ] || sudo mkdir -p $APT_CACHE_DIR"
   - |
-    if [ -f "$APT_CACHE_DIR" ]
+    if [ -f "$APT_CACHE_DIR/*.deb" ]
     then
       cp -v -p $APT_CACHE_DIR/*.deb /var/cache/apt/archives/
     fi
