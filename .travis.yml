@@ -18,6 +18,8 @@ cache:
     - $HOME/apt-cache
 
 before_install:
+  - pwd
+
   # Remove mysql
   - sudo apt-get purge -y mysql-server mysql-client mysql-common mysql-server-core-* mysql-client-core-*
   - sudo rm -rf /etc/mysql /var/lib/mysql
@@ -25,6 +27,7 @@ before_install:
   # Loading apt cache
   - export APT_CACHE_DIR="$HOME/apt-cache"
   - mkdir -p $APT_CACHE_DIR
+  - ls $APT_CACHE_DIR
   - ls $APT_CACHE_DIR/*.deb
   - |
     if ls $APT_CACHE_DIR/*.deb 1> /dev/null 2>&1
