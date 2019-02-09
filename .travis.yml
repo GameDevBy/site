@@ -167,7 +167,7 @@ before_install:
       echo -e "\n> phpize"
       phpize
       echo -e "\n> ./configure --enable-intl --with-icu-dir=$ICU_PREFIX"
-      ./configure --enable-intl --with-icu-dir="$ICU_PREFIX"
+      sudo ./configure --enable-intl --with-icu-dir="$ICU_PREFIX"
       echo -e "\n> make CXXFLAGS=$CXXFLAGS"
       make CXXFLAGS=$CXXFLAGS
       echo -e "\n> make test"
