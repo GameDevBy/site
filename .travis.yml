@@ -120,14 +120,14 @@ before_install:
       mkdir -p $DOWNLOADS_CACHE_DIR/icu/icu-$ICU_VERSION
       pushd $DOWNLOADS_CACHE_DIR/icu/icu-$ICU_VERSION
       ICU_VERSION_S=$(echo $ICU_VERSION | sed 's/\./-/g')
-      echo "\\n> git clone -b 'release-$ICU_VERSION_S' --single-branch --depth 1 https://github.com/nikic/php-ast.git ."
-      git clone -b 'release-$ICU_VERSION_S' --single-branch --depth 1 https://github.com/nikic/php-ast.git .
+      echo -e "\n> git clone -b 'release-$ICU_VERSION_S' --single-branch --depth 1 https://github.com/nikic/php-ast.git ."
+      git clone -b "release-$ICU_VERSION_S" --single-branch --depth 1 https://github.com/nikic/php-ast.git .
       cd ./icu4c/source
-      echo "\\n> ./runConfigureICU Linux --prefix=$ICU_PREFIX"
+      echo -e "\n> ./runConfigureICU Linux --prefix=$ICU_PREFIX"
       ./runConfigureICU Linux --prefix="$ICU_PREFIX"
-      echo "\\n> make"
+      echo -e "\n> make"
       make
-      echo "\\n> make test"
+      echo -e "\n> make test"
       make test
       popd
     fi
@@ -147,7 +147,7 @@ before_install:
       mkdir -p $DOWNLOADS_CACHE_DIR/php-src
       pushd $DOWNLOADS_CACHE_DIR/php-src
       PHP_SHORT_VERSION=$(echo $PHP_VERSION | grep -P '^[0-9]+\.[0-9]+\.[0-9]+' -o)
-      echo "\\n> git clone -b 'php-$PHP_SHORT_VERSION' --single-branch --depth 1 https://github.com/php/php-src.git ./php-$PHP_SHORT_VERSION"
+      echo -e "\n> git clone -b 'php-$PHP_SHORT_VERSION' --single-branch --depth 1 https://github.com/php/php-src.git ./php-$PHP_SHORT_VERSION"
       git clone -b 'php-$PHP_SHORT_VERSION' --single-branch --depth 1 https://github.com/php/php-src.git ./php-$PHP_SHORT_VERSION
       cd ./php-$PHP_SHORT_VERSION/ext/intl
       export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$ICU_PREFIX/lib
@@ -155,13 +155,13 @@ before_install:
       export CFLAGS="-O3"
       export CXXFLAGS=$($ICU_PREFIX/bin/icu-config --cxxflags)
       export CPPFLAGS
-      echo "\\n> phpize"
+      echo -e "\n> phpize"
       phpize
-      echo "\\n> ./configure --enable-intl --with-icu-dir=$ICU_PREFIX"
+      echo -e "\n> ./configure --enable-intl --with-icu-dir=$ICU_PREFIX"
       ./configure --enable-intl --with-icu-dir="$ICU_PREFIX"
-      echo "\\n> make CXXFLAGS=$CXXFLAGS"
+      echo -e "\n> make CXXFLAGS=$CXXFLAGS"
       make CXXFLAGS=$CXXFLAGS
-      echo "\\n> make test"
+      echo -e "\n> make test"
       make test
       rm -rf $DOWNLOADS_CACHE_DIR/php-src $DOWNLOADS_CACHE_DIR/build
       popd
