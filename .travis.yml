@@ -122,16 +122,18 @@ before_install:
       ICU_VERSION_S=$(echo $ICU_VERSION | sed 's/\./-/g')
       echo -e "\n> git clone -b 'release-$ICU_VERSION_S' --single-branch --depth 1 https://github.com/nikic/php-ast.git ."
       git clone -b "release-$ICU_VERSION_S" --single-branch --depth 1 https://github.com/unicode-org/icu.git .
-      cd ./icu4c/source
-      echo -e "\n> ./runConfigureICU Linux/gcc --prefix=$ICU_PREFIX"
-      ./runConfigureICU Linux/gcc --prefix="$ICU_PREFIX"
-      echo -e "\n> make"
-      make
-      echo -e "\n> make test"
-      make test
+      echo -e "\n> ./icu4c/source/runConfigureICU Linux/gcc --prefix=$ICU_PREFIX"
+      ./icu4c/source/runConfigureICU Linux/gcc --prefix="$ICU_PREFIX"
+      echo -e "\n> make VERBOSE=1 -j2"
+      make -j2
+      echo -e "\n> make VERBOSE=1 -j2 check"
+      make -j2 check
+      ls -la $ICU_BUILD_PATH/..
+      ls -la $ICU_BUILD_PATH
+      echo -e "\n> ( cd ./icu4c/source/test/depstest && ./depstest.py ../../../../build/ )"
       popd
     fi
-  - pushd $ICU_BUILD_PATH/icu4c/source
+  - pushd $ICU_BUILD_PATH
   # - sudo make install
 #  - sudo make VERBOSE=1 V=1 AM_DEFAULT_VERBOSITY=1 --debug=j check-installed-icu
   - popd
@@ -171,8 +173,8 @@ before_install:
 #  - php -r 'function_exists("intl_error_name") || (print("Failed to enable php-intl\n") && exit(1));'
 
   # View php detailed info
-  - ls -la $PHP_EXTENSIONS_PATH
-  - sudo php -i
+#  - ls -la $PHP_EXTENSIONS_PATH
+#  - sudo php -i
 
   # Install composer
 #  - |
