@@ -145,7 +145,7 @@ before_install:
       INTL_DOWNLOAD_URL="https://secure.php.net/distributions/php-$PHP_SHORT_VERSION.tar.gz"
       curl -L -o ./php-intl.tar.gz $INTL_DOWNLOAD_URL
       tar -zxf ./php-intl.tar.gz
-      cd ./php-src-php-$PHP_SHORT_VERSION/ext/intl
+      cd ./php-$PHP_SHORT_VERSION/ext/intl
       export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/icu5c/lib
       export TEST_PHP_ARGS="-q"
       export CFLAGS="-O3"
