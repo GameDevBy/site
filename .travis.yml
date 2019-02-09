@@ -121,7 +121,7 @@ before_install:
       pushd $DOWNLOADS_CACHE_DIR/icu/icu-$ICU_VERSION
       ICU_VERSION_S=$(echo $ICU_VERSION | sed 's/\./-/g')
       echo -e "\n> git clone -b 'release-$ICU_VERSION_S' --single-branch --depth 1 https://github.com/nikic/php-ast.git ."
-      git clone -b "release-$ICU_VERSION_S" --single-branch --depth 1 https://github.com/nikic/php-ast.git .
+      git clone -b "release-$ICU_VERSION_S" --single-branch --depth 1 https://github.com/unicode-org/icu.git .
       cd ./icu4c/source
       echo -e "\n> ./runConfigureICU Linux --prefix=$ICU_PREFIX"
       ./runConfigureICU Linux --prefix="$ICU_PREFIX"
