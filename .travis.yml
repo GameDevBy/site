@@ -142,9 +142,7 @@ before_install:
       mkdir -p $DOWNLOADS_CACHE_DIR/php-intl
       pushd $DOWNLOADS_CACHE_DIR/php-intl
       PHP_SHORT_VERSION=$(echo $PHP_VERSION | grep -P '^[0-9]+\.[0-9]+\.[0-9]+' -o)
-      INTL_DOWNLOAD_URL="https://secure.php.net/distributions/php-$PHP_SHORT_VERSION.tar.gz"
-      curl -L -o ./php-intl.tar.gz $INTL_DOWNLOAD_URL
-      tar -zxf ./php-intl.tar.gz
+      git clone -b 'v1.0.0' --single-branch --depth 1 https://github.com/nikic/php-ast.git ./php-$PHP_SHORT_VERSION
       cd ./php-$PHP_SHORT_VERSION/ext/intl
       export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/icu5c/lib
       export TEST_PHP_ARGS="-q"
