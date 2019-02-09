@@ -132,7 +132,7 @@ before_install:
     fi
   - pushd $ICU_BUILD_PATH
 #  - sudo make install
-  - sudo make --debug=d check-installed-icu
+  - sudo make --debug=j check-installed-icu
   - popd
 
   # Build intl ext
