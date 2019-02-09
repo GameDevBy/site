@@ -119,7 +119,7 @@ before_install:
       rm -rf $DOWNLOADS_CACHE_DIR/icu
       mkdir -p $ICU_BUILD_PATH
       pushd $ICU_BUILD_PATH
-      ICU_VERSION_S=$(echo $ICU_VERSION | sed 's/\./-/g')
+      export ICU_VERSION_S=$(echo $ICU_VERSION | sed 's/\./-/g')
       echo -e "\n> git -c advice.detachedHead=false clone -b 'release-$ICU_VERSION_S' --single-branch --depth 1 https://github.com/nikic/php-ast.git ."
       git -c advice.detachedHead=false clone -b "release-$ICU_VERSION_S" --single-branch --depth 1 https://github.com/unicode-org/icu.git .
       echo -e "\n> ./icu4c/source/runConfigureICU Linux/gcc --prefix=$ICU_PREFIX"
