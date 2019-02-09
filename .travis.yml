@@ -128,18 +128,13 @@ before_install:
       make -j2
       echo -e "\n> make -j2 check"
       make -j2 check
+      ls -la $HOME/builds
+      ls -la $HOME/build
+      echo -e "\n> ( cd ./icu4c/source/test/depstest && ./depstest.py $HOME/build/ )"
+      cd ./icu4c/source/test/depstest && ./depstest.py $HOME/build/
       popd
     fi
   - pushd $ICU_BUILD_PATH
-  - ls -la $ICU_BUILD_PATH/../../../..
-  - ls -la $ICU_BUILD_PATH/../../..
-  - ls -la $ICU_BUILD_PATH/../..
-  - ls -la $ICU_BUILD_PATH/..
-  - ls -la $ICU_BUILD_PATH
-  - ls -la $ICU_BUILD_PATH/icu4c
-  - ls -la $ICU_BUILD_PATH/icu4c/source
-  - echo -e "\n> ( cd ./icu4c/source/test/depstest && ./depstest.py ../../../../build/ )"
-  - cd ./icu4c/source/test/depstest && ./depstest.py ../../../../build/
   # - sudo make install
 #  - sudo make VERBOSE=1 V=1 AM_DEFAULT_VERBOSITY=1 --debug=j check-installed-icu
   - popd
