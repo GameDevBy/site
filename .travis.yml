@@ -123,8 +123,8 @@ before_install:
       echo -e "\n> git clone -b 'release-$ICU_VERSION_S' --single-branch --depth 1 https://github.com/nikic/php-ast.git ."
       git clone -b "release-$ICU_VERSION_S" --single-branch --depth 1 https://github.com/unicode-org/icu.git .
       cd ./icu4c/source
-      echo -e "\n> ./runConfigureICU Linux --prefix=$ICU_PREFIX"
-      ./runConfigureICU Linux --prefix="$ICU_PREFIX"
+      echo -e "\n> ./runConfigureICU Linux/gcc --prefix=$ICU_PREFIX"
+      ./runConfigureICU Linux/gcc --prefix="$ICU_PREFIX"
       echo -e "\n> make"
       make
       echo -e "\n> make test"
@@ -132,8 +132,8 @@ before_install:
       popd
     fi
   - pushd $DOWNLOADS_CACHE_DIR/icu/icu-$ICU_VERSION/icu4c/source
-  - sudo make install
-  - sudo make check-installed-icu
+  # - sudo make install
+  - sudo make VERBOSE=1 V=1 AM_DEFAULT_VERBOSITY=1 --debug=j check-installed-icu
   - popd
 
   # Build intl ext
