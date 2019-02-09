@@ -84,13 +84,13 @@ before_install:
   - pushd $ICU_BUILD_PATH
   - sudo make install
   - ls -la $ICU_PREFIX/bin
-  - sudo export PATH=$ICU_PREFIX/bin:$PATH
+  - sudo -E bash -c "PATH=$ICU_PREFIX/bin:$PATH"
   - export PATH=$ICU_PREFIX/bin:$PATH
   - echo $PATH
   - sudo echo $PATH
   - ls -la $ICU_PREFIX/lib
   - export LD_LIBRARY_PATH=$ICU_PREFIX/lib:/usr/local/lib:/usr/lib:$LD_LIBRARY_PATH
-  - sudo export LD_LIBRARY_PATH=$ICU_PREFIX/lib:/usr/local/lib:/usr/lib:$LD_LIBRARY_PATH
+  - sudo -E bash -c "LD_LIBRARY_PATH=$ICU_PREFIX/lib:/usr/local/lib:/usr/lib:$LD_LIBRARY_PATH"
   - echo $LD_LIBRARY_PATH
   - sudo echo $LD_LIBRARY_PATH
   # Check ICU
