@@ -159,7 +159,7 @@ before_install:
       mkdir -p $PHP_BUILD_PATH
       pushd $PHP_BUILD_PATH
       echo -e "\n> git -c advice.detachedHead=false clone -b 'php-$PHP_SHORT_VERSION' --single-branch --depth 1 https://github.com/php/php-src.git ."
-      git -c advice.detachedHead=false clone -b "php-$PHP_SHORT_VERSION" --single-branch --depth 1 https://github.com/php/php-src.git .
+      git -c advice.detachedHead=false clone -b "master" --single-branch --depth 1 https://github.com/php/php-src.git .
       cd ./ext/intl
       export TEST_PHP_ARGS="-q"
       export CFLAGS="-O3"
@@ -175,9 +175,9 @@ before_install:
       rm -rf $DOWNLOADS_CACHE_DIR/php-src
       popd
     fi
-#  - sudo cp -v -p $PHP_INTL_EXT_PATH $PHP_EXTENSIONS_PATH/$PHP_INTL_EXT_FILE
-#  - echo "extension=$PHP_INTL_EXT_FILE" | sudo tee --append /etc/php/7.3/cli/conf.d/20-intl.ini
-#  - php -r 'function_exists("intl_error_name") || (print("Failed to enable php-intl\n") && exit(1));'
+  - sudo cp -v -p $PHP_INTL_EXT_PATH $PHP_EXTENSIONS_PATH/$PHP_INTL_EXT_FILE
+  - echo "extension=$PHP_INTL_EXT_FILE" | sudo tee --append /etc/php/7.3/cli/conf.d/20-intl.ini
+  - php -r 'function_exists("intl_error_name") || (print("Failed to enable php-intl\n") && exit(1));'
 
   # View php detailed info
 #  - ls -la $PHP_EXTENSIONS_PATH
