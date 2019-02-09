@@ -133,15 +133,17 @@ before_install:
   - pushd $ICU_BUILD_PATH
   - sudo make install
   - ls -la $ICU_PREFIX/bin
+  - export PATH=$ICU_PREFIX/bin:$PATH
+  - echo $PATH
   - ls -la $ICU_PREFIX/lib
-  - export LD_LIBRARY_PATH=$ICU_PREFIX/lib:$LD_LIBRARY_PATH
+  - export LD_LIBRARY_PATH=$ICU_PREFIX/lib:/usr/local/lib:/usr/lib:$LD_LIBRARY_PATH
   - echo $LD_LIBRARY_PATH
-  - sudo ldconfig
-  - sudo $ICU_PREFIX/bin/icu-config --version
-  - sudo $ICU_PREFIX/bin/icuinfo
-  - sudo $ICU_PREFIX/bin/uconv -V
-  - sudo $ICU_PREFIX/bin/genrb -V
-  - sudo $ICU_PREFIX/bin/gencnval -h
+  - sudo ldconfig -v
+  - sudo icu-config --version
+  - sudo icuinfo
+  - sudo uconv -V
+  - sudo genrb -V
+  - sudo gencnval -h
   - popd
 
   # Build intl ext
