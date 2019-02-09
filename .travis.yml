@@ -159,7 +159,7 @@ before_install:
       mkdir -p $PHP_BUILD_PATH
       pushd $PHP_BUILD_PATH
       echo -e "\n> git -c advice.detachedHead=false clone -b 'php-$PHP_SHORT_VERSION' --single-branch --depth 1 https://github.com/php/php-src.git ."
-      git -c advice.detachedHead=false clone -b 'php-$PHP_SHORT_VERSION' --single-branch --depth 1 https://github.com/php/php-src.git .
+      git -c advice.detachedHead=false clone -b "php-$PHP_SHORT_VERSION" --single-branch --depth 1 https://github.com/php/php-src.git .
       cd ./ext/intl
       export TEST_PHP_ARGS="-q"
       export CFLAGS="-O3"
