@@ -23,6 +23,9 @@ cache:
     - $TRAVIS_BUILD_DIR/.stylelintcache
     - $TRAVIS_BUILD_DIR/.psalm-cache
 
+notifications:
+  email: false
+
 before_install:
   - pwd
   - export APT_CACHE_DIR="$HOME/apt-cache"
@@ -38,11 +41,72 @@ before_install:
       if [ -f "$i" ]; then sudo cp -v -p $APT_CACHE_DIR/*.deb /var/cache/apt/archives/; break; fi
     done
 
+  # Remove old icu
+  - sudo apt-get purge -y icu icu-*
+
   # Update system
   - sudo LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php -y
   - sudo apt-get update -y
   - sudo apt-get upgrade -y
   - sudo apt-get autoremove -y
+
+  # Install ccache
+  # - sudo apt install -y ccache
+  # - sudo /usr/sbin/update-ccache-symlinks
+  # - export PATH="/usr/lib/ccache/:$PATH"
+  # - sudo export PATH="/usr/lib/ccache/:$PATH"
+  # - ccache --version
+  # - ccache --zero-stats
+  # - export USE_CCACHE=1
+  # - sudo export USE_CCACHE=1
+
+  # Build ICU
+  - export ICU_VERSION="63.1"
+  - export ICU_PREFIX="/opt/icu$ICU_VERSION"
+  - export ICU_BUILD_PATH="$DOWNLOADS_CACHE_DIR/icu/icu-$ICU_VERSION"
+  - |
+    if [ ! -d "$ICU_BUILD_PATH" ]; then
+      rm -rf $DOWNLOADS_CACHE_DIR/icu
+      mkdir -p $ICU_BUILD_PATH
+      pushd $ICU_BUILD_PATH
+      export ICU_VERSION_S=$(echo $ICU_VERSION | sed 's/\./-/g')
+      echo -e "\n> git -c advice.detachedHead=false clone -b 'release-$ICU_VERSION_S' --single-branch --depth 1 https://github.com/nikic/php-ast.git ."
+      git -c advice.detachedHead=false clone -b "release-$ICU_VERSION_S" --single-branch --depth 1 https://github.com/unicode-org/icu.git .
+      echo -e "\n> ./icu4c/source/runConfigureICU Linux/gcc --prefix=$ICU_PREFIX"
+      ./icu4c/source/runConfigureICU Linux/gcc --prefix="$ICU_PREFIX"
+      echo -e "\n> make -j2"
+      make -j2
+      echo -e "\n> make -j2 check"
+      make -j2 check
+      popd
+    fi
+  # Install ICU
+  - pushd $ICU_BUILD_PATH
+  - sudo make install
+  - ls -la $ICU_PREFIX/bin
+  - sudo export PATH=$ICU_PREFIX/bin:$PATH
+  - export PATH=$ICU_PREFIX/bin:$PATH
+  - echo $PATH
+  - sudo echo $PATH
+  - ls -la $ICU_PREFIX/lib
+  - export LD_LIBRARY_PATH=$ICU_PREFIX/lib:/usr/local/lib:/usr/lib:$LD_LIBRARY_PATH
+  - sudo export LD_LIBRARY_PATH=$ICU_PREFIX/lib:/usr/local/lib:/usr/lib:$LD_LIBRARY_PATH
+  - echo $LD_LIBRARY_PATH
+  - sudo echo $LD_LIBRARY_PATH
+  # Check ICU
+  - sudo ldconfig -v
+  - sudo icu-config --version
+  - sudo icuinfo
+  - sudo uconv -V
+  - sudo genrb -V
+  - sudo gencnval -h
+  - ldconfig -v
+  - icu-config --version
+  - icuinfo
+  - uconv -V
+  - genrb -V
+  - gencnval -h
+  - popd
 
   # TODO: replace to docker container
   # Install Percona Server
@@ -109,42 +173,6 @@ before_install:
 #  - sudo cp -v -p $PHP_AST_EXT_PATH $PHP_EXTENSIONS_PATH/$PHP_AST_EXT_FILE
 #  - echo "extension=$PHP_AST_EXT_FILE" | sudo tee --append /etc/php/7.3/cli/conf.d/20-ast.ini
 #  - php -r 'function_exists("ast\parse_code") || (print("Failed to enable php-ast\n") && exit(1));'
-
-  # Build ICU
-  - export ICU_VERSION="63.1"
-  - export ICU_PREFIX="/opt/icu$ICU_VERSION"
-  - export ICU_BUILD_PATH="$DOWNLOADS_CACHE_DIR/icu/icu-$ICU_VERSION"
-  - |
-    if [ ! -d "$ICU_BUILD_PATH" ]; then
-      rm -rf $DOWNLOADS_CACHE_DIR/icu
-      mkdir -p $ICU_BUILD_PATH
-      pushd $ICU_BUILD_PATH
-      export ICU_VERSION_S=$(echo $ICU_VERSION | sed 's/\./-/g')
-      echo -e "\n> git -c advice.detachedHead=false clone -b 'release-$ICU_VERSION_S' --single-branch --depth 1 https://github.com/nikic/php-ast.git ."
-      git -c advice.detachedHead=false clone -b "release-$ICU_VERSION_S" --single-branch --depth 1 https://github.com/unicode-org/icu.git .
-      echo -e "\n> ./icu4c/source/runConfigureICU Linux/gcc --prefix=$ICU_PREFIX"
-      ./icu4c/source/runConfigureICU Linux/gcc --prefix="$ICU_PREFIX"
-      echo -e "\n> make -j2"
-      make -j2
-      echo -e "\n> make -j2 check"
-      make -j2 check
-      popd
-    fi
-  - pushd $ICU_BUILD_PATH
-  - sudo make install
-  - ls -la $ICU_PREFIX/bin
-  - export PATH=$ICU_PREFIX/bin:$PATH
-  - echo $PATH
-  - ls -la $ICU_PREFIX/lib
-  - export LD_LIBRARY_PATH=$ICU_PREFIX/lib:/usr/local/lib:/usr/lib:$LD_LIBRARY_PATH
-  - echo $LD_LIBRARY_PATH
-  - sudo ldconfig -v
-  - sudo icu-config --version
-  - sudo icuinfo
-  - sudo uconv -V
-  - sudo genrb -V
-  - sudo gencnval -h
-  - popd
 
   # Build intl ext
   - export PHP_INTL_EXT_FILE="php-intl-$PHP_VERSION.so"
@@ -268,3 +296,6 @@ install:
 
 script:
   - echo "All done"
+
+after_success:
+# - ccache --show-stats
