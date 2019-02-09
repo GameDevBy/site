@@ -42,7 +42,7 @@ before_install:
     done
 
   # Remove old icu
-  - sudo apt-get purge -y icu icu-*
+  - sudo apt-get purge -y icu-*
 
   # Update system
   - sudo LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php -y
