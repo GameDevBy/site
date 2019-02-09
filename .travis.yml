@@ -131,6 +131,7 @@ before_install:
       ls -la $ICU_BUILD_PATH/..
       ls -la $ICU_BUILD_PATH
       echo -e "\n> ( cd ./icu4c/source/test/depstest && ./depstest.py ../../../../build/ )"
+      cd ./icu4c/source/test/depstest && ./depstest.py ../../../../build/
       popd
     fi
   - pushd $ICU_BUILD_PATH
