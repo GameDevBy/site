@@ -95,7 +95,7 @@ before_install:
 #      rm -rf $DOWNLOADS_CACHE_DIR/php-ast-release
 #      mkdir -p $DOWNLOADS_CACHE_DIR/php-ast-release
 #      mkdir -p $DOWNLOADS_CACHE_DIR/build
-#      git clone -b 'v1.0.0' --single-branch --depth 1 https://github.com/nikic/php-ast.git $DOWNLOADS_CACHE_DIR/php-ast
+#      git -c advice.detachedHead=false clone -b 'v1.0.0' --single-branch --depth 1 https://github.com/nikic/php-ast.git $DOWNLOADS_CACHE_DIR/php-ast
 #      export CFLAGS="-O3"
 #      pushd $DOWNLOADS_CACHE_DIR/php-ast
 #      phpize
@@ -120,13 +120,13 @@ before_install:
       mkdir -p $ICU_BUILD_PATH
       pushd $ICU_BUILD_PATH
       ICU_VERSION_S=$(echo $ICU_VERSION | sed 's/\./-/g')
-      echo -e "\n> git clone -b 'release-$ICU_VERSION_S' --single-branch --depth 1 https://github.com/nikic/php-ast.git ."
-      git clone -b "release-$ICU_VERSION_S" --single-branch --depth 1 https://github.com/unicode-org/icu.git .
+      echo -e "\n> git -c advice.detachedHead=false clone -b 'release-$ICU_VERSION_S' --single-branch --depth 1 https://github.com/nikic/php-ast.git ."
+      git -c advice.detachedHead=false clone -b "release-$ICU_VERSION_S" --single-branch --depth 1 https://github.com/unicode-org/icu.git .
       echo -e "\n> ./icu4c/source/runConfigureICU Linux/gcc --prefix=$ICU_PREFIX"
       ./icu4c/source/runConfigureICU Linux/gcc --prefix="$ICU_PREFIX"
-      echo -e "\n> make VERBOSE=1 -j2"
+      echo -e "\n> make -j2"
       make -j2
-      echo -e "\n> make VERBOSE=1 -j2 check"
+      echo -e "\n> make -j2 check"
       make -j2 check
       ls -la $ICU_BUILD_PATH/..
       ls -la $ICU_BUILD_PATH
@@ -134,6 +134,11 @@ before_install:
       cd ./icu4c/source/test/depstest && ./depstest.py ../../../../build/
       popd
     fi
+  - ls -la $ICU_BUILD_PATH/../..
+  - ls -la $ICU_BUILD_PATH/..
+  - ls -la $ICU_BUILD_PATH
+  - ls -la $ICU_BUILD_PATH/icu4c
+  - ls -la $ICU_BUILD_PATH/icu4c/source
   - pushd $ICU_BUILD_PATH
   # - sudo make install
 #  - sudo make VERBOSE=1 V=1 AM_DEFAULT_VERBOSITY=1 --debug=j check-installed-icu
@@ -150,8 +155,8 @@ before_install:
 #      mkdir -p $DOWNLOADS_CACHE_DIR/php-src
 #      pushd $DOWNLOADS_CACHE_DIR/php-src
 #      PHP_SHORT_VERSION=$(echo $PHP_VERSION | grep -P '^[0-9]+\.[0-9]+\.[0-9]+' -o)
-#      echo -e "\n> git clone -b 'php-$PHP_SHORT_VERSION' --single-branch --depth 1 https://github.com/php/php-src.git ./php-$PHP_SHORT_VERSION"
-#      git clone -b 'php-$PHP_SHORT_VERSION' --single-branch --depth 1 https://github.com/php/php-src.git ./php-$PHP_SHORT_VERSION
+#      echo -e "\n> git -c advice.detachedHead=false clone -b 'php-$PHP_SHORT_VERSION' --single-branch --depth 1 https://github.com/php/php-src.git ./php-$PHP_SHORT_VERSION"
+#      git -c advice.detachedHead=false clone -b 'php-$PHP_SHORT_VERSION' --single-branch --depth 1 https://github.com/php/php-src.git ./php-$PHP_SHORT_VERSION
 #      cd ./php-$PHP_SHORT_VERSION/ext/intl
 #      export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$ICU_PREFIX/lib
 #      export TEST_PHP_ARGS="-q"
