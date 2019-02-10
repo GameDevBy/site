@@ -62,21 +62,25 @@ RUN INSTALL_PKGS="php php-devel php-opcache php-curl php-gd php-mbstring php-xml
     php -version && \
     $STI_SCRIPTS_PATH/yum-cleanup
 
-# RUN PHP_VERSION=$(php -version | grep -P '(?<=PHP )([0-9]+\.[0-9]+\.[0-9]+)' -o) && \
-#     mkdir /tmp/php && \
-#     cd /tmp/php && \
-#     git -c advice.detachedHead=false clone --quiet -b "php-$PHP_SHORT_VERSION" --single-branch --depth 1 https://github.com/php/php-src.git . && \
-#     cd ./ext/intl && \
-#     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/icu5c/lib && \
-#     export TEST_PHP_ARGS="-q" && \
-#     phpize && \
-#     ./configure --enable-intl --with-icu-dir=/opt/icu5c && \
-#     make && make test && make install && \
-#     echo "extension=intl.so" > /etc/php.d/20-intl.ini && \
-#     rm -rf /tmp/php
+RUN PHP_VERSION=$(php -version | grep -P '(?<=PHP )([0-9]+\.[0-9]+\.[0-9]+)' -o) && \
+    mkdir /tmp/php && \
+    cd /tmp/php && \
+    git -c advice.detachedHead=false clone --quiet -b "php-$PHP_VERSION" --single-branch --depth 1 https://github.com/php/php-src.git . && \
+    cd ./ext/intl && \
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/icu5c/lib && \
+    export TEST_PHP_ARGS="-q" && \
+    phpize && \
+    ./configure --enable-intl --with-icu-dir=/opt/icu5c && \
+    make && make test && make install && \
+    echo "extension=intl.so" > /etc/php.d/20-intl.ini && \
+    rm -rf /tmp/php
+
+ARG BUILD_TIME_ENABLE_DEV=false
+ENV ENABLE_DEV=$BUILD_TIME_ENABLE_DEV
 
 # RUN yum remove -y --setopt=tsflags=nodocs php-devel deltarpm gcc-c++ make --nogpgcheck && \
-#     $STI_SCRIPTS_PATH/yum-cleanup
+#   yum -y clean all --enablerepo='*' && \
+#   rm -rf /var/cache/yum
 
 # RUN php -i
 # RUN ls /usr/lib64/php/modules/
