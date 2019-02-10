@@ -24,7 +24,7 @@ LABEL summary="${SUMMARY}" \
       io.openshift.tags="builder,${NAME},${NAME}${PHP_VER_SHORT},rh-${NAME}${PHP_VER_SHORT}" \
       io.openshift.s2i.scripts-url="image:///usr/libexec/s2i" \
       io.s2i.scripts-url="image:///usr/libexec/s2i" \
-      name="gamedev.by/i2s_centos7_php73 \
+      name="gamedev.by/i2s_centos7_php73" \
       version="latest"
 
 RUN INSTALL_PKGS="epel-release \
