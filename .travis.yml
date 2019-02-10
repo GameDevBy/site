@@ -98,7 +98,7 @@ before_install:
   - icu-config --version
   - icuinfo
   - uconv -V
-  - genrb -V
+  - genrb --version --verbose
   - gencnval -h
   - popd
 
