@@ -42,9 +42,9 @@ RUN INSTALL_PKGS="epel-release \
     yum -y --setopt=tsflags=nodocs update --nogpgcheck && \
     $STI_SCRIPTS_PATH/yum-cleanup
 
-# RUN INSTALL_PKGS="nss_wrapper gcc-c++ make git" && \
-#     yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS --nogpgcheck && \
-#     $STI_SCRIPTS_PATH/yum-cleanup
+RUN INSTALL_PKGS="nss_wrapper gcc-c++ make git" && \
+    yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS --nogpgcheck && \
+    $STI_SCRIPTS_PATH/yum-cleanup
 
 # RUN DUMB_VERSION="1.2.2" && \
 #     curl -fsSL https://github.com/Yelp/dumb-init/releases/download/v${DUMB_VERSION}/dumb-init_${DUMB_VERSION}_amd64 > /usr/local/bin/dumb-init && \
@@ -78,7 +78,7 @@ RUN INSTALL_PKGS="epel-release \
 #     echo "extension=intl.so" > /etc/php.d/20-intl.ini && \
 #     rm -rf /tmp/php
 
-# RUN echo $BUILD_TIME_ENABLE_DEV
+RUN echo $BUILD_TIME_ENABLE_DEV
 # RUN php -i
 # RUN ls /usr/lib64/php/modules/
 # RUN cat ${PHP_SYSCONF_PATH}/php.ini

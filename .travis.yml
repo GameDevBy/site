@@ -7,6 +7,7 @@ git:
 
 before_cache:
   # Save tagged docker images
+  - rm -rf $DOCKER_DIR
   - >
     mkdir -p $DOCKER_DIR && docker images -a --filter='dangling=false' --format '{{.Repository}}:{{.Tag}} {{.ID}}'
     | xargs -n 2 -t sh -c 'test -e $DOCKER_DIR/$1.tar.gz || docker save $0 | gzip -2 > $DOCKER_DIR/$1.tar.gz'
@@ -74,6 +75,7 @@ install:
   - if [ $TRAVIS_BRANCH == 'prod' ]; then export BUILD_OPTIONS=" --build-arg BUILD_TIME_ENABLE_DEV=false "; else export BUILD_OPTIONS=" --build-arg BUILD_TIME_ENABLE_DEV=true "; fi
   - echo $BUILD_OPTIONS
   - make tag TARGET=centos7 VERSION=i2s_centos7_php73
+  - docker rmi gamedev.by/i2s_centos7_php73:raw
 
 script:
   - echo "All done"
