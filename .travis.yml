@@ -32,7 +32,7 @@ before_install:
   - export DOWNLOADS_CACHE_DIR="$HOME/.build-downloads"
 
   # Remove mysql
-#  - sudo apt-get purge -y -q mysql-server mysql-client mysql-common mysql-server-core-* mysql-client-core-*
+#  - sudo apt-get -q purge -y mysql-server mysql-client mysql-common mysql-server-core-* mysql-client-core-*
 #  - sudo rm -rf /etc/mysql /var/lib/mysql
 
   # Loading apt cache
@@ -42,13 +42,13 @@ before_install:
     done
 
   # Remove old icu
-  - sudo apt-get purge -y -q icu-*
+  - sudo apt-get -q purge -y icu-*
 
   # Update system
   - sudo LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php -y
-  - sudo apt-get update -q -y
-  - sudo apt-get upgrade -q -y
-  - sudo apt-get autoremove -q -y
+  - sudo apt-get -q update -y
+  - sudo apt-get -q upgrade -y
+  - sudo apt-get -q autoremove -y
 
   # Install ccache
   # - sudo apt install -y ccache
@@ -71,7 +71,7 @@ before_install:
       pushd $ICU_BUILD_PATH
       export ICU_VERSION_S=$(echo $ICU_VERSION | sed 's/\./-/g')
       echo -e "\n> git -c advice.detachedHead=false clone -b 'release-$ICU_VERSION_S' --single-branch --depth 1 https://github.com/nikic/php-ast.git ."
-      git -q -c advice.detachedHead=false clone -b "release-$ICU_VERSION_S" --single-branch --depth 1 https://github.com/unicode-org/icu.git .
+      git -c advice.detachedHead=false clone --quiet -b "release-$ICU_VERSION_S" --single-branch --depth 1 https://github.com/unicode-org/icu.git .
       echo -e "\n> ./icu4c/source/runConfigureICU Linux/gcc --prefix=$ICU_PREFIX"
       ./icu4c/source/runConfigureICU Linux/gcc --prefix="$ICU_PREFIX"
       echo -e "\n> make --quiet -j2"
@@ -138,8 +138,8 @@ before_install:
 #  - sudo mysql -e "FLUSH PRIVILEGES"
 
   # Install php 7.3
-  - sudo apt-get install -y -q php7.3 php7.3-common php7.3-cli
-  - sudo apt-get install -y -q php7.3-curl php7.3-gd php7.3-mbstring php7.3-xml php7.3-zip php7.3-sqlite3 php7.3-mysql php-xdebug php7.3-soap php7.3-dev
+  - sudo apt-get -q install -y php7.3 php7.3-common php7.3-cli
+  - sudo apt-get -q install -y php7.3-curl php7.3-gd php7.3-mbstring php7.3-xml php7.3-zip php7.3-sqlite3 php7.3-mysql php-xdebug php7.3-soap php7.3-dev
   - sudo php -v
 
   # Build php-ast
@@ -154,7 +154,7 @@ before_install:
 #      rm -rf $DOWNLOADS_CACHE_DIR/php-ast-release
 #      mkdir -p $DOWNLOADS_CACHE_DIR/php-ast-release
 #      mkdir -p $DOWNLOADS_CACHE_DIR/build
-#      git -q -c advice.detachedHead=false clone -b 'v1.0.0' --single-branch --depth 1 https://github.com/nikic/php-ast.git $DOWNLOADS_CACHE_DIR/php-ast
+#      git -c advice.detachedHead=false clone --quiet -b 'v1.0.0' --single-branch --depth 1 https://github.com/nikic/php-ast.git $DOWNLOADS_CACHE_DIR/php-ast
 #      export CFLAGS="-O3"
 #      pushd $DOWNLOADS_CACHE_DIR/php-ast
 #      phpize
@@ -182,7 +182,7 @@ before_install:
       mkdir -p $PHP_BUILD_PATH
       pushd $PHP_BUILD_PATH
       echo -e "\n> git -q -c advice.detachedHead=false clone -b 'php-$PHP_SHORT_VERSION' --single-branch --depth 1 https://github.com/php/php-src.git ."
-      git -q -c advice.detachedHead=false clone -b "php-$PHP_SHORT_VERSION" --single-branch --depth 1 https://github.com/php/php-src.git .
+      git -c advice.detachedHead=false clone --quiet -b "php-$PHP_SHORT_VERSION" --single-branch --depth 1 https://github.com/php/php-src.git .
       cd ./ext/intl
       export TEST_PHP_ARGS="-q"
       export CFLAGS="-O3"
@@ -191,10 +191,10 @@ before_install:
       phpize
       echo -e "\n> ./configure --enable-intl --with-icu-dir=$ICU_PREFIX"
       ./configure --enable-intl --with-icu-dir="$ICU_PREFIX"
-      echo -e "\n> make CXXFLAGS=$CXXFLAGS"
-      make CXXFLAGS=$CXXFLAGS
-      echo -e "\n> make test"
-      make test
+      echo -e "\n> make -j2 CXXFLAGS=$CXXFLAGS"
+      make -j2 CXXFLAGS=$CXXFLAGS
+      echo -e "\n> make -j2 test"
+      make -j2 test
       rm -rf $DOWNLOADS_CACHE_DIR/php-src
       popd
     fi
