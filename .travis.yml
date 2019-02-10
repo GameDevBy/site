@@ -5,23 +5,9 @@ git:
   depth: 50
   submodules: false
 
-mysql:
-  database: gamedevby
-  username: root
-  encoding: utf8
-
 cache:
   directories:
-    - $HOME/.cache/composer/files
-    - $HOME/.composer/cache/files
-    - $HOME/.cache/phan-ast/build
     - $HOME/apt-cache
-    - $HOME/.npm
-    - $HOME/.build-downloads
-    - $TRAVIS_BUILD_DIR/.eslintcache
-    - $TRAVIS_BUILD_DIR/.phpcscache
-    - $TRAVIS_BUILD_DIR/.stylelintcache
-    - $TRAVIS_BUILD_DIR/.psalm-cache
 
 notifications:
   email: false
@@ -29,11 +15,6 @@ notifications:
 before_install:
   - pwd
   - export APT_CACHE_DIR="$HOME/apt-cache"
-  - export DOWNLOADS_CACHE_DIR="$HOME/.build-downloads"
-
-  # Remove mysql
-#  - sudo apt-get -qq -o=Dpkg::Use-Pty=0 purge -y mysql-server mysql-client mysql-common mysql-server-core-* mysql-client-core-*
-#  - sudo rm -rf /etc/mysql /var/lib/mysql
 
   # Loading apt cache
   - |
@@ -41,255 +22,33 @@ before_install:
       if [ -f "$i" ]; then sudo cp -p $APT_CACHE_DIR/*.deb /var/cache/apt/archives/; break; fi
     done
 
-  # Remove old icu
-  - sudo apt-get -qq -o=Dpkg::Use-Pty=0 purge -y icu-*
+  # Remove docker
+  - sudo service docker stop
+  - sudo apt-get -qq -o=Dpkg::Use-Pty=0 remove -y docker docker-engine docker.io containerd runc
 
   # Update system
-  - sudo LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php -y
+  - sudo LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
   - sudo apt-get -qq -o=Dpkg::Use-Pty=0 update -y
   - sudo apt-get -qq -o=Dpkg::Use-Pty=0 upgrade -y
   - sudo apt-get -qq -o=Dpkg::Use-Pty=0 autoremove -y
+  
+  # Install docker (read more: https://docs.docker.com/install/linux/docker-ce/ubuntu/ )
+  - sudo apt-get -qq -o=Dpkg::Use-Pty=0 install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common
+  - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+  - sudo apt-key fingerprint 0EBFCD88
+  - sudo add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+  - sudo apt-get -qq -o=Dpkg::Use-Pty=0 update -y
+  - sudo apt-get -qq -o=Dpkg::Use-Pty=0 install -y docker-ce docker-ce-cli containerd.io
 
-  # Install ccache
-  # - sudo apt install -y ccache
-  # - sudo /usr/sbin/update-ccache-symlinks
-  # - export PATH="/usr/lib/ccache/:$PATH"
-  # - sudo export PATH="/usr/lib/ccache/:$PATH"
-  # - ccache --version
-  # - ccache --zero-stats
-  # - export USE_CCACHE=1
-  # - sudo export USE_CCACHE=1
 
-  # Build ICU
-  - export ICU_VERSION="63.1"
-  - export ICU_PREFIX="/opt/icu$ICU_VERSION"
-  - export ICU_BUILD_PATH="$DOWNLOADS_CACHE_DIR/icu/icu-$ICU_VERSION"
-  - |
-    if [ ! -d "$ICU_BUILD_PATH" ]; then
-      rm -rf $DOWNLOADS_CACHE_DIR/icu
-      mkdir -p $ICU_BUILD_PATH
-      pushd $ICU_BUILD_PATH
-      export ICU_VERSION_S=$(echo $ICU_VERSION | sed 's/\./-/g')
-      echo -e "\n> git -c advice.detachedHead=false clone -b 'release-$ICU_VERSION_S' --single-branch --depth 1 https://github.com/nikic/php-ast.git ."
-      git -c advice.detachedHead=false clone --quiet -b "release-$ICU_VERSION_S" --single-branch --depth 1 https://github.com/unicode-org/icu.git .
-      echo -e "\n> ./icu4c/source/runConfigureICU Linux/gcc --prefix=$ICU_PREFIX"
-      ./icu4c/source/runConfigureICU Linux/gcc --prefix="$ICU_PREFIX"
-      echo -e "\n> make --quiet -j2"
-      make --quiet -j2
-      echo -e "\n> make --quiet -j2 check"
-      make --quiet -j2 check
-      popd
-    fi
-  # Install ICU
-  - pushd $ICU_BUILD_PATH
-  - sudo make install
-  - ls -la $ICU_PREFIX/bin
-  - sudo -E bash -c "PATH=$ICU_PREFIX/bin:$PATH"
-  - export PATH=$ICU_PREFIX/bin:$PATH
-  - echo $PATH
-  - sudo echo $PATH
-  - ls -la $ICU_PREFIX/lib
-  - export LD_LIBRARY_PATH=$ICU_PREFIX/lib:/usr/local/lib:/usr/lib:$LD_LIBRARY_PATH
-  - sudo -E bash -c "LD_LIBRARY_PATH=$ICU_PREFIX/lib:/usr/local/lib:/usr/lib:$LD_LIBRARY_PATH"
-  - echo $LD_LIBRARY_PATH
-  - sudo echo $LD_LIBRARY_PATH
-  - sudo ldconfig
-  # Check ICU
-  - icu-config --version
-  - icuinfo
-  - uconv -V
-  - genrb --version --verbose
-  - gencnval -h
-  - popd
+  # TODO
 
-  # TODO: replace to docker container
-  # Install Percona Server
-  #   https://www.percona.com/doc/percona-server/8.0/installation/apt_repo.html
-  #   https://www.percona.com/doc/percona-server/8.0/myrocks/install.html
-  # Fetch the repository packages from Percona web
-#  - curl -L -o ./percona-release_latest_all.deb https://repo.percona.com/apt/percona-release_latest.$(lsb_release -sc)_all.deb
-  # Install the downloaded package with dpkg. To do that, run the following commands as root or with sudo
-#  - sudo dpkg -i ./percona-release_latest_all.deb
-  # Enable the repository
-#  - sudo percona-release setup ps80
-  # Install the server package
-#  - sudo apt-get -qq -o=Dpkg::Use-Pty=0 install -y percona-server-rocksdb
-  # View *.cnf
-#  - cat /etc/mysql/conf.d/mysql.cnf
-#  - cat /etc/mysql/mysql.conf.d/mysqld.cnf
-  # Starting the service
-#  - sudo service mysql start
-  # Percona Server is distributed with several useful UDF (User Defined Function) from Percona Toolkit.
-  #   See http://www.percona.com/doc/percona-server/8.0/management/udf_percona_toolkit.html for more details
-#  - sudo mysql -e "CREATE FUNCTION fnv1a_64 RETURNS INTEGER SONAME 'libfnv1a_udf.so'"
-#  - sudo mysql -e "CREATE FUNCTION fnv_64 RETURNS INTEGER SONAME 'libfnv_udf.so'"
-#  - sudo mysql -e "CREATE FUNCTION murmur_hash RETURNS INTEGER SONAME 'libmurmur_udf.so'"
-  # Enable the RocksDB storage engine in Percona Server
-#  - sudo ps-admin --enable-rocksdb -u root
-  # View result
-#  - sudo mysql -e "SHOW ENGINES"
-#  - sudo mysql -e "SHOW VARIABLES"
-  # Create database
-#  - sudo mysql -e "CREATE DATABASE gamedevby"
-  # Create user
-#  - sudo mysql -e "CREATE USER 'gamedevby'@'localhost' IDENTIFIED BY 'gamedevby'"
-#  - sudo mysql -e "GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER, CREATE TEMPORARY TABLES ON gamedevby.* TO 'gamedevby'@'localhost'"
-#  - sudo mysql -e "FLUSH PRIVILEGES"
 
-  # Install php 7.3
-  - sudo apt-get -qq -o=Dpkg::Use-Pty=0 install -y php7.3 php7.3-common php7.3-cli
-  - sudo apt-get -qq -o=Dpkg::Use-Pty=0 install -y php7.3-curl php7.3-gd php7.3-mbstring php7.3-xml php7.3-zip php7.3-sqlite3 php7.3-mysql php-xdebug php7.3-soap php7.3-dev
-  - sudo php -v
-
-  # Build php-ast
-  - export PHP_EXTENSIONS_PATH=$(php -i | grep -P '(?<=extension_dir => )([^ ]*)' -o | grep -P '^(/[^ \n\t]*)' -o)
-  - echo $PHP_EXTENSIONS_PATH
-  - export PHP_VERSION=$(php -version | grep -P '(?<=PHP )([0-9]+\.[0-9]+\.[0-9]+[^ \n\t]*)' -o | grep -P '^[0-9]([^ \n\t]*)' -o)
-  - echo $PHP_VERSION
-#  - export PHP_AST_EXT_FILE="php-ast-$PHP_VERSION.so"
-#  - export PHP_AST_EXT_PATH="$DOWNLOADS_CACHE_DIR/php-ast-release/$PHP_AST_EXT_FILE"
-#  - |
-#    if [ ! -f "$PHP_AST_EXT_PATH" ]; then
-#      rm -rf $DOWNLOADS_CACHE_DIR/php-ast-release
-#      mkdir -p $DOWNLOADS_CACHE_DIR/php-ast-release
-#      mkdir -p $DOWNLOADS_CACHE_DIR/build
-#      git -c advice.detachedHead=false clone --quiet -b 'v1.0.0' --single-branch --depth 1 https://github.com/nikic/php-ast.git $DOWNLOADS_CACHE_DIR/php-ast
-#      export CFLAGS="-O3"
-#      pushd $DOWNLOADS_CACHE_DIR/php-ast
-#      phpize
-#      ./configure
-#      make
-#      make test
-#      mv modules/ast.so "$PHP_AST_EXT_PATH"
-#      rm -rf $DOWNLOADS_CACHE_DIR/php-ast $DOWNLOADS_CACHE_DIR/build
-#      popd
-#    fi
-#  - sudo cp -v -p $PHP_AST_EXT_PATH $PHP_EXTENSIONS_PATH/$PHP_AST_EXT_FILE
-#  - echo "extension=$PHP_AST_EXT_FILE" | sudo tee --append /etc/php/7.3/cli/conf.d/20-ast.ini
-#  - php -r 'function_exists("ast\parse_code") || (print("Failed to enable php-ast\n") && exit(1));'
-
-  # Build intl ext
-  - export PHP_INTL_EXT_FILE="php-intl-$PHP_VERSION.so"
-  - export PHP_INTL_EXT_PATH="$DOWNLOADS_CACHE_DIR/php-intl-release/$PHP_INTL_EXT_FILE"
-  - |
-    if [ ! -f "$PHP_INTL_EXT_PATH" ]; then
-      rm -rf $DOWNLOADS_CACHE_DIR/php-intl-release
-      rm -rf $DOWNLOADS_CACHE_DIR/php-src
-      mkdir -p $DOWNLOADS_CACHE_DIR/php-intl-release
-      export PHP_SHORT_VERSION=$(echo $PHP_VERSION | grep -P '^[0-9]+\.[0-9]+\.[0-9]+' -o)
-      export PHP_BUILD_PATH="$DOWNLOADS_CACHE_DIR/php-src/$PHP_SHORT_VERSION"
-      mkdir -p $PHP_BUILD_PATH
-      pushd $PHP_BUILD_PATH
-      echo -e "\n> git -q -c advice.detachedHead=false clone -b 'php-$PHP_SHORT_VERSION' --single-branch --depth 1 https://github.com/php/php-src.git ."
-      git -c advice.detachedHead=false clone --quiet -b "php-$PHP_SHORT_VERSION" --single-branch --depth 1 https://github.com/php/php-src.git .
-      cd ./ext/intl
-      export TEST_PHP_ARGS="-q"
-      export CFLAGS="-O3"
-      export CXXFLAGS=$($ICU_PREFIX/bin/icu-config --cxxflags)
-      echo -e "\n> phpize"
-      phpize
-      echo -e "\n> ./configure --enable-intl --with-icu-dir=$ICU_PREFIX"
-      ./configure --enable-intl --with-icu-dir="$ICU_PREFIX"
-      echo -e "\n> make -j2 CXXFLAGS=$CXXFLAGS"
-      make -j2 CXXFLAGS=$CXXFLAGS
-      echo -e "\n> make -j2 test"
-      make -j2 test
-      rm -rf $DOWNLOADS_CACHE_DIR/php-src
-      popd
-    fi
-  - sudo cp -v -p $PHP_INTL_EXT_PATH $PHP_EXTENSIONS_PATH/$PHP_INTL_EXT_FILE
-  - echo "extension=$PHP_INTL_EXT_FILE" | sudo tee --append /etc/php/7.3/cli/conf.d/20-intl.ini
-  - php -r 'function_exists("intl_error_name") || (print("Failed to enable php-intl\n") && exit(1));'
-
-  # View php detailed info
-#  - ls -la $PHP_EXTENSIONS_PATH
-#  - sudo php -i
-
-  # Install composer
-#  - |
-#    if [ ! -f "$DOWNLOADS_CACHE_DIR/composer-setup.php" ]; then
-#      curl -L -o $DOWNLOADS_CACHE_DIR/composer-setup.php https://getcomposer.org/installer
-#    fi
-#  - sudo php $DOWNLOADS_CACHE_DIR/composer-setup.php --install-dir=/usr/local/bin --filename=composer
-#  - composer diagnose --no-interaction --ansi --verbose
-#  - sudo mkdir -p ~/.composer/
-#  - sudo chown -R $USER ~/.composer/
-#  - composer --no-progress --no-interaction --no-ansi global require hirak/prestissimo
-
-  # Install symfony cli https://symfony.com/download
-#  - |
-#    if [ ! -f "$DOWNLOADS_CACHE_DIR/symfony-setup" ]; then
-#      curl -L -o $DOWNLOADS_CACHE_DIR/symfony-setup https://get.symfony.com/cli/installer
-#    fi
-#  - sudo bash $DOWNLOADS_CACHE_DIR/symfony-setup
-#  - sudo mv ~/.symfony/bin/symfony /usr/local/bin/symfony
-#  - sudo symfony -V
 
   # Updating apt cache
-  - echo "Start updating apt cache"
   - sudo apt-get autoclean -q -y
   - rm -rf $APT_CACHE_DIR/*.deb
   - cp -p /var/cache/apt/archives/*deb $APT_CACHE_DIR
 
-install:
-  # Validation
-#  - composer validate --strict --no-interaction --ansi
-#  - sudo symfony security:check
-
-  # Install Composer dependencies
-#  - composer --prefer-dist --no-progress --no-interaction --ansi --classmap-authoritative install
-#  - composer licenses --no-interaction --ansi
-
-  # Export environment settings
-#  - source ./init_env
-
-  # Info for debug
-#  - echo $PATH
-#  - ls -la /home/travis/build/GameDevBy/site/vendor/bin
-#  - ls -la /home/travis/build/GameDevBy/site/node_modules/.bin
-
-  # Check npm
-#  - npm audit
-
-  # Check code style
-#  - composer drupal:check --no-interaction --ansi
-
-  # Define build properties for the local test environment
-  # - echo -e "drupal.base_url = http://localhost:8888\n" > build.properties.local
-
-  # Create development environment
-  # - ./vendor/bin/phing -diagnostics
-  # - ./vendor/bin/phing create-dev-env
-
-  # Install site
-  # - ./vendor/bin/phing install-dev
-
-  # Start a web server on port 8888 in the background.
-  #- cd $TRAVIS_BUILD_DIR/web
-  #- nohup php -S localhost:8888 > /dev/null 2>&1 &
-
-  # Wait until the web server is responding.
-  # - until curl -s localhost:8888; do true; done > /dev/null
-  #  - cd $TRAVIS_BUILD_DIR
-
-  # Run test
-#  - ./vendor/bin/phpunit
-
-#  - cd $TRAVIS_BUILD_DIR/tests
-#  - ./behat
-
-#   - ./../vendor/bin/drush site-install --verbose --yes --db-url=sqlite://tmp/site.sqlite
-#   - ./../vendor/bin/drush runserver $SIMPLETEST_BASE_URL &
-#   - until curl -s $SIMPLETEST_BASE_URL; do true; done > /dev/null
-#   # Skip core/tests/Drupal/Tests/ComposerIntegrationTest.php because web/ has no composer.json
-#   # Ignore PageCache group temporarily, @see https://www.drupal.org/node/2770673
-#   # Ignore Setup group temporarily, @see https://www.drupal.org/node/2962157
-#   - ./../vendor/bin/phpunit -c core --testsuite unit --exclude-group Composer,DependencyInjection,PageCache,Setup
-#   - ./../vendor/bin/drush
-#   - if [[ $RELEASE = stable ]]; then ./../vendor/bin/drupal; fi;
-
 script:
   - echo "All done"
-
-after_success:
-# - ccache --show-stats
