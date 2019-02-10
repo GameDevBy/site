@@ -32,23 +32,23 @@ before_install:
   - export DOWNLOADS_CACHE_DIR="$HOME/.build-downloads"
 
   # Remove mysql
-#  - sudo apt-get purge -y mysql-server mysql-client mysql-common mysql-server-core-* mysql-client-core-*
+#  - sudo apt-get purge -y -q mysql-server mysql-client mysql-common mysql-server-core-* mysql-client-core-*
 #  - sudo rm -rf /etc/mysql /var/lib/mysql
 
   # Loading apt cache
   - |
     for i in $APT_CACHE_DIR/*.deb; do
-      if [ -f "$i" ]; then sudo cp -v -p $APT_CACHE_DIR/*.deb /var/cache/apt/archives/; break; fi
+      if [ -f "$i" ]; then sudo cp -p $APT_CACHE_DIR/*.deb /var/cache/apt/archives/; break; fi
     done
 
   # Remove old icu
-  - sudo apt-get purge -y icu-*
+  - sudo apt-get purge -y -q icu-*
 
   # Update system
   - sudo LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php -y
-  - sudo apt-get update -y
-  - sudo apt-get upgrade -y
-  - sudo apt-get autoremove -y
+  - sudo apt-get update -q -y
+  - sudo apt-get upgrade -q -y
+  - sudo apt-get autoremove -q -y
 
   # Install ccache
   # - sudo apt install -y ccache
@@ -71,13 +71,13 @@ before_install:
       pushd $ICU_BUILD_PATH
       export ICU_VERSION_S=$(echo $ICU_VERSION | sed 's/\./-/g')
       echo -e "\n> git -c advice.detachedHead=false clone -b 'release-$ICU_VERSION_S' --single-branch --depth 1 https://github.com/nikic/php-ast.git ."
-      git -c advice.detachedHead=false clone -b "release-$ICU_VERSION_S" --single-branch --depth 1 https://github.com/unicode-org/icu.git .
+      git -q -c advice.detachedHead=false clone -b "release-$ICU_VERSION_S" --single-branch --depth 1 https://github.com/unicode-org/icu.git .
       echo -e "\n> ./icu4c/source/runConfigureICU Linux/gcc --prefix=$ICU_PREFIX"
       ./icu4c/source/runConfigureICU Linux/gcc --prefix="$ICU_PREFIX"
-      echo -e "\n> make -j2"
-      make -j2
-      echo -e "\n> make -j2 check"
-      make -j2 check
+      echo -e "\n> make --quiet -j2"
+      make --quiet -j2
+      echo -e "\n> make --quiet -j2 check"
+      make --quiet -j2 check
       popd
     fi
   # Install ICU
@@ -93,13 +93,8 @@ before_install:
   - sudo -E bash -c "LD_LIBRARY_PATH=$ICU_PREFIX/lib:/usr/local/lib:/usr/lib:$LD_LIBRARY_PATH"
   - echo $LD_LIBRARY_PATH
   - sudo echo $LD_LIBRARY_PATH
+  - sudo ldconfig
   # Check ICU
-  - sudo ldconfig -v
-  - sudo icu-config --version
-  - sudo icuinfo
-  - sudo uconv -V
-  - sudo genrb -V
-  - sudo gencnval -h
   - ldconfig -v
   - icu-config --version
   - icuinfo
@@ -143,8 +138,8 @@ before_install:
 #  - sudo mysql -e "FLUSH PRIVILEGES"
 
   # Install php 7.3
-  - sudo apt-get install -y php7.3 php7.3-common php7.3-cli
-  - sudo apt-get install -y php7.3-curl php7.3-gd php7.3-mbstring php7.3-xml php7.3-zip php7.3-sqlite3 php7.3-mysql php-xdebug php7.3-soap php7.3-dev
+  - sudo apt-get install -y -q php7.3 php7.3-common php7.3-cli
+  - sudo apt-get install -y -q php7.3-curl php7.3-gd php7.3-mbstring php7.3-xml php7.3-zip php7.3-sqlite3 php7.3-mysql php-xdebug php7.3-soap php7.3-dev
   - sudo php -v
 
   # Build php-ast
@@ -159,7 +154,7 @@ before_install:
 #      rm -rf $DOWNLOADS_CACHE_DIR/php-ast-release
 #      mkdir -p $DOWNLOADS_CACHE_DIR/php-ast-release
 #      mkdir -p $DOWNLOADS_CACHE_DIR/build
-#      git -c advice.detachedHead=false clone -b 'v1.0.0' --single-branch --depth 1 https://github.com/nikic/php-ast.git $DOWNLOADS_CACHE_DIR/php-ast
+#      git -q -c advice.detachedHead=false clone -b 'v1.0.0' --single-branch --depth 1 https://github.com/nikic/php-ast.git $DOWNLOADS_CACHE_DIR/php-ast
 #      export CFLAGS="-O3"
 #      pushd $DOWNLOADS_CACHE_DIR/php-ast
 #      phpize
@@ -186,8 +181,8 @@ before_install:
       export PHP_BUILD_PATH="$DOWNLOADS_CACHE_DIR/php-src/$PHP_SHORT_VERSION"
       mkdir -p $PHP_BUILD_PATH
       pushd $PHP_BUILD_PATH
-      echo -e "\n> git clone -b 'php-$PHP_SHORT_VERSION' --single-branch --depth 1 https://github.com/php/php-src.git ."
-      git clone -b "php-$PHP_SHORT_VERSION" --single-branch --depth 1 https://github.com/php/php-src.git .
+      echo -e "\n> git -q -c advice.detachedHead=false clone -b 'php-$PHP_SHORT_VERSION' --single-branch --depth 1 https://github.com/php/php-src.git ."
+      git -q -c advice.detachedHead=false clone -b "php-$PHP_SHORT_VERSION" --single-branch --depth 1 https://github.com/php/php-src.git .
       cd ./ext/intl
       export TEST_PHP_ARGS="-q"
       export CFLAGS="-O3"
@@ -195,7 +190,7 @@ before_install:
       echo -e "\n> phpize"
       phpize
       echo -e "\n> ./configure --enable-intl --with-icu-dir=$ICU_PREFIX"
-      sudo ./configure --enable-intl --with-icu-dir="$ICU_PREFIX"
+      ./configure --enable-intl --with-icu-dir="$ICU_PREFIX"
       echo -e "\n> make CXXFLAGS=$CXXFLAGS"
       make CXXFLAGS=$CXXFLAGS
       echo -e "\n> make test"
@@ -233,18 +228,18 @@ before_install:
 
   # Updating apt cache
   - echo "Start updating apt cache"
-  - sudo apt-get autoclean -y
+  - sudo apt-get autoclean -q -y
   - rm -rf $APT_CACHE_DIR/*.deb
-  - cp -v -p /var/cache/apt/archives/*deb $APT_CACHE_DIR
+  - cp -p /var/cache/apt/archives/*deb $APT_CACHE_DIR
 
 install:
   # Validation
-#  - composer validate --strict --no-interaction --ansi --verbose
+#  - composer validate --strict --no-interaction --ansi
 #  - sudo symfony security:check
 
   # Install Composer dependencies
-#  - composer --verbose --prefer-dist --no-progress --no-interaction --ansi --classmap-authoritative install
-#  - composer licenses --no-interaction --ansi --verbose
+#  - composer --prefer-dist --no-progress --no-interaction --ansi --classmap-authoritative install
+#  - composer licenses --no-interaction --ansi
 
   # Export environment settings
 #  - source ./init_env
@@ -258,14 +253,14 @@ install:
 #  - npm audit
 
   # Check code style
-#  - composer drupal:check --no-interaction --ansi --verbose
+#  - composer drupal:check --no-interaction --ansi
 
   # Define build properties for the local test environment
   # - echo -e "drupal.base_url = http://localhost:8888\n" > build.properties.local
 
   # Create development environment
   # - ./vendor/bin/phing -diagnostics
-  # - ./vendor/bin/phing -verbose create-dev-env
+  # - ./vendor/bin/phing create-dev-env
 
   # Install site
   # - ./vendor/bin/phing install-dev
