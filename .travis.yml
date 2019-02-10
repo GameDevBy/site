@@ -13,9 +13,6 @@ env:
   global:
     - DOCKER_DIR="$HOME/docker"
     - APT_CACHE_DIR="$HOME/apt-cache"
-    - BASE_IMAGE_NAME=php
-    - VERSIONS=i2s_centos7_php73
-    - OPENSHIFT_NAMESPACES=
 
 cache:
   directories:
@@ -28,7 +25,7 @@ notifications:
 before_install:
   - pwd
 
-  # Loading apt cache
+  # Load apt cache
   - |
     for i in $APT_CACHE_DIR/*.deb; do
       if [ -f "$i" ]; then sudo cp -p $APT_CACHE_DIR/*.deb /var/cache/apt/archives/; break; fi
@@ -68,13 +65,14 @@ before_install:
   # Install Packages for i2s
   - sudo apt-get -q -y -o Dpkg::Use-Pty=0 install go-md2man
 
-  # Updating apt cache
+  # Update apt cache
   - sudo apt-get autoclean -q -y
   - rm -rf $APT_CACHE_DIR/*.deb
   - cp -p /var/cache/apt/archives/*deb $APT_CACHE_DIR
 
 install:
-  - make -f common/common.mk tag TARGET=centos7 VERSIONS=i2s_centos7_php73
+  # Build php 7.3 Centos 7 i2s docker image
+  - make tag TARGET=centos7 VERSIONS=i2s_centos7_php73
 
 script:
   - echo "All done"
