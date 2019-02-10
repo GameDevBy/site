@@ -11,23 +11,13 @@ before_cache:
 
 env:
   global:
-    - DOWNLOADS_CACHE_DIR="~/.build-downloads"
-    - APT_CACHE_DIR="~/apt-cache"
+    - DOCKER_DIR="$HOME/docker"
+    - APT_CACHE_DIR="$HOME/apt-cache"
 
 cache:
   directories:
-    - ~/apt-cache
-    - ~/docker
-    - ~/.cache/composer/files
-    - ~/.composer/cache/files
-    - ~/.cache/phan-ast/build
-    - ~/.npm
+    - $DOCKER_DIR
     - $APT_CACHE_DIR
-    - $DOWNLOADS_CACHE_DIR
-    - $TRAVIS_BUILD_DIR/.eslintcache
-    - $TRAVIS_BUILD_DIR/.phpcscache
-    - $TRAVIS_BUILD_DIR/.stylelintcache
-    - $TRAVIS_BUILD_DIR/.psalm-cache
 
 notifications:
   email: false
@@ -57,46 +47,6 @@ before_install:
   - sudo apt-get -q -y -o Dpkg::Use-Pty=0 upgrade
   - sudo apt-get -q -y -o Dpkg::Use-Pty=0 autoremove
 
-  # Install base php command line
-  - sudo apt-get -q -y -o Dpkg::Use-Pty=0 install php7.3-cli
-  - php -v
-
-  # Install composer
-  - |
-    if [ ! -f "$DOWNLOADS_CACHE_DIR/composer-setup.php" ]; then
-      curl -L -o $DOWNLOADS_CACHE_DIR/composer-setup.php https://getcomposer.org/installer
-    fi
-  - sudo php $DOWNLOADS_CACHE_DIR/composer-setup.php --install-dir=/usr/local/bin --filename=composer
-  - composer diagnose --no-interaction --ansi --verbose
-  - sudo mkdir -p ~/.composer/
-  - sudo chown -R $USER ~/.composer/
-  - composer --no-progress --no-interaction --no-ansi global require hirak/prestissimo
-
-  # Install symfony cli https://symfony.com/download
-  - |
-    if [ ! -f "$DOWNLOADS_CACHE_DIR/symfony-setup" ]; then
-      curl -L -o $DOWNLOADS_CACHE_DIR/symfony-setup https://get.symfony.com/cli/installer
-    fi
-  - sudo bash $DOWNLOADS_CACHE_DIR/symfony-setup
-  - sudo mv ~/.symfony/bin/symfony /usr/local/bin/symfony
-  - sudo symfony -V
-
-  # Validation
-  - composer validate --strict --no-interaction --ansi
-  - sudo symfony security:check
-
-  # Install Composer dependencies
-  - composer --prefer-dist --no-progress --no-interaction --ansi --classmap-authoritative install
-
-  # Export environment settings
-  - source ./init_env
-
-  # Check npm
-  - npm audit
-
-  # Check code style
-  - composer drupal:check --no-interaction --ansi
-
   # Install docker (read more: https://docs.docker.com/install/linux/docker-ce/ubuntu/ )
   - sudo apt-get -q -y -o Dpkg::Use-Pty=0 install apt-transport-https ca-certificates curl gnupg-agent software-properties-common
   - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
@@ -108,8 +58,8 @@ before_install:
 
   # Update docker images from cache
   - sudo service docker stop
-  - if [ "$(ls -A /home/travis/docker)" ]; then echo "/home/travis/docker already set"; else sudo mv /var/lib/docker /home/travis/docker; fi
-  - sudo bash -c "echo 'DOCKER_OPTS=\"-H tcp://127.0.0.1:2375 -H unix:///var/run/docker.sock -g /home/travis/docker\"' > /etc/default/docker"
+  - if [ "$(ls -A /home/travis/docker)" ]; then echo "/home/travis/docker already set"; else sudo mv /var/lib/docker $DOCKER_DIR; fi
+  - sudo bash -c "echo 'DOCKER_OPTS=\"-H tcp://127.0.0.1:2375 -H unix:///var/run/docker.sock -g $DOCKER_DIR"' > /etc/default/docker"
   - sudo service docker start
 
   # Updating apt cache
@@ -118,7 +68,7 @@ before_install:
   - cp -p /var/cache/apt/archives/*deb $APT_CACHE_DIR
 
 install:
-  - docker build -f ./.travis_dockerfile_centos -t testenv .
+  - make tag TARGET=centos7 VERSIONS=i2s_centos7_php73
 
 script:
   - echo "All done"
