@@ -10,11 +10,11 @@ before_cache:
   # Save tagged docker images
   - >
     docker images -a --format '{{.Repository}}:{{.Tag}} {{.ID}}'
-    | xargs -n 2 -t sh -c 'test -e ./$1.tar.gz || docker save $0 | gzip -3 > ./$1.tar.gz'
+    | xargs -n 2 -t sh -c 'test -e ./$1.tar.gz || docker save $1 | gzip -3 > ./$1.tar.gz'
   # Remove legacy images from cache
   - >
     ls -1 | sed -e 's/\..*$//'
-    | xargs -n 1 -t sh -c 'docker inspect --type=image $0 || rm ./$0.tar.gz'
+    | xargs -n 1 -t sh -c 'docker inspect --type=image $0 > /dev/null 2>&1 || rm ./$0.tar.gz'
   - popd
 
 env:
