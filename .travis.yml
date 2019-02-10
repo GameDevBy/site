@@ -57,6 +57,10 @@ before_install:
   - sudo apt-get -q -y -o Dpkg::Use-Pty=0 upgrade
   - sudo apt-get -q -y -o Dpkg::Use-Pty=0 autoremove
 
+  # Install base php command line
+  - sudo apt-get -q -y -o Dpkg::Use-Pty=0 install php7.3-cli
+  - php -v
+
   # Install composer
   - |
     if [ ! -f "$DOWNLOADS_CACHE_DIR/composer-setup.php" ]; then
