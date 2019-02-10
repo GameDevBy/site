@@ -9,17 +9,31 @@ before_cache:
   - sudo service docker stop
   - sudo chown -R travis ~/docker
 
+env:
+  global:
+    - DOWNLOADS_CACHE_DIR="~/.build-downloads"
+    - APT_CACHE_DIR="~/apt-cache"
+
 cache:
   directories:
     - ~/apt-cache
     - ~/docker
+    - ~/.cache/composer/files
+    - ~/.composer/cache/files
+    - ~/.cache/phan-ast/build
+    - ~/.npm
+    - $APT_CACHE_DIR
+    - $DOWNLOADS_CACHE_DIR
+    - $TRAVIS_BUILD_DIR/.eslintcache
+    - $TRAVIS_BUILD_DIR/.phpcscache
+    - $TRAVIS_BUILD_DIR/.stylelintcache
+    - $TRAVIS_BUILD_DIR/.psalm-cache
 
 notifications:
   email: false
 
 before_install:
   - pwd
-  - export APT_CACHE_DIR="$HOME/apt-cache"
 
   # Loading apt cache
   - |
@@ -33,7 +47,7 @@ before_install:
   # Remove unnecessary packages
   - sudo apt-get -q -y -o Dpkg::Use-Pty=0 purge openjdk-* icedtea* postgresql-*  mysql-*
 
-  # Remove docker
+  # Remove old docker
   - sudo service docker stop
   - sudo apt-get -q -y -o Dpkg::Use-Pty=0 remove docker docker-engine docker.io containerd runc
 
@@ -42,7 +56,43 @@ before_install:
   - sudo LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
   - sudo apt-get -q -y -o Dpkg::Use-Pty=0 upgrade
   - sudo apt-get -q -y -o Dpkg::Use-Pty=0 autoremove
-  
+
+  # Install composer
+  - |
+    if [ ! -f "$DOWNLOADS_CACHE_DIR/composer-setup.php" ]; then
+      curl -L -o $DOWNLOADS_CACHE_DIR/composer-setup.php https://getcomposer.org/installer
+    fi
+  - sudo php $DOWNLOADS_CACHE_DIR/composer-setup.php --install-dir=/usr/local/bin --filename=composer
+  - composer diagnose --no-interaction --ansi --verbose
+  - sudo mkdir -p ~/.composer/
+  - sudo chown -R $USER ~/.composer/
+  - composer --no-progress --no-interaction --no-ansi global require hirak/prestissimo
+
+  # Install symfony cli https://symfony.com/download
+  - |
+    if [ ! -f "$DOWNLOADS_CACHE_DIR/symfony-setup" ]; then
+      curl -L -o $DOWNLOADS_CACHE_DIR/symfony-setup https://get.symfony.com/cli/installer
+    fi
+  - sudo bash $DOWNLOADS_CACHE_DIR/symfony-setup
+  - sudo mv ~/.symfony/bin/symfony /usr/local/bin/symfony
+  - sudo symfony -V
+
+  # Validation
+  - composer validate --strict --no-interaction --ansi
+  - sudo symfony security:check
+
+  # Install Composer dependencies
+  - composer --prefer-dist --no-progress --no-interaction --ansi --classmap-authoritative install
+
+  # Export environment settings
+  - source ./init_env
+
+  # Check npm
+  - npm audit
+
+  # Check code style
+  - composer drupal:check --no-interaction --ansi
+
   # Install docker (read more: https://docs.docker.com/install/linux/docker-ce/ubuntu/ )
   - sudo apt-get -q -y -o Dpkg::Use-Pty=0 install apt-transport-https ca-certificates curl gnupg-agent software-properties-common
   - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
@@ -58,15 +108,13 @@ before_install:
   - sudo bash -c "echo 'DOCKER_OPTS=\"-H tcp://127.0.0.1:2375 -H unix:///var/run/docker.sock -g /home/travis/docker\"' > /etc/default/docker"
   - sudo service docker start
 
-
-  # TODO
-
-
-
   # Updating apt cache
   - sudo apt-get autoclean -q -y
   - rm -rf $APT_CACHE_DIR/*.deb
   - cp -p /var/cache/apt/archives/*deb $APT_CACHE_DIR
+
+install:
+  - docker build -f ./.travis_dockerfile_centos -t testenv .
 
 script:
   - echo "All done"

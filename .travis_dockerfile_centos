@@ -1,0 +1,8 @@
+FROM centos:centos7
+
+RUN rpm --import http://mirror.centos.org/centos/RPM-GPG-KEY-CentOS-7 && \
+    yum install -y epel-release deltarpm --setopt=tsflags=nodocs --nogpgcheck && \
+    yum -y --setopt=tsflags=nodocs update --nogpgcheck && \
+    yum install -y yum-utils make git curl --setopt=tsflags=nodocs --nogpgcheck && \
+    yum -y clean all --enablerepo='*' && \
+    rm -rf /var/cache/yum
