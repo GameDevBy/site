@@ -72,7 +72,7 @@ before_install:
 
 install:
   # Build php 7.3 Centos 7 i2s docker image
-  - if [ $TRAVIS_BRANCH == 'prod' ]; export BUILD_OPTIONS=" --build-arg BUILD_TIME_ENABLE_DEV=true "; else export BUILD_OPTIONS=" --build-arg BUILD_TIME_ENABLE_DEV=false "; fi
+  - if [ $TRAVIS_BRANCH == 'prod' ]; then export BUILD_OPTIONS=" --build-arg BUILD_TIME_ENABLE_DEV=true "; else export BUILD_OPTIONS=" --build-arg BUILD_TIME_ENABLE_DEV=false "; fi
   - echo $BUILD_OPTIONS
   - make tag TARGET=centos7 VERSION=i2s_centos7_php73
 
