@@ -13,6 +13,9 @@ env:
   global:
     - DOCKER_DIR="$HOME/docker"
     - APT_CACHE_DIR="$HOME/apt-cache"
+    - BASE_IMAGE_NAME=php
+    - VERSIONS=i2s_centos7_php73
+    - OPENSHIFT_NAMESPACES=
 
 cache:
   directories:
@@ -62,13 +65,16 @@ before_install:
   - sudo bash -c "echo 'DOCKER_OPTS=\"-H tcp://127.0.0.1:2375 -H unix:///var/run/docker.sock -g /home/travis/docker\"' > /etc/default/docker"
   - sudo service docker start
 
+  # Install Packages for i2s
+  - sudo apt-get -q -y -o Dpkg::Use-Pty=0 install go-md2man
+
   # Updating apt cache
   - sudo apt-get autoclean -q -y
   - rm -rf $APT_CACHE_DIR/*.deb
   - cp -p /var/cache/apt/archives/*deb $APT_CACHE_DIR
 
 install:
-  - make tag TARGET=centos7 VERSIONS=i2s_centos7_php73
+  - make -f common/common.mk tag TARGET=centos7 VERSIONS=i2s_centos7_php73
 
 script:
   - echo "All done"
