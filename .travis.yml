@@ -10,7 +10,7 @@ before_cache:
   # Save tagged docker images
   - >
     docker images -a --filter='dangling=false' --format '{{.Repository}}:{{.Tag}} {{.ID}}'
-    | xargs -n 2 -t sh -c 'test -e ./$1.tar.gz || docker save $1 | gzip --best > ./$1.tar.gz'
+    | xargs -n 2 -t sh -c 'test -e ./$1.tar.gz || docker save $1 | gzip -2 > ./$1.tar.gz'
   # Remove legacy images from cache
   - >
     ls -1 | sed -e 's/\..*$//'
@@ -83,6 +83,7 @@ install:
     else export BUILD_OPTIONS=" --build-arg BUILD_TIME_ENABLE_DEV=true --cache-from gamedev.by/i2s_centos7_php73:latest "
     fi
   - echo $BUILD_OPTIONS
+  - docker images -a
   - make tag TARGET=centos7 VERSION=i2s_centos7_php73
   - docker rmi gamedev.by/i2s_centos7_php73:raw
   - docker history gamedev.by/i2s_centos7_php73:latest
