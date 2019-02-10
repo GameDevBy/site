@@ -6,11 +6,16 @@ git:
   submodules: true
 
 before_cache:
+  - pushd $DOCKER_DIR
   # Save tagged docker images
-  - rm -rf $DOCKER_DIR
   - >
-    mkdir -p $DOCKER_DIR && docker images -a --filter='dangling=false' --format '{{.Repository}}:{{.Tag}} {{.ID}}'
-    | xargs -n 2 -t sh -c 'test -e $DOCKER_DIR/$1.tar.gz || docker save $0 | gzip -2 > $DOCKER_DIR/$1.tar.gz'
+    docker images -a --format '{{.Repository}}:{{.Tag}} {{.ID}}'
+    | xargs -n 2 -t sh -c 'test -e ./$1.tar.gz || docker save $0 | gzip -3 > ./$1.tar.gz'
+  # Remove legacy images from cache
+  - >
+    ls -1 | sed -e 's/\..*$//'
+    | xargs -n 1 -t sh -c 'docker inspect --type=image $0 || rm ./$0.tar.gz'
+  - popd
 
 env:
   global:
