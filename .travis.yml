@@ -10,7 +10,7 @@ before_cache:
   # Save tagged docker images
   - >
     docker images -a --format '{{.Repository}}:{{.Tag}} {{.ID}}'
-    | xargs -n 2 -t sh -c 'test -e ./$1.tar.gz || docker save $1 | gzip -3 > ./$1.tar.gz'
+    | xargs -n 2 -t sh -c 'test -e ./$1.tar.gz || docker save $1 | gzip --best > ./$1.tar.gz'
   # Remove legacy images from cache
   - >
     ls -1 | sed -e 's/\..*$//'
