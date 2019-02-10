@@ -62,7 +62,7 @@ RUN INSTALL_PKGS="php php-devel php-opcache php-curl php-gd php-mbstring php-xml
 RUN PHP_VERSION=$(php -version | grep -P '(?<=PHP )([0-9]+\.[0-9]+\.[0-9]+)' -o) && \
     mkdir /tmp/php && \
     cd /tmp/php && \
-    git -c advice.detachedHead=false clone --quiet -b "php-$PHP_SHORT_VERSION" --single-branch --depth 1 https://github.com/php/php-src.git .
+    git -c advice.detachedHead=false clone --quiet -b "php-$PHP_SHORT_VERSION" --single-branch --depth 1 https://github.com/php/php-src.git . && \
     cd ./ext/intl && \
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/icu5c/lib && \
     export TEST_PHP_ARGS="-q" && \
