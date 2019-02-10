@@ -21,6 +21,9 @@ before_install:
     for i in $APT_CACHE_DIR/*.deb; do
       if [ -f "$i" ]; then sudo cp -p $APT_CACHE_DIR/*.deb /var/cache/apt/archives/; break; fi
     done
+    
+  # Remove unnecessary packages
+  - sudo apt-get -qq -o=Dpkg::Use-Pty=0 purge -y openjdk-* icedtea icedtea* postgresql-*  mysql-*
 
   # Remove docker
   - sudo service docker stop
@@ -39,7 +42,7 @@ before_install:
   - sudo add-apt-repository -y "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
   - sudo apt-get -qq -o=Dpkg::Use-Pty=0 update -y
   - sudo apt-get -qq -o=Dpkg::Use-Pty=0 install -y docker-ce docker-ce-cli containerd.io
-
+  - sudo service docker status
 
   # TODO
 
