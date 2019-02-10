@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+
+set -e
+
+shopt -s dotglob
+echo " "
+echo "---> Installing application source..."
+mv /tmp/src/* "$HOME"
+
+mkdir -p ~/.ssh/
+echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+
+if [ -f composer.json ]; then
+  echo " "
+  echo "---> Found 'composer.json', installing dependencies using composer.phar... "
+
+  # Install Composer
+  TEMPFILE=$(mktemp)
+  RETRIES=6
+  for ((i=0; i<$RETRIES; i++)); do
+
+    if [ -z "$COMPOSER_INSTALLER" ]; then
+      export COMPOSER_INSTALLER="https://getcomposer.org/installer"
+    fi
+
+    echo "Downloading $COMPOSER_INSTALLER, attempt $((i+1))/$RETRIES"
+    curl --silent -o $TEMPFILE $COMPOSER_INSTALLER && break
+    sleep 10
+  done
+  if [[ $i == $RETRIES ]]; then
+    echo "Download failed, giving up."
+    exit 1
+  fi
+  php <$TEMPFILE
+
+  if [ "$(ls -a /tmp/artifacts/ 2>/dev/null)" ]; then
+    echo "Restoring build artifacts"
+    mv /tmp/artifacts/* $HOME/
+  fi
+
+  # Change the repo mirror if provided
+  if [ -n "$COMPOSER_MIRROR" ]; then
+    ./composer.phar config -g repositories.packagist composer $COMPOSER_MIRROR
+  fi
+
+  ./composer.phar --no-progress --no-interaction --no-ansi global require hirak/prestissimo
+
+  # Install App dependencies using Composer
+  ./composer.phar install --no-dev --no-progress --no-interaction --no-ansi --classmap-authoritative $COMPOSER_ARGS
+
+  ./composer.phar clear-cache
+
+  if [ ! -f composer.lock ]; then
+    echo -e "\nConsider adding a 'composer.lock' file into your source repository.\n"
+  fi
+fi
+
+# Fix source directory permissions
+fix-permissions ./

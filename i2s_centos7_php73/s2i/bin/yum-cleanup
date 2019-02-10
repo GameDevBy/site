@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+set -e
+
+mv /var/cache/yum/x86_64/7/timedhosts.txt ~/timedhosts.txt
+mv /var/cache/yum/x86_64/7/timedhosts ~/timedhosts
+
+mv /var/cache/yum/x86_64/7/base/mirrorlist.txt ~/base_mirrorlist.txt
+mv /var/cache/yum/x86_64/7/extras/mirrorlist.txt ~/extras_mirrorlist.txt
+mv /var/cache/yum/x86_64/7/updates/mirrorlist.txt ~/updates_mirrorlist.txt
+
+yum -y clean all --enablerepo='*'
+rm -rf /var/cache/yum
+
+mkdir -p /var/cache/yum/x86_64/7/base
+mkdir -p /var/cache/yum/x86_64/7/extras
+mkdir -p /var/cache/yum/x86_64/7/updates
+
+mv ~/timedhosts.txt /var/cache/yum/x86_64/7/timedhosts.txt
+mv ~/timedhosts /var/cache/yum/x86_64/7/timedhosts
+
+mv ~/base_mirrorlist.txt /var/cache/yum/x86_64/7/base/mirrorlist.txt
+mv ~/extras_mirrorlist.txt /var/cache/yum/x86_64/7/extras/mirrorlist.txt
+mv ~/updates_mirrorlist.txt /var/cache/yum/x86_64/7/updates/mirrorlist.txt
