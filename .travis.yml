@@ -3,7 +3,7 @@ dist: xenial # TODO: replace to bionic when fix https://github.com/travis-ci/tra
 
 git:
   depth: 50
-  submodules: false
+  submodules: true
 
 before_cache:
   - sudo service docker stop
