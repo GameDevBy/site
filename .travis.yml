@@ -9,7 +9,7 @@ before_cache:
   - pushd $DOCKER_DIR
   # Save tagged docker images
   - >
-    docker images -a --format '{{.Repository}}:{{.Tag}} {{.ID}}'
+    docker images -a --filter='dangling=false' --format '{{.Repository}}:{{.Tag}} {{.ID}}'
     | xargs -n 2 -t sh -c 'test -e ./$1.tar.gz || docker save $1 | gzip --best > ./$1.tar.gz'
   # Remove legacy images from cache
   - >
@@ -77,10 +77,15 @@ before_install:
 
 install:
   # Build php 7.3 Centos 7 i2s docker image
-  - if [ $TRAVIS_BRANCH == 'prod' ]; then export BUILD_OPTIONS=" --build-arg BUILD_TIME_ENABLE_DEV=false "; else export BUILD_OPTIONS=" --build-arg BUILD_TIME_ENABLE_DEV=true "; fi
+  - |
+    if [ $TRAVIS_BRANCH == 'prod' ]
+    then export BUILD_OPTIONS=" --build-arg BUILD_TIME_ENABLE_DEV=false --cache-from gamedev.by/i2s_centos7_php73:latest "
+    else export BUILD_OPTIONS=" --build-arg BUILD_TIME_ENABLE_DEV=true --cache-from gamedev.by/i2s_centos7_php73:latest "
+    fi
   - echo $BUILD_OPTIONS
   - make tag TARGET=centos7 VERSION=i2s_centos7_php73
   - docker rmi gamedev.by/i2s_centos7_php73:raw
+  - docker history gamedev.by/i2s_centos7_php73:latest
 
 script:
   - echo "All done"
