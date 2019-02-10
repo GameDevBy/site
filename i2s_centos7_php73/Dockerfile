@@ -17,6 +17,8 @@ for several commercial and non-commercial database management systems, so writin
 a database-enabled webpage with PHP is fairly simple. The most common use of PHP coding \
 is probably as a replacement for CGI scripts."
 
+COPY ./s2i/bin/yum-cleanup $STI_SCRIPTS_PATH/yum-cleanup
+
 LABEL summary="${SUMMARY}" \
       description="${DESCRIPTION}" \
       io.k8s.description="${DESCRIPTION}" \
@@ -71,6 +73,9 @@ RUN PHP_VERSION=$(php -version | grep -P '(?<=PHP )([0-9]+\.[0-9]+\.[0-9]+)' -o)
     make && make test && make install && \
     echo "extension=intl.so" > /etc/php.d/20-intl.ini && \
     rm -rf /tmp/php
+
+RUN yum remove -y --setopt=tsflags=nodocs php-devel --nogpgcheck && \
+    $STI_SCRIPTS_PATH/yum-cleanup
 
 RUN php -i
 RUN ls /usr/lib64/php/modules/
