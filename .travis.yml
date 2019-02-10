@@ -84,6 +84,7 @@ install:
     fi
   - echo $BUILD_OPTIONS
   - docker images -a
+  - docker pull centos/s2i-core-centos7
   - make tag TARGET=centos7 VERSION=i2s_centos7_php73
   - docker rmi gamedev.by/i2s_centos7_php73:raw
   - docker history gamedev.by/i2s_centos7_php73:latest
