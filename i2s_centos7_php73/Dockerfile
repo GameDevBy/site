@@ -39,7 +39,7 @@ RUN INSTALL_PKGS="epel-release \
     yum -y --setopt=tsflags=nodocs update --nogpgcheck && \
     $STI_SCRIPTS_PATH/yum-cleanup
 
-RUN INSTALL_PKGS="nss_wrapper htop gcc-c++ make git" && \
+RUN INSTALL_PKGS="nss_wrapper gcc-c++ make git" && \
     yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS --nogpgcheck && \
     $STI_SCRIPTS_PATH/yum-cleanup
 
@@ -54,11 +54,12 @@ RUN ICU_VERSION="63.1" && \
     ICU_VERSION_S=$(echo $ICU_VERSION | sed 's/\./-/g') && \
     git -c advice.detachedHead=false clone --quiet -b "release-$ICU_VERSION_S" --single-branch --depth 1 https://github.com/unicode-org/icu.git . && \
     ./icu4c/source/runConfigureICU Linux/gcc --prefix=/opt/icu5c && \
-    make --quiet -j2 && make --quiet -j2 check && make install && \
+    make -j2 && make -j2 check && make install && \
     rm -rf /tmp/icu
 
 RUN INSTALL_PKGS="php php-devel php-opcache php-curl php-gd php-mbstring php-xml php-zip php-sqlite3 php-mysql php-soap" && \
     yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS --nogpgcheck && \
+    php -version && \
     $STI_SCRIPTS_PATH/yum-cleanup
 
 RUN PHP_VERSION=$(php -version | grep -P '(?<=PHP )([0-9]+\.[0-9]+\.[0-9]+)' -o) && \
@@ -74,7 +75,7 @@ RUN PHP_VERSION=$(php -version | grep -P '(?<=PHP )([0-9]+\.[0-9]+\.[0-9]+)' -o)
     echo "extension=intl.so" > /etc/php.d/20-intl.ini && \
     rm -rf /tmp/php
 
-RUN yum remove -y --setopt=tsflags=nodocs php-devel --nogpgcheck && \
+RUN yum remove -y --setopt=tsflags=nodocs php-devel deltarpm gcc-c++ --nogpgcheck && \
     $STI_SCRIPTS_PATH/yum-cleanup
 
 RUN php -i
