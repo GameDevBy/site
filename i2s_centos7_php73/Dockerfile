@@ -44,14 +44,14 @@ RUN mkdir -p $HOME/.pki/nssdb && \
                   centos-release-scl \
                   deltarpm" && \
     rpm --import http://mirror.centos.org/centos/RPM-GPG-KEY-CentOS-7 && \
-    yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS --nogpgcheck && \
+    yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS && \
     yum-config-manager --enable remi-php73 && \
-    yum -y --setopt=tsflags=nodocs update --nogpgcheck && \
+    yum -y --setopt=tsflags=nodocs update && \
     $STI_SCRIPTS_PATH/yum-cleanup
 
 # Install additional packages
 RUN INSTALL_PKGS="yum-utils nss_wrapper gcc-c++ make git" && \
-    yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS --nogpgcheck && \
+    yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS && \
     $STI_SCRIPTS_PATH/yum-cleanup
 
 # Install dumb
@@ -66,13 +66,13 @@ RUN INSTALL_PKGS="yum-utils nss_wrapper gcc-c++ make git" && \
 #    cd /tmp/icu && \
 #    ICU_VERSION_S=$(echo $ICU_VERSION | sed 's/\./-/g') && \
 #    git -c advice.detachedHead=false clone --quiet -b "release-$ICU_VERSION_S" --single-branch --depth 1 https://github.com/unicode-org/icu.git . && \
-#    ./icu4c/source/runConfigureICU Linux/gcc --prefix=/opt/icu5c && \
+#    ./icu4c/source/runConfigureICU Linux --prefix=/opt/icu5c && \
 #    make -j2 && make -j2 check && make install && \
 #    rm -rf /tmp/icu
 
 # Install php
 RUN INSTALL_PKGS="php php-devel php-opcache php-curl php-gd php-mbstring php-xml php-zip php-sqlite3 php-mysql php-soap" && \
-    yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS --nogpgcheck && \
+    yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS && \
     php -version && \
     $STI_SCRIPTS_PATH/yum-cleanup
 
@@ -100,18 +100,11 @@ ENV \
 #     rm -rf /tmp/php
 
 # Install php-fmp and nginx https://nginx.org/ru/linux_packages.html#RHEL-CentOS
-RUN echo -e "\
-      [nginx]\n\
-      name=nginx stable repo\n\
-      baseurl=http://nginx.org/packages/centos/7/x86_64/\n\
-      gpgcheck=1\n\
-      enabled=1\n\
-      gpgkey=https://nginx.org/keys/nginx_signing.key\
-    " > /etc/yum.repos.d/nginx.repo && \
+RUN echo -e "[nginx]\nname=nginx stable repo\nbaseurl=http://nginx.org/packages/centos/7/x86_64/\ngpgcheck=1\nenabled=1\ngpgkey=https://nginx.org/keys/nginx_signing.key" > /etc/yum.repos.d/nginx.repo && \
     cat /etc/yum.repos.d/nginx.repo && \
     rpm --import https://nginx.org/keys/nginx_signing.key && \
     INSTALL_PKGS="php-fpm nginx" && \
-    yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS --nogpgcheck && \
+    yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS && \
     nginx -V && \
     $STI_SCRIPTS_PATH/yum-cleanup
 
@@ -138,7 +131,8 @@ RUN ls -la $PHP_SYSCONF_PATH/php-fpm.d/
 RUN cat $PHP_SYSCONF_PATH/php-fpm.d/www.conf
 
 # Remove unnecessary packeges
-#RUN yum remove -y --setopt=tsflags=nodocs php-devel deltarpm gcc-c++ make --nogpgcheck && \
+#RUN REMOVE_PKGS="php-devel deltarpm gcc-c++ make" && \
+#    yum remove -y --setopt=tsflags=nodocs $REMOVE_PKGS && \
 #    yum -y clean all --enablerepo='*' && \
 #    rm -rf /var/cache/yum && \
 #    rm $STI_SCRIPTS_PATH/yum-cleanup
