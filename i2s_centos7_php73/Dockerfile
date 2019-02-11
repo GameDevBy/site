@@ -129,15 +129,10 @@ ENV PHP_FPM_DATA_PATH=$APP_DATA/web
 # RUN php -i
 # RUN cat $PHP_SYSCONF_PATH/php.ini
 # RUN cat $PHP_INI_SCAN_DIR/10-opcache.ini
-RUN cat $PHP_SYSCONF_PATH/nginx/mime.types
-
-RUN ls -la $PHP_SYSCONF_PATH/nginx/
-#TODO RUN cat $PHP_SYSCONF_PATH/nginx/fastcgi-502.include
-RUN cat $PHP_SYSCONF_PATH/nginx/nginx.conf
-RUN cat $PHP_SYSCONF_PATH/nginx/fastcgi_params
-
-RUN ls -la $PHP_SYSCONF_PATH/nginx/conf.d/
-RUN cat $PHP_SYSCONF_PATH/nginx/conf.d/sever.conf
+# RUN cat $PHP_SYSCONF_PATH/nginx/mime.types
+# RUN cat $PHP_SYSCONF_PATH/nginx/nginx.conf
+# RUN cat $PHP_SYSCONF_PATH/nginx/fastcgi_params
+RUN cat $PHP_SYSCONF_PATH/nginx/conf.d/default.conf
 RUN cat $PHP_SYSCONF_PATH/php-fpm.conf
 
 RUN ls -la $PHP_SYSCONF_PATH/php-fpm.d/
