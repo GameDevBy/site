@@ -83,8 +83,8 @@ RUN PHP_VERSION=$(php -version | grep -P '(?<=PHP )([0-9]+\.[0-9]+\.[0-9]+)' -o)
 RUN echo $BUILD_TIME_ENABLE_DEV
 RUN php -i
 RUN ls /usr/lib64/php/modules/
-RUN cat ${PHP_SYSCONF_PATH}/php.ini
-RUN cat ${PHP_SYSCONF_PATH}/php.d/10-opcache.ini
+RUN cat /etc/php.ini
+RUN cat /etc/php.d/10-opcache.ini
 
 # RUN yum remove -y --setopt=tsflags=nodocs php-devel deltarpm gcc-c++ make --nogpgcheck && \
 #    yum -y clean all --enablerepo='*' && \
