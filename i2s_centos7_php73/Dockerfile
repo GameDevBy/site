@@ -96,7 +96,7 @@ RUN PHP_VERSION=$(php -version | grep -P '(?<=PHP )([0-9]+\.[0-9]+\.[0-9]+)' -o)
     phpize && \
     ./configure --enable-intl --with-icu-dir=/opt/icu5c && \
     make && make test && make install && \
-    echo "extension=intl.so" > $PHP_INI_SCAN_DIR/20-intl.ini && \
+    echo "extension=intl.so" > /etc/php.d/20-intl.ini && \
     rm -rf /tmp/php
 
 # Install php-fmp and nginx
@@ -111,15 +111,15 @@ ENV PHP_FPM_DATA_PATH=${APP_DATA}/web
 # Debug info
 RUN ls /usr/lib64/php/modules/
 RUN php -i
-# RUN cat $PHP_SYSCONF_PATH/php.ini
-# RUN cat $PHP_INI_SCAN_DIR/10-opcache.ini
-RUN [ -f $PHP_SYSCONF_PATH/nginx/mime.types ] && cat $PHP_SYSCONF_PATH/nginx/mime.types
-RUN [ -f $PHP_SYSCONF_PATH/nginx/fastcgi-502.include ] && cat $PHP_SYSCONF_PATH/nginx/fastcgi-502.include
-RUN [ -f $PHP_SYSCONF_PATH/nginx/nginx.conf ] && cat $PHP_SYSCONF_PATH/nginx/nginx.conf
-RUN [ -f $PHP_SYSCONF_PATH/nginx/fastcgi_params ] && cat $PHP_SYSCONF_PATH/nginx/fastcgi_params
-RUN [ -f $PHP_SYSCONF_PATH/nginx/conf.d/sever.conf ] && cat $PHP_SYSCONF_PATH/nginx/conf.d/sever.conf
-RUN [ -f $PHP_SYSCONF_PATH/php-fpm.conf ] && cat $PHP_SYSCONF_PATH/php-fpm.conf
-RUN [ -f $PHP_SYSCONF_PATH/php-fpm.d/www.conf ] && cat $PHP_SYSCONF_PATH/php-fpm.d/www.conf
+# RUN cat /etc/php.ini
+# RUN cat /etc/php.d/10-opcache.ini
+RUN [ -f /etc/nginx/mime.types ] && cat /etc/nginx/mime.types
+RUN [ -f /etc/nginx/fastcgi-502.include ] && cat /etc/nginx/fastcgi-502.include
+RUN [ -f /etc/nginx/nginx.conf ] && cat /etc/nginx/nginx.conf
+RUN [ -f /etc/nginx/fastcgi_params ] && cat /etc/nginx/fastcgi_params
+RUN [ -f /etc/nginx/conf.d/sever.conf ] && cat /etc/nginx/conf.d/sever.conf
+RUN [ -f /etc/php-fpm.conf ] && cat /etc/php-fpm.conf
+RUN [ -f /etc/php-fpm.d/www.conf ] && cat /etc/php-fpm.d/www.conf
 
 # Remove unnecessary packeges
 RUN yum remove -y --setopt=tsflags=nodocs php-devel deltarpm gcc-c++ make --nogpgcheck && \
