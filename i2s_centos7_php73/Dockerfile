@@ -50,7 +50,7 @@ RUN mkdir -p $HOME/.pki/nssdb && \
     $STI_SCRIPTS_PATH/yum-cleanup
 
 # Install additional packages
-RUN INSTALL_PKGS="nss_wrapper gcc-c++ make git" && \
+RUN INSTALL_PKGS="yum-utils nss_wrapper gcc-c++ make git" && \
     yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS --nogpgcheck && \
     $STI_SCRIPTS_PATH/yum-cleanup
 
@@ -99,8 +99,15 @@ ENV \
 #     echo "extension=intl.so" > $PHP_INI_SCAN_DIR/20-intl.ini && \
 #     rm -rf /tmp/php
 
-# Install php-fmp and nginx
-RUN echo -e "[nginx]\nname=nginx repo\nbaseurl=http://nginx.org/packages/mainline/centos/$releasever/$basearch/\ngpgcheck=0\nenabled=1" > /etc/yum.repos.d/nginx.repo && \
+# Install php-fmp and nginx https://nginx.org/ru/linux_packages.html#RHEL-CentOS
+RUN echo -e "\
+      [nginx]\n\
+      name=nginx stable repo\n\
+      baseurl=http://nginx.org/packages/centos/7/x86_64/\n\
+      gpgcheck=1\n\
+      enabled=1\n\
+      gpgkey=https://nginx.org/keys/nginx_signing.key\
+    " > /etc/yum.repos.d/nginx.repo && \
     cat /etc/yum.repos.d/nginx.repo && \
     rpm --import https://nginx.org/keys/nginx_signing.key && \
     INSTALL_PKGS="php-fpm nginx" && \
