@@ -99,8 +99,21 @@ ENV \
 #     echo "extension=intl.so" > $PHP_INI_SCAN_DIR/20-intl.ini && \
 #     rm -rf /tmp/php
 
-# Install php-fmp and nginx https://nginx.org/ru/linux_packages.html#RHEL-CentOS
-RUN echo -e "[nginx]\nname=nginx stable repo\nbaseurl=http://nginx.org/packages/centos/7/x86_64/\ngpgcheck=1\nenabled=1\ngpgkey=https://nginx.org/keys/nginx_signing.key" > /etc/yum.repos.d/nginx.repo && \
+# Install php-fmp and nginx
+# https://nginx.org/ru/linux_packages.html#RHEL-CentOS
+#
+# (From here https://www.nginx.com/blog/nginx-1-6-1-7-released/)
+# Note that stable does not mean more reliable or more bug-free.
+# In fact, the mainline is generally regarded as more reliable because we port all bug fixes to it,
+# and not just critical fixes as for the stable branch.
+# On the other hand, changes in the stable branch are very unlikely to affect third-party modules.
+# We don’t make the same commitment concerning the mainline,
+# where new features can affect the operation of third-party modules.
+# Which Version Should I Use?
+# We recommend that in general you deploy the NGINX mainline branch at all times.
+# The main reason to use the stable branch is that you are concerned about possible impacts of new features,
+# such as incompatibility with third-party modules or the inadvertent introduction of bugs in new features.
+RUN echo -e "[nginx]\nname=nginx mainline repo\nbaseurl=http://nginx.org/packages/mainline/centos/7/x86_64/\ngpgcheck=1\nenabled=1\ngpgkey=https://nginx.org/keys/nginx_signing.key" > /etc/yum.repos.d/nginx.repo && \
     cat /etc/yum.repos.d/nginx.repo && \
     rpm --import https://nginx.org/keys/nginx_signing.key && \
     INSTALL_PKGS="php-fpm nginx" && \
