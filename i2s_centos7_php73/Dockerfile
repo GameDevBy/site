@@ -111,8 +111,15 @@ ENV PHP_FPM_DATA_PATH=${APP_DATA}/web
 # Debug info
 RUN ls /usr/lib64/php/modules/
 RUN php -i
-RUN cat $PHP_SYSCONF_PATH/php.ini
-RUN cat $PHP_INI_SCAN_DIR/10-opcache.ini
+# RUN cat $PHP_SYSCONF_PATH/php.ini
+# RUN cat $PHP_INI_SCAN_DIR/10-opcache.ini
+RUN [ -f $PHP_SYSCONF_PATH/nginx/mime.types ] && cat $PHP_SYSCONF_PATH/nginx/mime.types
+RUN [ -f $PHP_SYSCONF_PATH/nginx/fastcgi-502.include ] && cat $PHP_SYSCONF_PATH/nginx/fastcgi-502.include
+RUN [ -f $PHP_SYSCONF_PATH/nginx/nginx.conf ] && cat $PHP_SYSCONF_PATH/nginx/nginx.conf
+RUN [ -f $PHP_SYSCONF_PATH/nginx/fastcgi_params ] && cat $PHP_SYSCONF_PATH/nginx/fastcgi_params
+RUN [ -f $PHP_SYSCONF_PATH/nginx/conf.d/sever.conf ] && cat $PHP_SYSCONF_PATH/nginx/conf.d/sever.conf
+RUN [ -f $PHP_SYSCONF_PATH/php-fpm.conf ] && cat $PHP_SYSCONF_PATH/php-fpm.conf
+RUN [ -f $PHP_SYSCONF_PATH/php-fpm.d/www.conf ] && cat $PHP_SYSCONF_PATH/php-fpm.d/www.conf
 
 # Remove unnecessary packeges
 RUN yum remove -y --setopt=tsflags=nodocs php-devel deltarpm gcc-c++ make --nogpgcheck && \
@@ -130,3 +137,7 @@ COPY ./s2i/bin/ $STI_SCRIPTS_PATH
 
 # Copy extra files to the image.
 COPY ./root/ /
+
+RUN /usr/libexec/container-setup && rpm-file-permissions
+
+USER 1001

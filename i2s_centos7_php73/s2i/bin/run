@@ -2,7 +2,7 @@
 
 set -e
 
-source /opt/app-root/etc/generate_container_user
+source /usr/libexec/generate-container-user
 
 export_vars=$(cgroup-limits); export $export_vars
 export DOCUMENTROOT=${DOCUMENTROOT:-/}
