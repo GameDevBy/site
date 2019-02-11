@@ -113,12 +113,18 @@ RUN ls /usr/lib64/php/modules/
 RUN php -i
 # RUN cat $PHP_SYSCONF_PATH/php.ini
 # RUN cat $PHP_INI_SCAN_DIR/10-opcache.ini
-RUN [ -f $PHP_SYSCONF_PATH/nginx/mime.types ] && cat $PHP_SYSCONF_PATH/nginx/mime.types
-RUN [ -f $PHP_SYSCONF_PATH/nginx/fastcgi-502.include ] && cat $PHP_SYSCONF_PATH/nginx/fastcgi-502.include
+# RUN [ -f $PHP_SYSCONF_PATH/nginx/mime.types ] && cat $PHP_SYSCONF_PATH/nginx/mime.types
+
+RUN ls -la $PHP_SYSCONF_PATH/nginx/
+#TODO RUN [ -f $PHP_SYSCONF_PATH/nginx/fastcgi-502.include ] && cat $PHP_SYSCONF_PATH/nginx/fastcgi-502.include
 RUN [ -f $PHP_SYSCONF_PATH/nginx/nginx.conf ] && cat $PHP_SYSCONF_PATH/nginx/nginx.conf
 RUN [ -f $PHP_SYSCONF_PATH/nginx/fastcgi_params ] && cat $PHP_SYSCONF_PATH/nginx/fastcgi_params
+
+RUN ls -la $PHP_SYSCONF_PATH/nginx/conf.d/
 RUN [ -f $PHP_SYSCONF_PATH/nginx/conf.d/sever.conf ] && cat $PHP_SYSCONF_PATH/nginx/conf.d/sever.conf
 RUN [ -f $PHP_SYSCONF_PATH/php-fpm.conf ] && cat $PHP_SYSCONF_PATH/php-fpm.conf
+
+RUN ls -la $PHP_SYSCONF_PATH/php-fpm.d/
 RUN [ -f $PHP_SYSCONF_PATH/php-fpm.d/www.conf ] && cat $PHP_SYSCONF_PATH/php-fpm.d/www.conf
 
 # Remove unnecessary packeges
