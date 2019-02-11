@@ -124,6 +124,22 @@ RUN echo -e "[nginx]\nname=nginx mainline repo\nbaseurl=http://nginx.org/package
 # Set web env
 ENV PHP_FPM_DATA_PATH=$APP_DATA/web
 
+# Install composer
+RUN mkdir /tmp/composer && \
+    curl -L -o /tmp/composer/composer-setup.php https://getcomposer.org/installer && \
+    php /tmp/composer/composer-setup.php --install-dir=/usr/local/bin --filename=composer && \
+    composer diagnose --no-interaction --ansi --verbose && \
+    composer --no-progress --no-interaction --no-ansi global require hirak/prestissimo && \
+    rm -rf /tmp/composer
+
+
+# Copy script for install development environment
+COPY ./s2i/bin/debug-specific-config $STI_SCRIPTS_PATH/debug-specific-config
+
+# Run script for install development environment
+RUN $STI_SCRIPTS_PATH/debug-specific-config && \
+    $STI_SCRIPTS_PATH/yum-cleanup
+
 # Debug info
 RUN ls /usr/lib64/php/modules/ && \
     php -i
