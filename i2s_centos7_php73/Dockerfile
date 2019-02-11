@@ -55,20 +55,20 @@ RUN INSTALL_PKGS="nss_wrapper gcc-c++ make git" && \
     $STI_SCRIPTS_PATH/yum-cleanup
 
 # Install dumb
-RUN DUMB_VERSION="1.2.2" && \
-    curl -fsSL https://github.com/Yelp/dumb-init/releases/download/v$DUMB_VERSION/dumb-init_${DUMB_VERSION}_amd64 > /usr/local/bin/dumb-init && \
-    chmod +x /usr/local/bin/dumb-init && \
-    dumb-init -V
+#RUN DUMB_VERSION="1.2.2" && \
+#    curl -fsSL https://github.com/Yelp/dumb-init/releases/download/v$DUMB_VERSION/dumb-init_${DUMB_VERSION}_amd64 > /usr/local/bin/dumb-init && \
+#    chmod +x /usr/local/bin/dumb-init && \
+#    dumb-init -V
 
 # Build icu
-RUN ICU_VERSION="63.1" && \
-    mkdir /tmp/icu && \
-    cd /tmp/icu && \
-    ICU_VERSION_S=$(echo $ICU_VERSION | sed 's/\./-/g') && \
-    git -c advice.detachedHead=false clone --quiet -b "release-$ICU_VERSION_S" --single-branch --depth 1 https://github.com/unicode-org/icu.git . && \
-    ./icu4c/source/runConfigureICU Linux/gcc --prefix=/opt/icu5c && \
-    make -j2 && make -j2 check && make install && \
-    rm -rf /tmp/icu
+#RUN ICU_VERSION="63.1" && \
+#    mkdir /tmp/icu && \
+#    cd /tmp/icu && \
+#    ICU_VERSION_S=$(echo $ICU_VERSION | sed 's/\./-/g') && \
+#    git -c advice.detachedHead=false clone --quiet -b "release-$ICU_VERSION_S" --single-branch --depth 1 https://github.com/unicode-org/icu.git . && \
+#    ./icu4c/source/runConfigureICU Linux/gcc --prefix=/opt/icu5c && \
+#    make -j2 && make -j2 check && make install && \
+#    rm -rf /tmp/icu
 
 # Install php
 RUN INSTALL_PKGS="php php-devel php-opcache php-curl php-gd php-mbstring php-xml php-zip php-sqlite3 php-mysql php-soap" && \
@@ -102,7 +102,7 @@ ENV \
 # Install php-fmp and nginx
 RUN echo -e "[nginx]\nname=nginx repo\nbaseurl=http://nginx.org/packages/mainline/centos/$releasever/$basearch/\ngpgcheck=0\nenabled=1" > /etc/yum.repos.d/nginx.repo && \
     cat /etc/yum.repos.d/nginx.repo && \
-    curl -O https://nginx.org/keys/nginx_signing.key && apt-key add ./nginx_signing.key && rm ./nginx_signing.key && apt-key list && \
+    rpm --import https://nginx.org/keys/nginx_signing.key && \
     INSTALL_PKGS="php-fpm nginx" && \
     yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS --nogpgcheck && \
     nginx -V && \
@@ -131,23 +131,23 @@ RUN ls -la $PHP_SYSCONF_PATH/php-fpm.d/
 RUN cat $PHP_SYSCONF_PATH/php-fpm.d/www.conf
 
 # Remove unnecessary packeges
-RUN yum remove -y --setopt=tsflags=nodocs php-devel deltarpm gcc-c++ make --nogpgcheck && \
-    yum -y clean all --enablerepo='*' && \
-    rm -rf /var/cache/yum && \
-    rm $STI_SCRIPTS_PATH/yum-cleanup
+#RUN yum remove -y --setopt=tsflags=nodocs php-devel deltarpm gcc-c++ make --nogpgcheck && \
+#    yum -y clean all --enablerepo='*' && \
+#    rm -rf /var/cache/yum && \
+#    rm $STI_SCRIPTS_PATH/yum-cleanup
 
 # Add default user
-RUN useradd -u 1001 -r -g 0 -d $HOME -s /sbin/nologin -c "Default Application User" default && \
-    chown -R 1001:0 $APP_ROOT
+#RUN useradd -u 1001 -r -g 0 -d $HOME -s /sbin/nologin -c "Default Application User" default && \
+#    chown -R 1001:0 $APP_ROOT
 
-EXPOSE 8080
+#EXPOSE 8080
 
 # Copy the S2I scripts from the specific language image to $STI_SCRIPTS_PATH
-COPY ./s2i/bin/ $STI_SCRIPTS_PATH
+#COPY ./s2i/bin/ $STI_SCRIPTS_PATH
 
 # Copy extra files to the image.
-COPY ./root/ /
+#COPY ./root/ /
 
-RUN /usr/libexec/container-setup && rpm-file-permissions
+#RUN /usr/libexec/container-setup && rpm-file-permissions
 
-USER 1001
+#USER 1001
