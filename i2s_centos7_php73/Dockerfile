@@ -100,7 +100,10 @@ ENV \
 #     rm -rf /tmp/php
 
 # Install php-fmp and nginx
-RUN INSTALL_PKGS="php-fpm nginx" && \
+RUN echo -e "[nginx]\nname=nginx repo\nbaseurl=http://nginx.org/packages/mainline/centos/$releasever/$basearch/\ngpgcheck=0\nenabled=1" > /etc/yum.repos.d/nginx.repo && \
+    cat /etc/yum.repos.d/nginx.repo && \
+    curl -O https://nginx.org/keys/nginx_signing.key && apt-key add ./nginx_signing.key && rm ./nginx_signing.key && apt-key list && \
+    INSTALL_PKGS="php-fpm nginx" && \
     yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS --nogpgcheck && \
     nginx -V && \
     $STI_SCRIPTS_PATH/yum-cleanup
@@ -109,23 +112,23 @@ RUN INSTALL_PKGS="php-fpm nginx" && \
 ENV PHP_FPM_DATA_PATH=$APP_DATA/web
 
 # Debug info
-RUN ls /usr/lib64/php/modules/
-RUN php -i
+# RUN ls /usr/lib64/php/modules/
+# RUN php -i
 # RUN cat $PHP_SYSCONF_PATH/php.ini
 # RUN cat $PHP_INI_SCAN_DIR/10-opcache.ini
-# RUN [ -f $PHP_SYSCONF_PATH/nginx/mime.types ] && cat $PHP_SYSCONF_PATH/nginx/mime.types
+RUN cat $PHP_SYSCONF_PATH/nginx/mime.types
 
 RUN ls -la $PHP_SYSCONF_PATH/nginx/
-#TODO RUN [ -f $PHP_SYSCONF_PATH/nginx/fastcgi-502.include ] && cat $PHP_SYSCONF_PATH/nginx/fastcgi-502.include
-RUN [ -f $PHP_SYSCONF_PATH/nginx/nginx.conf ] && cat $PHP_SYSCONF_PATH/nginx/nginx.conf
-RUN [ -f $PHP_SYSCONF_PATH/nginx/fastcgi_params ] && cat $PHP_SYSCONF_PATH/nginx/fastcgi_params
+#TODO RUN cat $PHP_SYSCONF_PATH/nginx/fastcgi-502.include
+RUN cat $PHP_SYSCONF_PATH/nginx/nginx.conf
+RUN cat $PHP_SYSCONF_PATH/nginx/fastcgi_params
 
 RUN ls -la $PHP_SYSCONF_PATH/nginx/conf.d/
-RUN [ -f $PHP_SYSCONF_PATH/nginx/conf.d/sever.conf ] && cat $PHP_SYSCONF_PATH/nginx/conf.d/sever.conf
-RUN [ -f $PHP_SYSCONF_PATH/php-fpm.conf ] && cat $PHP_SYSCONF_PATH/php-fpm.conf
+RUN cat $PHP_SYSCONF_PATH/nginx/conf.d/sever.conf
+RUN cat $PHP_SYSCONF_PATH/php-fpm.conf
 
 RUN ls -la $PHP_SYSCONF_PATH/php-fpm.d/
-RUN [ -f $PHP_SYSCONF_PATH/php-fpm.d/www.conf ] && cat $PHP_SYSCONF_PATH/php-fpm.d/www.conf
+RUN cat $PHP_SYSCONF_PATH/php-fpm.d/www.conf
 
 # Remove unnecessary packeges
 RUN yum remove -y --setopt=tsflags=nodocs php-devel deltarpm gcc-c++ make --nogpgcheck && \
