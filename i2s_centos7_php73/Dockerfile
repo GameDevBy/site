@@ -44,47 +44,47 @@ RUN mkdir -p ${HOME}/.pki/nssdb && \
     yum -y --setopt=tsflags=nodocs update --nogpgcheck && \
     $STI_SCRIPTS_PATH/yum-cleanup
 
-# RUN INSTALL_PKGS="nss_wrapper gcc-c++ make git" && \
-#     yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS --nogpgcheck && \
-#     $STI_SCRIPTS_PATH/yum-cleanup
+RUN INSTALL_PKGS="nss_wrapper gcc-c++ make git" && \
+    yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS --nogpgcheck && \
+    $STI_SCRIPTS_PATH/yum-cleanup
 
-# RUN DUMB_VERSION="1.2.2" && \
-#     curl -fsSL https://github.com/Yelp/dumb-init/releases/download/v${DUMB_VERSION}/dumb-init_${DUMB_VERSION}_amd64 > /usr/local/bin/dumb-init && \
-#     chmod +x /usr/local/bin/dumb-init && \
-#     dumb-init -V
+RUN DUMB_VERSION="1.2.2" && \
+    curl -fsSL https://github.com/Yelp/dumb-init/releases/download/v${DUMB_VERSION}/dumb-init_${DUMB_VERSION}_amd64 > /usr/local/bin/dumb-init && \
+    chmod +x /usr/local/bin/dumb-init && \
+    dumb-init -V
 
-# RUN ICU_VERSION="63.1" && \
-#     mkdir /tmp/icu && \
-#     cd /tmp/icu && \
-#     ICU_VERSION_S=$(echo $ICU_VERSION | sed 's/\./-/g') && \
-#     git -c advice.detachedHead=false clone --quiet -b "release-$ICU_VERSION_S" --single-branch --depth 1 https://github.com/unicode-org/icu.git . && \
-#     ./icu4c/source/runConfigureICU Linux/gcc --prefix=/opt/icu5c && \
-#     make -j2 && make -j2 check && make install && \
-#     rm -rf /tmp/icu
+RUN ICU_VERSION="63.1" && \
+    mkdir /tmp/icu && \
+    cd /tmp/icu && \
+    ICU_VERSION_S=$(echo $ICU_VERSION | sed 's/\./-/g') && \
+    git -c advice.detachedHead=false clone --quiet -b "release-$ICU_VERSION_S" --single-branch --depth 1 https://github.com/unicode-org/icu.git . && \
+    ./icu4c/source/runConfigureICU Linux/gcc --prefix=/opt/icu5c && \
+    make -j2 && make -j2 check && make install && \
+    rm -rf /tmp/icu
 
-# RUN INSTALL_PKGS="php php-devel php-opcache php-curl php-gd php-mbstring php-xml php-zip php-sqlite3 php-mysql php-soap" && \
-#     yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS --nogpgcheck && \
-#     php -version && \
-#     $STI_SCRIPTS_PATH/yum-cleanup
+RUN INSTALL_PKGS="php php-devel php-opcache php-curl php-gd php-mbstring php-xml php-zip php-sqlite3 php-mysql php-soap" && \
+    yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS --nogpgcheck && \
+    php -version && \
+    $STI_SCRIPTS_PATH/yum-cleanup
 
-# RUN PHP_VERSION=$(php -version | grep -P '(?<=PHP )([0-9]+\.[0-9]+\.[0-9]+)' -o) && \
-#     mkdir /tmp/php && \
-#     cd /tmp/php && \
-#     git -c advice.detachedHead=false clone --quiet -b "php-$PHP_VERSION" --single-branch --depth 1 https://github.com/php/php-src.git . && \
-#     cd ./ext/intl && \
-#     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/icu5c/lib && \
-#     export TEST_PHP_ARGS="-q" && \
-#     phpize && \
-#     ./configure --enable-intl --with-icu-dir=/opt/icu5c && \
-#     make && make test && make install && \
-#     echo "extension=intl.so" > /etc/php.d/20-intl.ini && \
-#     rm -rf /tmp/php
+RUN PHP_VERSION=$(php -version | grep -P '(?<=PHP )([0-9]+\.[0-9]+\.[0-9]+)' -o) && \
+    mkdir /tmp/php && \
+    cd /tmp/php && \
+    git -c advice.detachedHead=false clone --quiet -b "php-$PHP_VERSION" --single-branch --depth 1 https://github.com/php/php-src.git . && \
+    cd ./ext/intl && \
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/icu5c/lib && \
+    export TEST_PHP_ARGS="-q" && \
+    phpize && \
+    ./configure --enable-intl --with-icu-dir=/opt/icu5c && \
+    make && make test && make install && \
+    echo "extension=intl.so" > /etc/php.d/20-intl.ini && \
+    rm -rf /tmp/php
 
 RUN echo $BUILD_TIME_ENABLE_DEV
-# RUN php -i
-# RUN ls /usr/lib64/php/modules/
-# RUN cat ${PHP_SYSCONF_PATH}/php.ini
-# RUN cat ${PHP_SYSCONF_PATH}/php.d/10-opcache.ini
+RUN php -i
+RUN ls /usr/lib64/php/modules/
+RUN cat ${PHP_SYSCONF_PATH}/php.ini
+RUN cat ${PHP_SYSCONF_PATH}/php.d/10-opcache.ini
 
 # RUN yum remove -y --setopt=tsflags=nodocs php-devel deltarpm gcc-c++ make --nogpgcheck && \
 #    yum -y clean all --enablerepo='*' && \
