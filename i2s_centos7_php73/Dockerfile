@@ -55,20 +55,20 @@ RUN INSTALL_PKGS="yum-utils nss_wrapper gcc-c++ make git" && \
     $STI_SCRIPTS_PATH/yum-cleanup
 
 # Install dumb
-#RUN DUMB_VERSION="1.2.2" && \
-#    curl -fsSL https://github.com/Yelp/dumb-init/releases/download/v$DUMB_VERSION/dumb-init_${DUMB_VERSION}_amd64 > /usr/local/bin/dumb-init && \
-#    chmod +x /usr/local/bin/dumb-init && \
-#    dumb-init -V
+RUN DUMB_VERSION="1.2.2" && \
+    curl -fsSL https://github.com/Yelp/dumb-init/releases/download/v$DUMB_VERSION/dumb-init_${DUMB_VERSION}_amd64 > /usr/local/bin/dumb-init && \
+    chmod +x /usr/local/bin/dumb-init && \
+    dumb-init -V
 
 # Build icu
-#RUN ICU_VERSION="63.1" && \
-#    mkdir /tmp/icu && \
-#    cd /tmp/icu && \
-#    ICU_VERSION_S=$(echo $ICU_VERSION | sed 's/\./-/g') && \
-#    git -c advice.detachedHead=false clone --quiet -b "release-$ICU_VERSION_S" --single-branch --depth 1 https://github.com/unicode-org/icu.git . && \
-#    ./icu4c/source/runConfigureICU Linux --prefix=/opt/icu5c && \
-#    make -j2 && make -j2 check && make install && \
-#    rm -rf /tmp/icu
+RUN ICU_VERSION="63.1" && \
+    mkdir /tmp/icu && \
+    cd /tmp/icu && \
+    ICU_VERSION_S=$(echo $ICU_VERSION | sed 's/\./-/g') && \
+    git -c advice.detachedHead=false clone --quiet -b "release-$ICU_VERSION_S" --single-branch --depth 1 https://github.com/unicode-org/icu.git . && \
+    ./icu4c/source/runConfigureICU Linux --prefix=/opt/icu5c && \
+    make -j2 && make -j2 check && make install && \
+    rm -rf /tmp/icu
 
 # Install php
 RUN INSTALL_PKGS="php php-devel php-opcache php-curl php-gd php-mbstring php-xml php-zip php-sqlite3 php-mysql php-soap" && \
@@ -86,18 +86,18 @@ ENV \
     APP_ENV=prod
 
 # Build php intl extension
-# RUN PHP_VERSION=$(php -version | grep -P '(?<=PHP )([0-9]+\.[0-9]+\.[0-9]+)' -o) && \
-#     mkdir /tmp/php && \
-#     cd /tmp/php && \
-#     git -c advice.detachedHead=false clone --quiet -b "php-$PHP_VERSION" --single-branch --depth 1 https://github.com/php/php-src.git . && \
-#     cd ./ext/intl && \
-#     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/icu5c/lib && \
-#     export TEST_PHP_ARGS="-q" && \
-#     phpize && \
-#     ./configure --enable-intl --with-icu-dir=/opt/icu5c && \
-#     make && make test && make install && \
-#     echo "extension=intl.so" > $PHP_INI_SCAN_DIR/20-intl.ini && \
-#     rm -rf /tmp/php
+RUN PHP_VERSION=$(php -version | grep -P '(?<=PHP )([0-9]+\.[0-9]+\.[0-9]+)' -o) && \
+    mkdir /tmp/php && \
+    cd /tmp/php && \
+    git -c advice.detachedHead=false clone --quiet -b "php-$PHP_VERSION" --single-branch --depth 1 https://github.com/php/php-src.git . && \
+    cd ./ext/intl && \
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/icu5c/lib && \
+    export TEST_PHP_ARGS="-q" && \
+    phpize && \
+    ./configure --enable-intl --with-icu-dir=/opt/icu5c && \
+    make && make test && make install && \
+    echo "extension=intl.so" > /etc/php.d/20-intl.ini && \
+    rm -rf /tmp/php
 
 # Install php-fmp and nginx
 # https://nginx.org/ru/linux_packages.html#RHEL-CentOS
@@ -125,18 +125,18 @@ RUN echo -e "[nginx]\nname=nginx mainline repo\nbaseurl=http://nginx.org/package
 ENV PHP_FPM_DATA_PATH=$APP_DATA/web
 
 # Debug info
-# RUN ls /usr/lib64/php/modules/
-# RUN php -i
+RUN ls /usr/lib64/php/modules/ && \
+    php -i
+
+# View override files for debug purpose
 # RUN cat $PHP_SYSCONF_PATH/php.ini
 # RUN cat $PHP_INI_SCAN_DIR/10-opcache.ini
 # RUN cat $PHP_SYSCONF_PATH/nginx/mime.types
 # RUN cat $PHP_SYSCONF_PATH/nginx/nginx.conf
 # RUN cat $PHP_SYSCONF_PATH/nginx/fastcgi_params
-RUN cat $PHP_SYSCONF_PATH/nginx/conf.d/default.conf
-RUN cat $PHP_SYSCONF_PATH/php-fpm.conf
-
-RUN ls -la $PHP_SYSCONF_PATH/php-fpm.d/
-RUN cat $PHP_SYSCONF_PATH/php-fpm.d/www.conf
+# RUN cat $PHP_SYSCONF_PATH/nginx/conf.d/default.conf
+# RUN cat $PHP_SYSCONF_PATH/php-fpm.conf
+# RUN cat $PHP_SYSCONF_PATH/php-fpm.d/www.conf
 
 # Remove unnecessary packeges
 #RUN REMOVE_PKGS="php-devel deltarpm gcc-c++ make" && \
