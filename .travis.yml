@@ -88,7 +88,10 @@ install:
   - echo $BUILD_OPTIONS
   - docker pull centos:7
   - make tag TARGET=centos7 VERSION=i2s_centos7_php73
-  - docker rmi gamedev.by/i2s_centos7_php73:raw
+  - docker rmi -f gamedev.by/i2s_centos7_php73:latest
+  - docker tag gamedev.by/i2s_centos7_php73:raw gamedev.by/i2s_centos7_php73:latest
+  - docker rmi -f gamedev.by/i2s_centos7_php73:raw
+  - docker images -a
   - docker history gamedev.by/i2s_centos7_php73:latest
 
 script:
