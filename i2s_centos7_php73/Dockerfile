@@ -99,6 +99,15 @@ RUN PHP_VERSION=$(php -version | grep -P '(?<=PHP )([0-9]+\.[0-9]+\.[0-9]+)' -o)
     echo "extension=intl.so" > $PHP_INI_SCAN_DIR/20-intl.ini && \
     rm -rf /tmp/php
 
+# Install php-fmp and nginx
+RUN INSTALL_PKGS="php-fpm nginx" && \
+    yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS --nogpgcheck && \
+    php -version && \
+    $STI_SCRIPTS_PATH/yum-cleanup
+
+# Set web env
+ENV PHP_FPM_DATA_PATH=${APP_DATA}/web
+
 # Debug info
 RUN ls /usr/lib64/php/modules/
 RUN php -i
@@ -113,6 +122,8 @@ RUN yum remove -y --setopt=tsflags=nodocs php-devel deltarpm gcc-c++ make --nogp
 # Add default user
 RUN useradd -u 1001 -r -g 0 -d ${HOME} -s /sbin/nologin -c "Default Application User" default && \
     chown -R 1001:0 ${APP_ROOT}
+
+EXPOSE 8080
 
 # Copy the S2I scripts from the specific language image to $STI_SCRIPTS_PATH
 COPY ./s2i/bin/ $STI_SCRIPTS_PATH

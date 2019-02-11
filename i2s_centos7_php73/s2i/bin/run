@@ -36,4 +36,7 @@ export PHP_INI_SCAN_DIR=${PHP_INI_SCAN_DIR:-${PHP_SYSCONF_PATH}/php.d}
 envsubst < /opt/app-root/etc/php.ini.template > ${PHP_SYSCONF_PATH}/php.ini
 envsubst < /opt/app-root/etc/php.d/10-opcache.ini.template > ${PHP_INI_SCAN_DIR}/10-opcache.ini
 
-# TODO
+envsubst < /opt/app-root/etc/php-fpm.d/www.conf.template > ${PHP_SYSCONF_PATH}/php-fpm.d/www.conf
+envsubst < /opt/app-root/etc/php-fpm.conf.template > ${PHP_SYSCONF_PATH}/php-fpm.conf
+
+exec /usr/libexec/run-server

@@ -13,3 +13,27 @@ mkdir /tmp/sessions
 chmod -R a+rwx /tmp/sessions
 chown -R 1001:0 /tmp/sessions
 chmod -R a+rwx ${PHP_SYSCONF_PATH}
+
+mkdir -p /run/php-fpm
+chmod -R a+rwx /run/php-fpm
+
+mkdir -p ${APP_ROOT}/run/php-fpm
+chmod -R a+rwx ${APP_ROOT}/run/php-fpm
+
+mkdir -p /var/lib/nginx/tmp
+chmod -R a+rwx /var/lib/nginx
+chmod -R a+rwx /var/lib/nginx/tmp
+chmod -R a+rwx /var/log/nginx
+
+mkdir -p /var/run/nginx
+chmod -R a+rwx /var/run/nginx
+chmod a+rwx /var
+
+touch /var/run/nginx.pid
+touch /var/log/nginx/access.log
+touch /var/log/nginx/error.log
+chmod a+rwx /var/log/nginx/access.log
+chmod a+rwx /var/log/nginx/error.log
+chown -R 1001:0 /var/log/nginx/
+chown -R 1001:0 /var/run/nginx.pid
+chown -R 1001:0 /var/lib/nginx

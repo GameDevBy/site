@@ -1,0 +1,8 @@
+fastcgi_buffers 16 4k;
+fastcgi_buffer_size 4k;
+fastcgi_connect_timeout 300;
+fastcgi_send_timeout 300;
+fastcgi_read_timeout 300;
+client_body_buffer_size 256K;
+client_max_body_size 300M;
+output_buffers 2 32k;
