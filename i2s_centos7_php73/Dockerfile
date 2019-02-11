@@ -71,21 +71,31 @@ RUN ICU_VERSION="63.1" && \
     rm -rf /tmp/icu
 
 # Install php
+# Enable extension from https://www.drupal.org/docs/8/system-requirements/php-requirements
 RUN INSTALL_PKGS="php php-common php-devel php-gd php-json php-mbstring php-opcache php-pdo php-xml php-mysqlnd" && \
     yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS && \
-    ls -la /etc/php.d/ && \
-    cat /etc/php.d/20-json.ini && \
-    cat /etc/php.d/20-mbstring.ini && \
-    cat /etc/php.d/20-phar.ini && \
-    cat /etc/php.d/20-gd.ini && \
-    cat /etc/php.d/20-xml.ini && \
-    cat /etc/php.d/20-tokenizer.ini && \
-    cat /etc/php.d/20-curl.ini && \
-    cat /etc/php.d/20-dom.ini && \
+    rm -rf /etc/php.d/ && \
+    mkdir -p /etc/php.d/ && \
+    echo "extension=date" > /etc/php.d/20-date.ini && \
+    echo "extension=dom" > /etc/php.d/20-dom.ini && \
+    echo "extension=filter" > /etc/php.d/20-filter.ini && \
+    echo "extension=gd" > /etc/php.d/20-gd.ini && \
+    echo "extension=hash" > /etc/php.d/20-hash.ini && \
+    echo "extension=json" > /etc/php.d/20-json.ini && \
+    echo "extension=pcre" > /etc/php.d/20-pcre.ini && \
+    echo "extension=pdo" > /etc/php.d/20-pdo.ini && \
+    echo "extension=session" > /etc/php.d/20-session.ini && \
+    echo "extension=SimpleXML" > /etc/php.d/20-SimpleXML.ini && \
+    echo "extension=SPL" > /etc/php.d/20-SPL.ini && \
+    echo "extension=tokenizer" > /etc/php.d/20-tokenizer.ini && \
+    echo "extension=xml" > /etc/php.d/20-xml.ini && \
+    echo "extension=OpenSSL" > /etc/php.d/20-OpenSSL.ini && \
+    echo "extension=curl" > /etc/php.d/20-curl.ini && \
+    echo "extension=mbstring" > /etc/php.d/20-mbstring.ini && \
+    echo "extension=mysqli" > /etc/php.d/30-mysqli.ini && \
+    echo "extension=phar" > /etc/php.d/40-phar.ini && \
     php -version && \
     $STI_SCRIPTS_PATH/yum-cleanup
-
-# mysqli
 
 # Set php env variable
 ENV \
@@ -107,6 +117,7 @@ RUN PHP_VERSION=$(php -version | grep -P '(?<=PHP )([0-9]+\.[0-9]+\.[0-9]+)' -o)
     phpize && \
     ./configure --enable-intl --with-icu-dir=/opt/icu5c && \
     make && make test && make install && \
+    ls -la /etc/php.d/ && \
     echo "extension=intl.so" > /etc/php.d/20-intl.ini && \
     rm -rf /tmp/php
 
