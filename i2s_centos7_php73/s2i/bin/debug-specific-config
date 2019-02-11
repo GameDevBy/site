@@ -5,8 +5,10 @@
 # Quick error exit from script when fail any command below
 set -e
 
+BUILD_TIME_ENABLE_DEV=${BUILD_TIME_ENABLE_DEV:-false}
+
 # Exit is run on production environment
-if [[ "BUILD_TIME_ENABLE_DEV" != true ]] ; then
+if [[ "$BUILD_TIME_ENABLE_DEV" != true ]] ; then
     echo 'Is release build'
     exit 0
 fi

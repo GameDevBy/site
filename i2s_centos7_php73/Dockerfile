@@ -71,7 +71,7 @@ RUN ICU_VERSION="63.1" && \
     rm -rf /tmp/icu
 
 # Install php
-RUN INSTALL_PKGS="php php-devel php-opcache php-curl php-gd php-mbstring php-xml php-zip php-sqlite3 php-mysql php-soap php-json php-phar php-iconv" && \
+RUN INSTALL_PKGS="php php-devel php-opcache php-curl php-gd php-mbstring php-xml php-zip php-sqlite3 php-mysqlnd php-json php-phar" && \
     yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS && \
     php -version && \
     $STI_SCRIPTS_PATH/yum-cleanup
@@ -123,6 +123,10 @@ RUN echo -e "[nginx]\nname=nginx mainline repo\nbaseurl=http://nginx.org/package
 
 # Set web env
 ENV PHP_FPM_DATA_PATH=$APP_DATA/web
+
+# TODO remove
+RUN ls /usr/lib64/php/modules/ && \
+    php -i
 
 # Install composer
 RUN mkdir /tmp/composer && \
