@@ -1,38 +1,40 @@
-FROM centos/s2i-core-centos7
+FROM centos:7
 
-# Description
 # This image provides an PHP environment for running PHP 7.3 applications.
-
-ENV PHP_VERSION=7.3 \
-    PHP_VER_SHORT=73 \
-    NAME=php \
-    PATH=$PATH
-
-ENV SUMMARY="Platform for building and running PHP $PHP_VERSION applications" \
-    DESCRIPTION="PHP $PHP_VERSION available as container is a base platform for \
-building and running various PHP $PHP_VERSION applications and frameworks. \
-PHP is an HTML-embedded scripting language. PHP attempts to make it easy for developers \
-to write dynamically generated web pages. PHP also offers built-in database integration \
-for several commercial and non-commercial database management systems, so writing \
-a database-enabled webpage with PHP is fairly simple. The most common use of PHP coding \
-is probably as a replacement for CGI scripts."
+# Base on:
+#    https://github.com/sclorg/s2i-base-container (2f92944a0dc4e52e0c44913cd85e32b5c0c772bd 22 ‎Jan 2019)
+#    https://github.com/sclorg/s2i-php-container (60378a6fa5420b33d5d7ce72e894fcce54c8c5df 5 Oct 2018)
 
 ARG BUILD_TIME_ENABLE_DEV=false
 ENV ENABLE_DEV=$BUILD_TIME_ENABLE_DEV
 
-COPY ./s2i/bin/yum-cleanup $STI_SCRIPTS_PATH/yum-cleanup
-
-LABEL summary="${SUMMARY}" \
-      description="${DESCRIPTION}" \
-      io.k8s.description="${DESCRIPTION}" \
-      io.k8s.display-name="PHP ${PHP_VERSION}" \
-      io.openshift.tags="builder,${NAME},${NAME}${PHP_VER_SHORT},rh-${NAME}${PHP_VER_SHORT}" \
-      io.openshift.s2i.scripts-url="image:///usr/libexec/s2i" \
-      io.s2i.scripts-url="image:///usr/libexec/s2i" \
-      name="gamedev.by/i2s_centos7_php73" \
+LABEL name="gamedev.by/i2s_centos7_php73" \
       version="latest"
 
-RUN INSTALL_PKGS="epel-release \
+ENV \
+    # Path to be used in other layers to place s2i scripts into
+    STI_SCRIPTS_PATH=/usr/libexec/s2i \
+    APP_ROOT=/opt/app-root \
+    # The $HOME is not set by default, but some applications needs this variable
+    HOME=/opt/app-root/src \
+    PATH=/opt/app-root/src/bin:/opt/app-root/bin:$PATH
+
+# Directory with the sources is set as the working directory so all STI scripts
+# can execute relative to this path.
+WORKDIR ${HOME}
+
+COPY ./s2i/bin/yum-cleanup $STI_SCRIPTS_PATH/yum-cleanup
+
+# When bash is started non-interactively, to run a shell script, for example it
+# looks for this variable and source the content of this file. This will enable
+# the SCL for all scripts without need to do 'scl enable'.
+ENV BASH_ENV=${APP_ROOT}/etc/scl_enable \
+    ENV=${APP_ROOT}/etc/scl_enable \
+    PROMPT_COMMAND=". ${APP_ROOT}/etc/scl_enable"
+
+RUN mkdir -p ${HOME}/.pki/nssdb && \
+    chown -R 1001:0 ${HOME}/.pki && \
+    INSTALL_PKGS="epel-release \
                   https://rpms.remirepo.net/enterprise/remi-release-7.rpm \
                   centos-release-scl \
                   deltarpm" && \
@@ -87,3 +89,7 @@ RUN echo $BUILD_TIME_ENABLE_DEV
 # RUN yum remove -y --setopt=tsflags=nodocs php-devel deltarpm gcc-c++ make --nogpgcheck && \
 #    yum -y clean all --enablerepo='*' && \
 #    rm -rf /var/cache/yum
+
+# Add default user
+RUN useradd -u 1001 -r -g 0 -d ${HOME} -s /sbin/nologin -c "Default Application User" default && \
+    chown -R 1001:0 ${APP_ROOT}

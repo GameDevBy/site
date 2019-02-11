@@ -9,12 +9,12 @@ before_cache:
   - pushd $DOCKER_DIR
   # Save tagged docker images
   - >
-    docker images -a --filter='dangling=false' --format '{{.Repository}}:{{.Tag}} {{.ID}}'
-    | xargs -n 2 -t sh -c 'test -e ./$1.tar.gz || docker save $1 | gzip -2 > ./$1.tar.gz'
+    docker images -a --filter='dangling=false' --format '{{.Repository}} {{.Tag}} {{.ID}}'
+    | xargs -n 3 -t sh -c 'test -e ./$2@$(echo $0 | sed "s/\//%/g")#$1.tar.gz || docker save $0:$1 | gzip -2 > ./$2@$(echo $0 | sed "s/\//%/g")#$1.tar.gz'
   # Remove legacy images from cache
   - >
-    ls -1 | sed -e 's/\..*$//'
-    | xargs -n 1 -t sh -c 'docker inspect --type=image $0 > /dev/null 2>&1 || rm ./$0.tar.gz'
+    ls -1 | sed -e 's/\@.*$//'
+    | xargs -n 1 -t sh -c 'docker inspect --type=image $0 > /dev/null 2>&1 || rm ./$0*'
   - popd
 
 env:
@@ -66,6 +66,7 @@ before_install:
 
   # Update docker images from cache
   - if [[ -d $DOCKER_DIR ]]; then ls $DOCKER_DIR/*.tar.gz | xargs -I {file} sh -c "zcat {file} | docker load"; fi
+  - docker images -a
 
   # Install Packages for i2s
   - sudo apt-get -q -y -o Dpkg::Use-Pty=0 install go-md2man
@@ -83,8 +84,7 @@ install:
     else export BUILD_OPTIONS=" --build-arg BUILD_TIME_ENABLE_DEV=true --cache-from gamedev.by/i2s_centos7_php73:latest "
     fi
   - echo $BUILD_OPTIONS
-  - docker images -a
-  - docker pull centos/s2i-core-centos7
+  - docker pull centos:7
   - make tag TARGET=centos7 VERSION=i2s_centos7_php73
   - docker rmi gamedev.by/i2s_centos7_php73:raw
   - docker history gamedev.by/i2s_centos7_php73:latest
