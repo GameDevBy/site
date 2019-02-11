@@ -23,7 +23,7 @@ ENV \
     PATH=/opt/app-root/src/bin:/opt/app-root/bin:$PATH
 
 # Directory with the sources is set as the working directory so all STI scripts can execute relative to this path.
-WORKDIR ${HOME}
+WORKDIR $HOME
 
 # Copy script for yum cleanup
 COPY ./s2i/bin/yum-cleanup $STI_SCRIPTS_PATH/yum-cleanup
@@ -32,13 +32,13 @@ COPY ./s2i/bin/yum-cleanup $STI_SCRIPTS_PATH/yum-cleanup
 # looks for this variable and source the content of this file. This will enable
 # the SCL for all scripts without need to do 'scl enable'.
 ENV \
-    BASH_ENV=${APP_ROOT}/etc/scl_enable \
-    ENV=${APP_ROOT}/etc/scl_enable \
-    PROMPT_COMMAND=". ${APP_ROOT}/etc/scl_enable"
+    BASH_ENV=$APP_ROOT/etc/scl_enable \
+    ENV=$APP_ROOT/etc/scl_enable \
+    PROMPT_COMMAND=". $APP_ROOT/etc/scl_enable"
 
 # Install base repository
-RUN mkdir -p ${HOME}/.pki/nssdb && \
-    chown -R 1001:0 ${HOME}/.pki && \
+RUN mkdir -p $HOME/.pki/nssdb && \
+    chown -R 1001:0 $HOME/.pki && \
     INSTALL_PKGS="epel-release \
                   https://rpms.remirepo.net/enterprise/remi-release-7.rpm \
                   centos-release-scl \
@@ -56,7 +56,7 @@ RUN INSTALL_PKGS="nss_wrapper gcc-c++ make git" && \
 
 # Install dumb
 RUN DUMB_VERSION="1.2.2" && \
-    curl -fsSL https://github.com/Yelp/dumb-init/releases/download/v${DUMB_VERSION}/dumb-init_${DUMB_VERSION}_amd64 > /usr/local/bin/dumb-init && \
+    curl -fsSL https://github.com/Yelp/dumb-init/releases/download/v$DUMB_VERSION/dumb-init_${DUMB_VERSION}_amd64 > /usr/local/bin/dumb-init && \
     chmod +x /usr/local/bin/dumb-init && \
     dumb-init -V
 
@@ -78,35 +78,35 @@ RUN INSTALL_PKGS="php php-devel php-opcache php-curl php-gd php-mbstring php-xml
 
 # Set php env variable
 ENV \
-    APP_DATA=${APP_ROOT}/src \
+    APP_DATA=$APP_ROOT/src \
     PHP_DEFAULT_INCLUDE_PATH=/usr/share/pear:/usr/share/php \
     PHP_SYSCONF_PATH=/etc \
-    PHP_INI_SCAN_DIR=${PHP_SYSCONF_PATH}/php.d \
+    PHP_INI_SCAN_DIR=$PHP_SYSCONF_PATH/php.d \
     SYMFONY_ENV=prod \
     APP_ENV=prod
 
 # Build php intl extension
-RUN PHP_VERSION=$(php -version | grep -P '(?<=PHP )([0-9]+\.[0-9]+\.[0-9]+)' -o) && \
-    mkdir /tmp/php && \
-    cd /tmp/php && \
-    git -c advice.detachedHead=false clone --quiet -b "php-$PHP_VERSION" --single-branch --depth 1 https://github.com/php/php-src.git . && \
-    cd ./ext/intl && \
-    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/icu5c/lib && \
-    export TEST_PHP_ARGS="-q" && \
-    phpize && \
-    ./configure --enable-intl --with-icu-dir=/opt/icu5c && \
-    make && make test && make install && \
-    echo "extension=intl.so" > $PHP_INI_SCAN_DIR/20-intl.ini && \
-    rm -rf /tmp/php
+# RUN PHP_VERSION=$(php -version | grep -P '(?<=PHP )([0-9]+\.[0-9]+\.[0-9]+)' -o) && \
+#     mkdir /tmp/php && \
+#     cd /tmp/php && \
+#     git -c advice.detachedHead=false clone --quiet -b "php-$PHP_VERSION" --single-branch --depth 1 https://github.com/php/php-src.git . && \
+#     cd ./ext/intl && \
+#     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/icu5c/lib && \
+#     export TEST_PHP_ARGS="-q" && \
+#     phpize && \
+#     ./configure --enable-intl --with-icu-dir=/opt/icu5c && \
+#     make && make test && make install && \
+#     echo "extension=intl.so" > $PHP_INI_SCAN_DIR/20-intl.ini && \
+#     rm -rf /tmp/php
 
 # Install php-fmp and nginx
 RUN INSTALL_PKGS="php-fpm nginx" && \
     yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS --nogpgcheck && \
-    php -version && \
+    nginx -V && \
     $STI_SCRIPTS_PATH/yum-cleanup
 
 # Set web env
-ENV PHP_FPM_DATA_PATH=${APP_DATA}/web
+ENV PHP_FPM_DATA_PATH=$APP_DATA/web
 
 # Debug info
 RUN ls /usr/lib64/php/modules/
@@ -124,11 +124,12 @@ RUN [ -f $PHP_SYSCONF_PATH/php-fpm.d/www.conf ] && cat $PHP_SYSCONF_PATH/php-fpm
 # Remove unnecessary packeges
 RUN yum remove -y --setopt=tsflags=nodocs php-devel deltarpm gcc-c++ make --nogpgcheck && \
     yum -y clean all --enablerepo='*' && \
-    rm -rf /var/cache/yum
+    rm -rf /var/cache/yum && \
+    rm $STI_SCRIPTS_PATH/yum-cleanup
 
 # Add default user
-RUN useradd -u 1001 -r -g 0 -d ${HOME} -s /sbin/nologin -c "Default Application User" default && \
-    chown -R 1001:0 ${APP_ROOT}
+RUN useradd -u 1001 -r -g 0 -d $HOME -s /sbin/nologin -c "Default Application User" default && \
+    chown -R 1001:0 $APP_ROOT
 
 EXPOSE 8080
 
