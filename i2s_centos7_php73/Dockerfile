@@ -71,7 +71,7 @@ RUN ICU_VERSION="63.1" && \
     rm -rf /tmp/icu
 
 # Install php
-RUN INSTALL_PKGS="php php-devel php-opcache php-curl php-gd php-mbstring php-xml php-zip php-sqlite3 php-mysql php-soap" && \
+RUN INSTALL_PKGS="php php-devel php-opcache php-curl php-gd php-mbstring php-xml php-zip php-sqlite3 php-mysql php-soap php-json php-phar php-iconv" && \
     yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS && \
     php -version && \
     $STI_SCRIPTS_PATH/yum-cleanup
