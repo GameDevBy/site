@@ -28,3 +28,6 @@ bash /tmp/symfony/symfony-setup
 mv ~/.symfony/bin/symfony /usr/local/bin/symfony
 symfony -V
 rm -rf /tmp/symfony
+
+# Install composer extension for quick download
+composer --no-progress --no-interaction --ansi global require hirak/prestissimo

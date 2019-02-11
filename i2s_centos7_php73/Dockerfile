@@ -71,20 +71,21 @@ RUN ICU_VERSION="63.1" && \
     rm -rf /tmp/icu
 
 # Install php
-RUN INSTALL_PKGS="php php-curl php-dom php-devel php-opcache php-curl php-gd php-mbstring php-xml php-zip php-sqlite3 php-json php-phar" && \
+RUN INSTALL_PKGS="php php-common php-devel php-gd php-json php-mbstring php-opcache php-pdo php-xml php-mysqlnd" && \
     yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS && \
     ls -la /etc/php.d/ && \
-    echo "extension=json.so" > /etc/php.d/20-json.ini && \
-    echo "extension=mbstring.so" > /etc/php.d/20-mbstring.ini && \
-    echo "extension=phar.so" > /etc/php.d/20-phar.ini && \
-    echo "extension=gd.so" > /etc/php.d/20-gd.ini && \
-    echo "extension=pdo.so" > /etc/php.d/20-pdo.ini && \
-    echo "extension=xml.so" > /etc/php.d/20-xml.ini && \
-    echo "extension=tokenizer.so" > /etc/php.d/20-tokenizer.ini && \
-    echo "extension=mysqli.so" > /etc/php.d/20-mysqli.ini && \
-    echo "extension=curl.so" > /etc/php.d/20-curl.ini && \
+    cat /etc/php.d/20-json.ini && \
+    cat /etc/php.d/20-mbstring.ini && \
+    cat /etc/php.d/20-phar.ini && \
+    cat /etc/php.d/20-gd.ini && \
+    cat /etc/php.d/20-xml.ini && \
+    cat /etc/php.d/20-tokenizer.ini && \
+    cat /etc/php.d/20-curl.ini && \
+    cat /etc/php.d/20-dom.ini && \
     php -version && \
     $STI_SCRIPTS_PATH/yum-cleanup
+
+# mysqli
 
 # Set php env variable
 ENV \
@@ -146,7 +147,6 @@ RUN mkdir /tmp/composer && \
     php -r "if (hash('SHA384', file_get_contents('/tmp/composer/composer-setup.php')) !== trim(file_get_contents('/tmp/composer/composer-setup.sig'))) { unlink('/tmp/composer/composer-setup.php'); echo 'Invalid installer' . PHP_EOL; exit(1); }" && \
     php /tmp/composer/composer-setup.php --install-dir=/usr/local/bin --filename=composer && \
     composer diagnose --no-interaction --ansi --verbose && \
-    composer --no-progress --no-interaction --no-ansi global require hirak/prestissimo && \
     rm -rf /tmp/composer
 
 # Copy script for install development environment
