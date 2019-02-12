@@ -76,23 +76,16 @@ RUN INSTALL_PKGS="php php-common php-devel php-gd php-json php-mbstring php-opca
     yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS && \
     rm -rf /etc/php.d/ && \
     mkdir -p /etc/php.d/ && \
-    echo "extension=date" > /etc/php.d/20-date.ini && \
     echo "extension=dom" > /etc/php.d/20-dom.ini && \
-    echo "extension=filter" > /etc/php.d/20-filter.ini && \
     echo "extension=gd" > /etc/php.d/20-gd.ini && \
-    echo "extension=hash" > /etc/php.d/20-hash.ini && \
     echo "extension=json" > /etc/php.d/20-json.ini && \
-    echo "extension=pcre" > /etc/php.d/20-pcre.ini && \
     echo "extension=pdo" > /etc/php.d/20-pdo.ini && \
-    echo "extension=session" > /etc/php.d/20-session.ini && \
     echo "extension=SimpleXML" > /etc/php.d/20-SimpleXML.ini && \
-    echo "extension=SPL" > /etc/php.d/20-SPL.ini && \
     echo "extension=tokenizer" > /etc/php.d/20-tokenizer.ini && \
     echo "extension=xml" > /etc/php.d/20-xml.ini && \
-    echo "extension=OpenSSL" > /etc/php.d/20-OpenSSL.ini && \
     echo "extension=curl" > /etc/php.d/20-curl.ini && \
     echo "extension=mbstring" > /etc/php.d/20-mbstring.ini && \
-    echo "extension=mysqli" > /etc/php.d/30-mysqli.ini && \
+    echo "extension=mysqlnd" > /etc/php.d/30-mysqlnd.ini && \
     echo "extension=phar" > /etc/php.d/40-phar.ini && \
     php -version && \
     $STI_SCRIPTS_PATH/yum-cleanup
@@ -102,9 +95,11 @@ ENV \
     APP_DATA=$APP_ROOT/src \
     PHP_DEFAULT_INCLUDE_PATH=/usr/share/pear:/usr/share/php \
     PHP_SYSCONF_PATH=/etc \
-    PHP_INI_SCAN_DIR=$PHP_SYSCONF_PATH/php.d \
     SYMFONY_ENV=prod \
     APP_ENV=prod
+
+# Set php ini scan dir
+ENV PHP_INI_SCAN_DIR=$PHP_SYSCONF_PATH/php.d
 
 # Build php intl extension
 RUN PHP_VERSION=$(php -version | grep -P '(?<=PHP )([0-9]+\.[0-9]+\.[0-9]+)' -o) && \
@@ -117,8 +112,7 @@ RUN PHP_VERSION=$(php -version | grep -P '(?<=PHP )([0-9]+\.[0-9]+\.[0-9]+)' -o)
     phpize && \
     ./configure --enable-intl --with-icu-dir=/opt/icu5c && \
     make && make test && make install && \
-    ls -la /etc/php.d/ && \
-    echo "extension=intl.so" > /etc/php.d/20-intl.ini && \
+    echo "extension=intl" > $PHP_INI_SCAN_DIR/20-intl.ini && \
     rm -rf /tmp/php
 
 # Install php-fmp and nginx
@@ -145,11 +139,6 @@ RUN echo -e "[nginx]\nname=nginx mainline repo\nbaseurl=http://nginx.org/package
 
 # Set web env
 ENV PHP_FPM_DATA_PATH=$APP_DATA/web
-
-# TODO remove
-RUN ls -la /usr/lib64/php/modules/ && \
-    ls -la /etc/php.d/ && \
-    php -i
 
 # Install composer
 RUN mkdir /tmp/composer && \
