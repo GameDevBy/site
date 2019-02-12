@@ -25,6 +25,9 @@ ENV \
 # Directory with the sources is set as the working directory so all STI scripts can execute relative to this path.
 WORKDIR $HOME
 
+# Config shell for run commands
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
 # Copy script for yum cleanup
 COPY ./s2i/bin/yum-cleanup $STI_SCRIPTS_PATH/yum-cleanup
 
@@ -39,19 +42,19 @@ ENV \
 # Install base repository
 RUN mkdir -p $HOME/.pki/nssdb && \
     chown -R 1001:0 $HOME/.pki && \
-    INSTALL_PKGS="epel-release \
+    INSTALL_PKGS=(epel-release \
                   https://rpms.remirepo.net/enterprise/remi-release-7.rpm \
                   centos-release-scl \
-                  deltarpm" && \
+                  deltarpm) && \
     rpm --import http://mirror.centos.org/centos/RPM-GPG-KEY-CentOS-7 && \
-    yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS && \
+    yum install -y --setopt=tsflags=nodocs "${INSTALL_PKGS[@]}" && \
     yum-config-manager --enable remi-php73 && \
     yum -y --setopt=tsflags=nodocs update && \
     $STI_SCRIPTS_PATH/yum-cleanup
 
 # Install additional packages
-RUN INSTALL_PKGS="yum-utils nss_wrapper gcc-c++ make git" && \
-    yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS && \
+RUN INSTALL_PKGS=(yum-utils nss_wrapper gcc-c++ make git) && \
+    yum install -y --setopt=tsflags=nodocs "${INSTALL_PKGS[@]}" && \
     $STI_SCRIPTS_PATH/yum-cleanup
 
 # Install dumb
@@ -63,17 +66,20 @@ RUN DUMB_VERSION="1.2.2" && \
 # Build icu
 RUN ICU_VERSION="63.1" && \
     mkdir /tmp/icu && \
-    cd /tmp/icu && \
-    ICU_VERSION_S=$(echo $ICU_VERSION | sed 's/\./-/g') && \
+    pushd /tmp/icu || exit 1 && \
+    ICU_VERSION_S=${ICU_VERSION//\./-} && \
     git -c advice.detachedHead=false clone --quiet -b "release-$ICU_VERSION_S" --single-branch --depth 1 https://github.com/unicode-org/icu.git . && \
-    ./icu4c/source/runConfigureICU Linux --prefix=/opt/icu5c && \
+    pushd ./icu4c/source/ || exit 1 && \
+    ./runConfigureICU Linux --prefix=/opt/icu5c && \
+    popd || exit 1 && \
     make -j2 && make -j2 check && make install && \
-    rm -rf /tmp/icu
+    rm -rf /tmp/icu && \
+    popd || exit 1
 
 # Install php
 # Enable extension from https://www.drupal.org/docs/8/system-requirements/php-requirements
-RUN INSTALL_PKGS="php php-common php-devel php-gd php-json php-mbstring php-opcache php-pdo php-xml php-mysqlnd" && \
-    yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS && \
+RUN INSTALL_PKGS=(php php-common php-devel php-gd php-json php-mbstring php-opcache php-pdo php-xml php-mysqlnd) && \
+    yum install -y --setopt=tsflags=nodocs "${INSTALL_PKGS[@]}" && \
     rm -rf /etc/php.d/ && \
     mkdir -p /etc/php.d/ && \
     echo "extension=dom" > /etc/php.d/20-dom.ini && \
@@ -103,16 +109,19 @@ ENV PHP_INI_SCAN_DIR=$PHP_SYSCONF_PATH/php.d
 # Build php intl extension
 RUN PHP_VERSION=$(php -version | grep -P '(?<=PHP )([0-9]+\.[0-9]+\.[0-9]+)' -o) && \
     mkdir /tmp/php && \
-    cd /tmp/php && \
+    pushd /tmp/php || exit 1 && \
     git -c advice.detachedHead=false clone --quiet -b "php-$PHP_VERSION" --single-branch --depth 1 https://github.com/php/php-src.git . && \
-    cd ./ext/intl && \
+    pushd ./ext/intl || exit 1 && \
     export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/icu5c/lib && \
     export TEST_PHP_ARGS="-q" && \
     phpize && \
     ./configure --enable-intl --with-icu-dir=/opt/icu5c && \
     make && make test && make install && \
     echo "extension=intl" > $PHP_INI_SCAN_DIR/20-intl.ini && \
-    rm -rf /tmp/php
+    popd || exit 1 && \
+    rm -rf /tmp/php && \
+    popd || exit 1 && \
+    php -r 'function_exists("intl_error_name") || (print("Failed to enable php-intl\n") && exit(1));'
 
 # Install php-fmp and nginx
 # https://nginx.org/ru/linux_packages.html#RHEL-CentOS
@@ -131,8 +140,8 @@ RUN PHP_VERSION=$(php -version | grep -P '(?<=PHP )([0-9]+\.[0-9]+\.[0-9]+)' -o)
 RUN echo -e "[nginx]\nname=nginx mainline repo\nbaseurl=http://nginx.org/packages/mainline/centos/7/x86_64/\ngpgcheck=1\nenabled=1\ngpgkey=https://nginx.org/keys/nginx_signing.key" > /etc/yum.repos.d/nginx.repo && \
     cat /etc/yum.repos.d/nginx.repo && \
     rpm --import https://nginx.org/keys/nginx_signing.key && \
-    INSTALL_PKGS="php-fpm nginx" && \
-    yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS && \
+    INSTALL_PKGS=(php-fpm nginx) && \
+    yum install -y --setopt=tsflags=nodocs "${INSTALL_PKGS[@]}" && \
     nginx -V && \
     $STI_SCRIPTS_PATH/yum-cleanup
 
@@ -175,6 +184,8 @@ RUN ls -la /usr/lib64/php/modules/ && \
 #    yum remove -y --setopt=tsflags=nodocs $REMOVE_PKGS && \
 #    yum -y clean all --enablerepo='*' && \
 #    rm -rf /var/cache/yum && \
+#    rm $STI_SCRIPTS_PATH/yum-cleanup && \
+#    rm $STI_SCRIPTS_PATH/debug-specific-config && \
 #    rm $STI_SCRIPTS_PATH/yum-cleanup
 
 # Add default user
