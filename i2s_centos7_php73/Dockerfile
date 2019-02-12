@@ -80,7 +80,6 @@ RUN INSTALL_PKGS="php php-common php-devel php-gd php-json php-mbstring php-opca
     echo "extension=gd" > /etc/php.d/20-gd.ini && \
     echo "extension=json" > /etc/php.d/20-json.ini && \
     echo "extension=pdo" > /etc/php.d/20-pdo.ini && \
-    echo "extension=SimpleXML" > /etc/php.d/20-SimpleXML.ini && \
     echo "extension=tokenizer" > /etc/php.d/20-tokenizer.ini && \
     echo "extension=xml" > /etc/php.d/20-xml.ini && \
     echo "extension=curl" > /etc/php.d/20-curl.ini && \

@@ -6,6 +6,7 @@
 set -e
 
 BUILD_TIME_ENABLE_DEV=${BUILD_TIME_ENABLE_DEV:-false}
+PHP_INI_SCAN_DIR=${PHP_INI_SCAN_DIR:-/etc/php.d}
 
 # Exit is run on production environment
 if [[ "$BUILD_TIME_ENABLE_DEV" != true ]] ; then
@@ -15,11 +16,11 @@ fi
 
 # Install shell check https://www.mankier.com/1/shellcheck
 yum install -y --setopt=tsflags=nodocs ShellCheck
-shellcheck -v
+shellcheck -V
 
 # Install php ast extension for phan https://github.com/nikic/php-ast
 yum install -y --setopt=tsflags=nodocs php-ast
-echo "extension=ast" > /etc/php.d/40-ast.ini
+echo "extension=ast" > ${PHP_INI_SCAN_DIR}/40-ast.ini
 php -r 'function_exists("ast\parse_code") || (print("Failed to enable php-ast\n") && exit(1));'
 
 # Install symfony cli https://symfony.com/download
