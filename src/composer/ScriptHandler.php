@@ -141,11 +141,16 @@ class ScriptHandler {
     $phpPath = dirname($phpPath);
 
     $initEnvContent = $isWindows ?
-      'set PHAN_DISABLE_XDEBUG_WARN=1' . PHP_EOL
+      'set COMPOSER_HOME=' . $drupalFinder->getComposerRoot() . '\windows\app\local\persist\composer\home' . PHP_EOL
+      . 'set PHP_INI_SCAN_DIR=' . $drupalFinder->getComposerRoot() . '\windows\app\local\apps\php-nts\current\cli' . PHP_EOL
+      . 'set SCOOP=' . $drupalFinder->getComposerRoot() . '\windows\app\local' . PHP_EOL
+      . 'set SCOOP_GLOBAL=' . $drupalFinder->getComposerRoot() . '\windows\app\global' . PHP_EOL
+      . 'set PHAN_DISABLE_XDEBUG_WARN=1' . PHP_EOL
       . 'set PATH='
         . $drupalFinder->getComposerRoot() . '\vendor\bin;'
         . $drupalFinder->getComposerRoot() . '\node_modules\.bin;'
-        . $phpPath . ';%PATH%' . PHP_EOL :
+        . $drupalFinder->getComposerRoot() . '\windows\app\local\shims;%PATH%'
+      . PHP_EOL :
       'export PHAN_DISABLE_XDEBUG_WARN=1' . PHP_EOL
       . 'PATH="'
         . $drupalFinder->getComposerRoot() . '/vendor/bin:'
@@ -177,6 +182,7 @@ class ScriptHandler {
       ->exclude('.idea')
       ->exclude('node_modules')
       ->exclude('vendor')
+      ->exclude('windows/app')
       ->exclude('web/core/modules/system/tests/fixtures/HtaccessTest')
       // ->exclude('web/core')
       // ->exclude('web/modules/contrib')
