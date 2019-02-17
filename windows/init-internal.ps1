@@ -28,6 +28,10 @@ function Unzip
 
 ################
 
+# Set root path
+
+$ROOT_DIR = [IO.Path]::GetFullPath("$PSScriptRoot\..")
+
 # PowerShell must be enabled for your user account
 
 Set-ExecutionPolicy RemoteSigned -scope CurrentUser
@@ -60,9 +64,11 @@ $OLD_COMPOSER_HOME_DIR = [environment]::getEnvironmentVariable('COMPOSER_HOME', 
 $OLD_SCOOP = [environment]::getEnvironmentVariable('SCOOP', 'User')
 $OLD_SCOOP_GLOBAL = [environment]::getEnvironmentVariable('SCOOP_GLOBAL', 'Machine')
 
-# Set scoop exe path
+# Set exe pathes
 
 $SCOOP_EXE = "$SCRIPT_DIR_LOCAL\apps\scoop\current\bin\scoop.ps1"
+$ARIA2_EXE = "$SCRIPT_DIR_LOCAL\shims\aria2c.exe"
+$COMPOSER_EXE = "$SCRIPT_DIR_LOCAL\apps\composer\current\composer.ps1"
 
 # Install scoop
 
@@ -144,8 +150,8 @@ opcache.file_cache=$SCRIPT_DIR_LOCAL\persist\php-nts\file_cache
 }
 
 # Install php xdebug extension
-$XDEBUG_DLL = "$PHP_DEF_EXT_DIR\php_xdebug.dll"
-if (!(test-path $XDEBUG_DLL))
+
+if (!(test-path "$PHP_DEF_EXT_DIR\php_xdebug.dll"))
 {
   $XDEBUG_URL_PREFIX = "https://xdebug.org/files"
   $XDEBUG_VERSION = "2.7.0RC1"
@@ -158,7 +164,7 @@ if (!(test-path $XDEBUG_DLL))
     $BIT = ''
   }
   $XDEBUG_URL = "$XDEBUG_URL_PREFIX/php_xdebug-$XDEBUG_VERSION-7.3-vc15-nts$BIT.dll"
-  Invoke-WebRequest -Uri $XDEBUG_URL -OutFile $XDEBUG_DLL
+  Start-Process $ARIA2_EXE -NoNewWindow -Wait -ArgumentList "--split=16", "--dir=$PHP_DEF_EXT_DIR", "--out=php_xdebug.dll", $XDEBUG_URL
 
   $XDEBUG_INI = @"
 zend_extension=xdebug
@@ -178,7 +184,7 @@ xdebug.max_nesting_level=1000
 
 # Install php ast extension
 
-if (!(test-path "$SCRIPT_DIR\extern\php-ast"))
+if (!(test-path "$PHP_DEF_EXT_DIR\php_ast.dll"))
 {
   $AST_URL_PREFIX = "https://windows.php.net/downloads/pecl/releases/ast"
   $AST_VERSION = "1.0.1"
@@ -191,15 +197,19 @@ if (!(test-path "$SCRIPT_DIR\extern\php-ast"))
     $BIT = 'x86'
   }
   $AST_URL = "$AST_URL_PREFIX/$AST_VERSION/php_ast-$AST_VERSION-7.3-nts-vc15-$BIT.zip"
-  $AST_ZIP = "$SCRIPT_DIR\extern\php-ast\php_ast.zip"
-  If (!(test-path "$SCRIPT_DIR\extern\php-ast"))
+  $AST_DIR = "$SCRIPT_DIR\extern\php-ast"
+  If (!(test-path "$AST_DIR"))
   {
-    New-Item -ItemType Directory -Force -Path "$SCRIPT_DIR\extern\php-ast" *>$null
+    New-Item -ItemType Directory -Force -Path "$AST_DIR" *>$null
   }
-  Invoke-WebRequest -Uri $AST_URL -OutFile $AST_ZIP
-  Unzip $AST_ZIP "$SCRIPT_DIR\extern\php-ast"
+  $AST_ZIP = "php_ast.zip"
+  Start-Process $ARIA2_EXE -NoNewWindow -Wait -ArgumentList "--split=16", "--dir=$AST_DIR", "--out=$AST_ZIP", $AST_URL
 
-  Copy-Item "$SCRIPT_DIR\extern\php-ast\php_ast.dll" "$PHP_DEF_EXT_DIR\php_ast.dll"
+  Unzip "$AST_DIR\$AST_ZIP" "$AST_DIR"
+
+  Copy-Item "$AST_DIR\php_ast.dll" "$PHP_DEF_EXT_DIR\php_ast.dll"
+
+  Remove-Item $AST_DIR -Recurse -Force
 
   $AST_INI = @"
 extension=ast
@@ -230,10 +240,35 @@ if (!(test-path "$SCRIPT_DIR_LOCAL\apps\composer\current"))
 {
   Invoke-Expression "&'$SCOOP_EXE' install composer"
 }
-$OLD_COMPOSER_HOME_DIR = "$SCRIPT_DIR_LOCAL\persist\composer\home"
+$COMPOSER_HOME_DIR = "$SCRIPT_DIR_LOCAL\persist\composer\home"
+[environment]::setEnvironmentVariable($COMPOSER_HOME_DIR, 'User')
 
-# Check
+# Install shellcheck (https://github.com/koalaman/shellcheck)
+
+if (!(test-path "$SCRIPT_DIR_LOCAL\apps\shellcheck\current"))
+{
+  Invoke-Expression "&'$SCOOP_EXE' install shellcheck"
+}
+
+# Check all istalled application by virus
+
 Invoke-Expression "&'$SCOOP_EXE' virustotal *"
+
+# Install composer parallel install plugin (https://github.com/hirak/prestissimo)
+
+if (!(test-path "$COMPOSER_HOME_DIR\vendor\hirak\prestissimo"))
+{
+  Write-Output "Installing composer plugin for parallel install..."
+  Invoke-Expression "&'$COMPOSER_EXE' -q global require hirak/prestissimo"
+}
+
+# Change current directory to root
+
+Set-Location $ROOT_DIR
+
+# Install composer envarenment
+
+Invoke-Expression "&'$COMPOSER_EXE' install"
 
 # Restory old context
 

@@ -11,6 +11,7 @@ Prod: [![Build Status Prod](https://travis-ci.org/GameDevBy/site.svg?branch=prod
 ## Документация
 
 * [Настройка dev-окружаения под windows](./docs/config-win-dev-env.md).
+* [Подробнее](https://www.drupal.org/about/licensing) про лицензирование drupal и его производных ([перевод](https://habr.com/ru/post/280228/)).
 
 ## Разное
 
@@ -19,4 +20,4 @@ Prod: [![Build Status Prod](https://travis-ci.org/GameDevBy/site.svg?branch=prod
 composer drupal:update
 ```
 
-Последняя версия синхронизации с [drupal-project](https://github.com/drupal-composer/drupal-project/commit/f2b83dc777a188cc1ccc4526f947e66d70fad380).
+Последняя версия синхронизации с [drupal-project](https://github.com/drupal-composer/drupal-project/commit/4229acea4bb6181f421e8dd0e72a02ccdc98df1d).
