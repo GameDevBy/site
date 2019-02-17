@@ -49,8 +49,13 @@ $env:SCOOP = $SCRIPT_DIR_LOCAL
 [environment]::setEnvironmentVariable($COMPOSER_HOME_DIR, 'User')
 [environment]::setEnvironmentVariable('PHP_INI_SCAN_DIR', $PHP_INI_SCAN_DIR, 'Process')
 
-# Check
+# Check scoop install
 
+if (!(test-path "$SCOOP_EXE"))
+{
+  Write-Output "Environment not initialized. Run init.bat before."
+  exit 1
+}
 Invoke-Expression "&'$SCOOP_EXE' checkup"
 
 # Install idea
