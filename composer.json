@@ -125,6 +125,9 @@
         "drupal:check-power-script": [
             "DrupalProject\\composer\\ScriptHandler::runPowerScriptCheck"
         ],
+        "drupal:check-bat": [
+            "DrupalProject\\composer\\ScriptHandler::runBatCheck"
+        ],
         "drupal:check-psalm": [
             "psalm --diff --diff-methods"
         ],
@@ -142,6 +145,7 @@
             "@drupal:check-xml",
             "@drupal:check-shell",
             "@drupal:check-power-script",
+            "@drupal:check-bat",
             "@drupal:check-psalm",
             "@drupal:check-phan"
         ],

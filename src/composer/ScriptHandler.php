@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DrupalProject\composer;
 
 use Composer\Script\Event;
@@ -195,6 +197,8 @@ class ScriptHandler {
     foreach ($finder as $file) {
       $filePath = $file->getRealPath();
       $event->getIO()->write('Jsonlint checking: ' . $filePath);
+      $output=[];
+      $returnValue=1;
       exec('jsonlint ' . $filePath . ' 2>&1', $output, $returnValue);
       if ($returnValue != 0) {
         throw new RuntimeException('Error with style in json: ' . $filePath . PHP_EOL . implode(PHP_EOL, $output));
@@ -236,6 +240,8 @@ class ScriptHandler {
     foreach ($finder as $file) {
       $filePath = $file->getRealPath();
       $event->getIO()->write('Shell checking: ' . $filePath);
+      $output=[];
+      $returnValue=1;
       exec('shellcheck --exclude=SC1017,SC1091 --check-sourced' . $color . '--shell=bash --severity=style ' . $filePath . ' 2>&1', $output, $returnValue);
       if ($returnValue != 0) {
         throw new RuntimeException('Error with style in shell script: ' . $filePath . PHP_EOL . implode(PHP_EOL, $output));
@@ -244,7 +250,7 @@ class ScriptHandler {
   }
 
   /**
-   * Run check with phan.
+   * Run check with power shell checker.
    *
    * @param \Composer\Script\Event $event
    *   Event.
@@ -277,10 +283,61 @@ class ScriptHandler {
       $filePath = $file->getRealPath();
       $event->getIO()->write('PowerScript checking: ' . $filePath);
       $execStr = 'powershell -Command "Invoke-ScriptAnalyzer -Setting \'' . $drupalFinder->getComposerRoot() . '\windows\PSScriptAnalyzerSettings.psd1\' -Path \'' . $filePath . '\'"';
+      $output=[];
+      $returnValue=1;
       exec($execStr . ' 2>&1', $output, $returnValue);
       $output = implode(PHP_EOL, $output);
       if ($returnValue != 0 || strpos($output, 'RuleName') !== FALSE) {
         throw new RuntimeException('Error with style in PowerScript: ' . $filePath . PHP_EOL . $output);
+      }
+    }
+  }
+
+  /**
+   * Run check with bat checker.
+   *
+   * @param \Composer\Script\Event $event
+   *   Event.
+   *
+   * @see https://www.robvanderwoude.com/battech_batcodecheck.php
+   */
+  public static function runBatCheck(Event $event): void {
+    $isWindows = (stripos(PHP_OS, 'WIN') === 0);
+
+    if (!$isWindows) {
+      return;
+    }
+
+    $drupalFinder = new DrupalFinder();
+    $drupalFinder->locateRoot(getcwd());
+    $finder = new Finder();
+
+    $rootDir = $drupalFinder->getComposerRoot();
+
+    $finder->files()
+      ->in($rootDir)
+      ->exclude('.git')
+      ->exclude('.idea')
+      ->exclude('node_modules')
+      ->exclude('vendor')
+      ->exclude('windows/app')
+      // ->exclude('web/core')
+      // ->exclude('web/modules/contrib')
+      // ->exclude('web/themes/contrib')
+      // ->exclude('web/profiles/contrib')
+      ->name('*.bat')
+      ->name('*.cmd')
+      ->notName('init_env.bat');
+    foreach ($finder as $file) {
+      $filePath = $file->getRealPath();
+      $event->getIO()->write('BatCodeCheck checking: ' . $filePath);
+      $execStr = 'call ' . $rootDir . '/windows/app/local/shims/BatCodeCheck.exe ' . $filePath;
+      $output=[];
+      $returnValue=1;
+      exec($execStr, $output, $returnValue);
+      if ($returnValue != 0) {
+        $output = implode(PHP_EOL, $output);
+        throw new RuntimeException('Error with style in BatCodeCheck: ' . $filePath . PHP_EOL . $output);
       }
     }
   }

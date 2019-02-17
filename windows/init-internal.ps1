@@ -250,6 +250,26 @@ if (!(test-path "$SCRIPT_DIR_LOCAL\apps\shellcheck\current"))
   Invoke-Expression "&'$SCOOP_EXE' install shellcheck"
 }
 
+# Install BatCodeCheck (https://www.robvanderwoude.com/battech_batcodecheck.php)
+
+if (!(test-path "$SCRIPT_DIR_LOCAL\shims\BatCodeCheck.exe"))
+{
+  $BAD_CODE_CHECK_URL = "https://www.robvanderwoude.com/files/batcodecheck.zip"
+  $BAD_CODE_CHECK_DIR = "$SCRIPT_DIR\extern\batcodecheck"
+  If (!(test-path "$BAD_CODE_CHECK_DIR"))
+  {
+    New-Item -ItemType Directory -Force -Path "$BAD_CODE_CHECK_DIR" *>$null
+  }
+  $BAD_CODE_CHECK_ZIP = "batcodecheck.zip"
+  Start-Process $ARIA2_EXE -NoNewWindow -Wait -ArgumentList "--split=16", "--dir=$BAD_CODE_CHECK_DIR", "--out=$BAD_CODE_CHECK_ZIP", $BAD_CODE_CHECK_URL
+
+  Unzip "$BAD_CODE_CHECK_DIR\$BAD_CODE_CHECK_ZIP" "$BAD_CODE_CHECK_DIR"
+
+  Copy-Item "$BAD_CODE_CHECK_DIR\BatCodeCheck.exe" "$SCRIPT_DIR_LOCAL\shims\BatCodeCheck.exe"
+
+  Remove-Item $BAD_CODE_CHECK_DIR -Recurse -Force
+}
+
 # Check all istalled application by virus
 
 Invoke-Expression "&'$SCOOP_EXE' virustotal *"
