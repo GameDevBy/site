@@ -250,6 +250,13 @@ if (!(test-path "$SCRIPT_DIR_LOCAL\apps\shellcheck\current"))
   Invoke-Expression "&'$SCOOP_EXE' install shellcheck"
 }
 
+# Install hadolint (https://github.com/hadolint/hadolint)
+
+if (!(test-path "$SCRIPT_DIR_LOCAL\apps\hadolint\current"))
+{
+  Invoke-Expression "&'$SCOOP_EXE' install hadolint"
+}
+
 # Install BatCodeCheck (https://www.robvanderwoude.com/battech_batcodecheck.php)
 
 if (!(test-path "$SCRIPT_DIR_LOCAL\shims\BatCodeCheck.exe"))

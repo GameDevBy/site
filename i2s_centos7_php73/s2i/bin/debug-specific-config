@@ -27,5 +27,9 @@ mv ~/.symfony/bin/symfony /usr/local/bin/symfony
 symfony -V
 rm -rf /tmp/symfony
 
+# Install hadolint https://github.com/hadolint/hadolint
+curl -L -o /usr/local/bin/hadolint https://github.com/hadolint/hadolint/releases/download/v1.16.0/hadolint-Linux-x86_64
+hadolint -v
+
 # Install composer extension for quick download
 composer --no-progress --no-interaction --ansi global require hirak/prestissimo

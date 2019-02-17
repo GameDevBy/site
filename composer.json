@@ -80,7 +80,7 @@
     },
     "scripts": {
         "pre-cmd": [
-            "DrupalProject\\composer\\ScriptHandler::checkComposerVersion"
+            "DrupalProject\\composer\\CheckerHandler::checkComposerVersion"
         ],
         "post-cmd": [
             "DrupalProject\\composer\\ScriptHandler::createRequiredFiles",
@@ -93,16 +93,16 @@
             "phpmd ./drush,./src,./tests,./.phan,./web/themes,./web/profiles,./web/modules text ./phpmd-ruleset.xml --exclude web/modules/contrib/*,web\\modules\\contrib\\*,web/themes/contrib/*,web\\themes\\contrib\\*,web/profiles/contrib/*,web\\profiles\\contrib\\*"
         ],
         "drupal:check-phpcs": [
-            "DrupalProject\\composer\\ScriptHandler::runPhpcs"
+            "DrupalProject\\composer\\CheckerHandler::runPhpcs"
         ],
         "drupal:check-eslint": [
-            "DrupalProject\\composer\\ScriptHandler::runEslint"
+            "DrupalProject\\composer\\CheckerHandler::runEslint"
         ],
         "drupal:fix-eslint": [
             "eslint --cache -c ./web/core/.eslintrc.json --fix ."
         ],
         "drupal:check-stylelint": [
-            "DrupalProject\\composer\\ScriptHandler::runStylelint"
+            "DrupalProject\\composer\\CheckerHandler::runStylelint"
         ],
         "drupal:fix-stylelint": [
             "stylelint --cache --config ./web/core/.stylelintrc.json --fix \"**/*.css\" \"**/*.scss\" \"**/*.sass\"  \"**/*.less\" \"**/*.sss\""
@@ -111,7 +111,7 @@
             "phpcbf"
         ],
         "drupal:check-json": [
-            "DrupalProject\\composer\\ScriptHandler::runJsonLint"
+            "DrupalProject\\composer\\CheckerHandler::runJsonLint"
         ],
         "drupal:check-yml": [
             "yamllint \"./**/*.yaml\" \"./**/*.yml\""
@@ -120,19 +120,22 @@
             "xmllint -e vendor ."
         ],
         "drupal:check-shell": [
-            "DrupalProject\\composer\\ScriptHandler::runShellCheck"
+            "DrupalProject\\composer\\CheckerHandler::runShellCheck"
         ],
         "drupal:check-power-script": [
-            "DrupalProject\\composer\\ScriptHandler::runPowerScriptCheck"
+            "DrupalProject\\composer\\CheckerHandler::runPowerScriptCheck"
         ],
         "drupal:check-bat": [
-            "DrupalProject\\composer\\ScriptHandler::runBatCheck"
+            "DrupalProject\\composer\\CheckerHandler::runBatCheck"
+        ],
+        "drupal:check-docker": [
+            "DrupalProject\\composer\\CheckerHandler::runDockerCheck"
         ],
         "drupal:check-psalm": [
             "psalm --diff --diff-methods"
         ],
         "drupal:check-phan": [
-            "DrupalProject\\composer\\ScriptHandler::runPhan"
+            "DrupalProject\\composer\\CheckerHandler::runPhan"
         ],
         "drupal:check": [
             "pjv -w -r",
@@ -146,6 +149,7 @@
             "@drupal:check-shell",
             "@drupal:check-power-script",
             "@drupal:check-bat",
+            "@drupal:check-docker",
             "@drupal:check-psalm",
             "@drupal:check-phan"
         ],
