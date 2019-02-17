@@ -147,16 +147,16 @@ class ScriptHandler {
       . 'set SCOOP_GLOBAL=' . $drupalFinder->getComposerRoot() . '\windows\app\global' . PHP_EOL
       . 'set PHAN_DISABLE_XDEBUG_WARN=1' . PHP_EOL
       . 'set PATH='
-        . $drupalFinder->getComposerRoot() . '\vendor\bin;'
-        . $drupalFinder->getComposerRoot() . '\node_modules\.bin;'
-        . $drupalFinder->getComposerRoot() . '\windows\app\local\shims;%PATH%'
+      . $drupalFinder->getComposerRoot() . '\vendor\bin;'
+      . $drupalFinder->getComposerRoot() . '\node_modules\.bin;'
+      . $drupalFinder->getComposerRoot() . '\windows\app\local\shims;%PATH%'
       . PHP_EOL :
       'export PHAN_DISABLE_XDEBUG_WARN=1' . PHP_EOL
       . 'PATH="'
-        . $drupalFinder->getComposerRoot() . '/vendor/bin:'
-        . $drupalFinder->getComposerRoot() . '/node_modules/.bin:'
-        . $phpPath . ':$PATH"' . PHP_EOL
-        . 'export PATH' . PHP_EOL;
+      . $drupalFinder->getComposerRoot() . '/vendor/bin:'
+      . $drupalFinder->getComposerRoot() . '/node_modules/.bin:'
+      . $phpPath . ':$PATH"' . PHP_EOL
+      . 'export PATH' . PHP_EOL;
 
     $fileSystem->dumpFile($initEnvPath, $initEnvContent);
 
@@ -170,9 +170,12 @@ class ScriptHandler {
   /**
    * Run check with json lint.
    *
+   * @param \Composer\Script\Event $event
+   *   Event.
+   *
    * @see https://www.npmjs.com/package/jsonlint
    */
-  public static function runJsonLint(): void {
+  public static function runJsonLint(Event $event): void {
     $drupalFinder = new DrupalFinder();
     $drupalFinder->locateRoot(getcwd());
     $finder = new Finder();
@@ -190,7 +193,95 @@ class ScriptHandler {
       // ->exclude('web/profiles/contrib')
       ->name('*.json');
     foreach ($finder as $file) {
-      exec('jsonlint ' . $file->getRealPath());
+      $filePath = $file->getRealPath();
+      $event->getIO()->write('Jsonlint checking: ' . $filePath);
+      exec('jsonlint ' . $filePath . ' 2>&1', $output, $returnValue);
+      if ($returnValue != 0) {
+        throw new RuntimeException('Error with style in json: ' . $filePath . PHP_EOL . implode(PHP_EOL, $output));
+      }
+    }
+  }
+
+  /**
+   * Check shell scripts.
+   *
+   * @param \Composer\Script\Event $event
+   *   Event.
+   *
+   * @see https://github.com/koalaman/shellcheck
+   */
+  public static function runShellCheck(Event $event): void {
+    $isWindows = (stripos(PHP_OS, 'WIN') === 0);
+    $color = ' --color=always ';
+    if ($isWindows) {
+      $color .= ' --color=never ';
+    }
+
+    $drupalFinder = new DrupalFinder();
+    $drupalFinder->locateRoot(getcwd());
+    $finder = new Finder();
+    $finder->files()
+      ->in($drupalFinder->getComposerRoot())
+      ->exclude('.git')
+      ->exclude('.idea')
+      ->exclude('node_modules')
+      ->exclude('vendor')
+      ->exclude('windows/app')
+      // ->exclude('web/core')
+      // ->exclude('web/modules/contrib')
+      // ->exclude('web/themes/contrib')
+      // ->exclude('web/profiles/contrib')
+      ->name('/^[^.]*$/')
+      ->contains('#!/usr/bin/env bash');
+    foreach ($finder as $file) {
+      $filePath = $file->getRealPath();
+      $event->getIO()->write('Shell checking: ' . $filePath);
+      exec('shellcheck --exclude=SC1017,SC1091 --check-sourced' . $color . '--shell=bash --severity=style ' . $filePath . ' 2>&1', $output, $returnValue);
+      if ($returnValue != 0) {
+        throw new RuntimeException('Error with style in shell script: ' . $filePath . PHP_EOL . implode(PHP_EOL, $output));
+      }
+    }
+  }
+
+  /**
+   * Run check with phan.
+   *
+   * @param \Composer\Script\Event $event
+   *   Event.
+   *
+   * @see https://github.com/PowerShell/PSScriptAnalyzer
+   */
+  public static function runPowerScriptCheck(Event $event): void {
+    $isWindows = (stripos(PHP_OS, 'WIN') === 0);
+
+    if (!$isWindows) {
+      return;
+    }
+
+    $drupalFinder = new DrupalFinder();
+    $drupalFinder->locateRoot(getcwd());
+    $finder = new Finder();
+    $finder->files()
+      ->in($drupalFinder->getComposerRoot())
+      ->exclude('.git')
+      ->exclude('.idea')
+      ->exclude('node_modules')
+      ->exclude('vendor')
+      ->exclude('windows/app')
+      // ->exclude('web/core')
+      // ->exclude('web/modules/contrib')
+      // ->exclude('web/themes/contrib')
+      // ->exclude('web/profiles/contrib')
+      ->name('*.ps1');
+    foreach ($finder as $file) {
+      $filePath = $file->getRealPath();
+      $event->getIO()->write('PowerScript checking: ' . $filePath);
+      $execStr = 'powershell -Command "Invoke-ScriptAnalyzer -Setting \'' . $drupalFinder->getComposerRoot() . '\windows\PSScriptAnalyzerSettings.psd1\' -Path \'' . $filePath . '\'"';
+      exec($execStr . ' 2>&1', $output, $returnValue);
+      $output = implode(PHP_EOL, $output);
+      if ($returnValue != 0 || strpos($output, 'RuleName') !== FALSE) {
+        throw new RuntimeException('Error with style in PowerScript: ' . $filePath . PHP_EOL . $output);
+      }
     }
   }
 
@@ -201,11 +292,15 @@ class ScriptHandler {
     $isWindows = (stripos(PHP_OS, 'WIN') === 0);
 
     if ($isWindows) {
-      exec('SET PHAN_DISABLE_XDEBUG_WARN=1 && phan -p --require-config-exists');
-      return;
+      exec('SET PHAN_DISABLE_XDEBUG_WARN=1 && phan -p --require-config-exists 2>&1', $output, $returnValue);
+    }
+    else {
+      exec('export PHAN_DISABLE_XDEBUG_WARN=1 && phan -p --color --require-config-exists 2>&1', $output, $returnValue);
     }
 
-    exec('export PHAN_DISABLE_XDEBUG_WARN=1 && phan -p --color --require-config-exists');
+    if ($returnValue != 0) {
+      throw new RuntimeException(implode(PHP_EOL, $output));
+    }
   }
 
   /**
@@ -215,11 +310,15 @@ class ScriptHandler {
     $isWindows = (stripos(PHP_OS, 'WIN') === 0);
 
     if ($isWindows) {
-      exec('eslint --no-color --cache -c ./web/core/.eslintrc.json .');
-      return;
+      exec('eslint --no-color --cache -c ./web/core/.eslintrc.json . 2>&1', $output, $returnValue);
+    }
+    else {
+      exec('eslint --color --cache -c ./web/core/.eslintrc.json . 2>&1', $output, $returnValue);
     }
 
-    exec('eslint --color --cache -c ./web/core/.eslintrc.json .');
+    if ($returnValue != 0) {
+      throw new RuntimeException(implode(PHP_EOL, $output));
+    }
   }
 
   /**
@@ -229,11 +328,15 @@ class ScriptHandler {
     $isWindows = (stripos(PHP_OS, 'WIN') === 0);
 
     if ($isWindows) {
-      exec('stylelint --no-color --cache --config ./web/core/.stylelintrc.json "**/*.css" "**/*.scss" "**/*.sass"  "**/*.less" "**/*.sss"');
-      return;
+      exec('stylelint --no-color --cache --config ./web/core/.stylelintrc.json "**/*.css" "**/*.scss" "**/*.sass"  "**/*.less" "**/*.sss 2>&1', $output, $returnValue);
+    }
+    else {
+      exec('stylelint --color --cache --config ./web/core/.stylelintrc.json "**/*.css" "**/*.scss" "**/*.sass"  "**/*.less" "**/*.sss 2>&1', $output, $returnValue);
     }
 
-    exec('stylelint --color --cache --config ./web/core/.stylelintrc.json "**/*.css" "**/*.scss" "**/*.sass"  "**/*.less" "**/*.sss"');
+    if ($returnValue != 0) {
+      throw new RuntimeException(implode(PHP_EOL, $output));
+    }
   }
 
   /**
@@ -243,11 +346,15 @@ class ScriptHandler {
     $isWindows = (stripos(PHP_OS, 'WIN') === 0);
 
     if ($isWindows) {
-      exec('phpcs -s -p --no-colors');
-      return;
+      exec('phpcs -s -p --no-colors 2>&1', $output, $returnValue);
+    }
+    else {
+      exec('phpcs -s -p --colors 2>&1', $output, $returnValue);
     }
 
-    exec('phpcs -s -p --colors');
+    if ($returnValue != 0) {
+      throw new RuntimeException(implode(PHP_EOL, $output));
+    }
   }
 
   /**

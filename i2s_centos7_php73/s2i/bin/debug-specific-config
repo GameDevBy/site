@@ -16,7 +16,7 @@ fi
 
 # Install php ast extension for phan https://github.com/nikic/php-ast
 yum install -y --setopt=tsflags=nodocs php-ast
-echo "extension=ast" > ${PHP_INI_SCAN_DIR}/40-ast.ini
+echo "extension=ast" > "${PHP_INI_SCAN_DIR}/40-ast.ini"
 php -r 'function_exists("ast\parse_code") || (print("Failed to enable php-ast\n") && exit(1));'
 
 # Install symfony cli https://symfony.com/download

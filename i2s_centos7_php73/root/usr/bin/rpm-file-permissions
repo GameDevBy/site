@@ -6,9 +6,9 @@ CHECK_DIRS="/ /opt /etc /usr /usr/bin /usr/lib /usr/lib64 /usr/share /usr/libexe
 
 rpm_format="[%{FILESTATES:fstate}  %7{FILEMODES:octal} %{FILENAMES:shescape}\n]"
 
-rpm -q --qf "$rpm_format" filesystem | while read line
+rpm -q --qf "$rpm_format" filesystem | while read -r line
 do
-    eval "set -- $line"
+    eval "set -- ${line}"
 
     case $1 in
         normal) ;;

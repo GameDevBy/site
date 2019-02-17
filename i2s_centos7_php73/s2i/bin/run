@@ -4,7 +4,11 @@ set -e
 
 source /usr/libexec/generate-container-user
 
-export_vars=$(cgroup-limits); export $export_vars
+export_vars=$(cgroup-limits)
+# TODO Fix https://github.com/koalaman/shellcheck/wiki/SC2086 and https://www.shellcheck.net/wiki/SC2163
+# shellcheck disable=SC2086,SC2163
+export $export_vars
+
 export DOCUMENTROOT=${DOCUMENTROOT:-/}
 
 # Default php.ini configuration values, all taken from php defaults.
@@ -33,10 +37,10 @@ export OPCACHE_REVALIDATE_FREQ=${OPCACHE_REVALIDATE_FREQ:-60}
 export PHPRC=${PHPRC:-${PHP_SYSCONF_PATH}/php.ini}
 export PHP_INI_SCAN_DIR=${PHP_INI_SCAN_DIR:-${PHP_SYSCONF_PATH}/php.d}
 
-envsubst < /opt/app-root/etc/php.ini.template > ${PHP_SYSCONF_PATH}/php.ini
-envsubst < /opt/app-root/etc/php.d/10-opcache.ini.template > ${PHP_INI_SCAN_DIR}/10-opcache.ini
+envsubst < /opt/app-root/etc/php.ini.template > "${PHP_SYSCONF_PATH}/php.ini"
+envsubst < /opt/app-root/etc/php.d/10-opcache.ini.template > "${PHP_INI_SCAN_DIR}/10-opcache.ini"
 
-envsubst < /opt/app-root/etc/php-fpm.d/www.conf.template > ${PHP_SYSCONF_PATH}/php-fpm.d/www.conf
-envsubst < /opt/app-root/etc/php-fpm.conf.template > ${PHP_SYSCONF_PATH}/php-fpm.conf
+envsubst < /opt/app-root/etc/php-fpm.d/www.conf.template > "${PHP_SYSCONF_PATH}/php-fpm.d/www.conf"
+envsubst < /opt/app-root/etc/php-fpm.conf.template > "${PHP_SYSCONF_PATH}/php-fpm.conf"
 
 exec /usr/libexec/run-server

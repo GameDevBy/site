@@ -7,8 +7,6 @@ use Drush\Utils\StringUtils;
 
 /**
  * Edit this file to reflect your organization's needs.
- *
- * @noinspection PhpUndefinedClassInspection
  */
 class PolicyCommands extends DrushCommands {
 

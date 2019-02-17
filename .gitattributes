@@ -59,3 +59,9 @@
 *.ttf     -text diff
 *.woff    -text diff
 *.woff2   -text diff
+
+# Windows specific settings
+
+*.bat     text=auto whitespace=blank-at-eol,-blank-at-eof,-space-before-tab,tab-in-indent,tabwidth=2
+*.ps1     text=auto whitespace=blank-at-eol,-blank-at-eof,-space-before-tab,tab-in-indent,tabwidth=2
+*.psd1    text=auto whitespace=blank-at-eol,-blank-at-eof,-space-before-tab,tab-in-indent,tabwidth=2

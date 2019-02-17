@@ -28,13 +28,13 @@ function Unzip
 
 ################
 
-# Set root path
-
-$ROOT_DIR = [IO.Path]::GetFullPath("$PSScriptRoot\..")
-
 # PowerShell must be enabled for your user account
 
 Set-ExecutionPolicy RemoteSigned -scope CurrentUser
+
+# Set root path
+
+$ROOT_DIR = [IO.Path]::GetFullPath("$PSScriptRoot\..")
 
 # Create directory for scoop
 

@@ -70,7 +70,8 @@
     "autoload": {
         "psr-4": {
             "Drupal\\DrupalProject\\": "tests/src",
-            "DrupalProject\\": "src"
+            "DrupalProject\\": "src",
+            "Drush\\Commands\\": "drush"
         },
         "classmap": [
             "src/composer/ScriptHandler.php"
@@ -118,6 +119,12 @@
         "drupal:check-xml": [
             "xmllint -e vendor ."
         ],
+        "drupal:check-shell": [
+            "DrupalProject\\composer\\ScriptHandler::runShellCheck"
+        ],
+        "drupal:check-power-script": [
+            "DrupalProject\\composer\\ScriptHandler::runPowerScriptCheck"
+        ],
         "drupal:check-psalm": [
             "psalm --diff --diff-methods"
         ],
@@ -133,6 +140,8 @@
             "@drupal:check-json",
             "@drupal:check-yml",
             "@drupal:check-xml",
+            "@drupal:check-shell",
+            "@drupal:check-power-script",
             "@drupal:check-psalm",
             "@drupal:check-phan"
         ],

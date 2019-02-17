@@ -3,7 +3,7 @@
 Минимальные требования:
 
 * Windows 7 SP1+ / Windows Server 2008+
-* [PowerShell 3+](https://www.microsoft.com/en-us/download/details.aspx?id=34595)
+* [PowerShell 5.1+](https://www.microsoft.com/en-us/download/details.aspx?id=54616)
 * [.NET Framework 4.5+](https://www.microsoft.com/net/download)
 
 Настраиваем локальную версию git (почитать подробнее о том, как это сделать, можно например [тут](https://habr.com/ru/post/125799)).

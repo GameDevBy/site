@@ -3,7 +3,7 @@ FROM centos:7
 # This image provides an PHP environment for running PHP 7.3 applications.
 # Base on:
 #    https://github.com/sclorg/s2i-base-container (2f92944a0dc4e52e0c44913cd85e32b5c0c772bd 22 ‎Jan 2019)
-#    https://github.com/sclorg/s2i-php-container (60378a6fa5420b33d5d7ce72e894fcce54c8c5df 5 Oct 2018)
+#    https://github.com/sclorg/s2i-php-container (91316354e9a0294746c756c00d8830b4319f6d3c Feb 14, 2019)
 
 # Variable for debug|release build
 ARG BUILD_TIME_ENABLE_DEV=false
