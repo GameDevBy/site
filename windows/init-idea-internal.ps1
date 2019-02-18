@@ -93,52 +93,30 @@ function InstallIdeaPlugin
 
 Set-ExecutionPolicy RemoteSigned -scope CurrentUser
 
-# Save old context
-
-$OLD_PATH = [environment]::getEnvironmentVariable('PATH_USER', 'User')
-$OLD_PHP_INI_SCAN_DIR = [environment]::getEnvironmentVariable('PHP_INI_SCAN_DIR', 'User')
-$OLD_COMPOSER_HOME_DIR = [environment]::getEnvironmentVariable('COMPOSER_HOME', 'User')
-$OLD_SCOOP = [environment]::getEnvironmentVariable('SCOOP', 'User')
-$OLD_SCOOP_GLOBAL = [environment]::getEnvironmentVariable('SCOOP_GLOBAL', 'Machine')
-
 # Set envarenment
 
-$SCRIPT_DIR = "$PSScriptRoot\app"
-$SCRIPT_DIR_LOCAL = "$SCRIPT_DIR\local"
-$SCRIPT_DIR_GLOBAL = "$SCRIPT_DIR\global"
-$COMPOSER_HOME_DIR = "$SCRIPT_DIR_LOCAL\persist\composer\home"
-$PHP_INI_SCAN_DIR = "$SCRIPT_DIR_LOCAL\apps\php-nts\current\cli"
-
-$SCOOP_EXE = "$SCRIPT_DIR_LOCAL\apps\scoop\current\bin\scoop.ps1"
-
-$global:IDEA_PLUGINS_DIR = "$SCRIPT_DIR_LOCAL\apps\idea\current\plugins"
-$global:ARIA2_EXE = "$SCRIPT_DIR_LOCAL\shims\aria2c.exe"
-
-# Config envarenment
-
-[environment]::setEnvironmentVariable('SCOOP', $SCRIPT_DIR_LOCAL, 'User')
-$env:SCOOP = $SCRIPT_DIR_LOCAL
-[environment]::setEnvironmentVariable('SCOOP_GLOBAL', $SCRIPT_DIR_GLOBAL, 'Machine')
-[environment]::setEnvironmentVariable($COMPOSER_HOME_DIR, 'User')
-[environment]::setEnvironmentVariable('PHP_INI_SCAN_DIR', $PHP_INI_SCAN_DIR, 'Process')
-
-# Check scoop install
-
-if (!(test-path "$SCOOP_EXE"))
-{
-  Write-Output "Environment not initialized. Run init.bat before."
-  exit 1
-}
-Invoke-Expression "&'$SCOOP_EXE' checkup"
+$IDEA_INSTALL_DIR="$PSScriptRoot\app\extern\idea"
+$global:IDEA_PLUGINS_DIR = "$IDEA_INSTALL_DIR\plugins"
+$global:ARIA2_EXE = "$PSScriptRoot\app\local\shims\aria2c.exe"
 
 # Install idea
 
-if (!(test-path "$SCRIPT_DIR_LOCAL\apps\idea\current"))
+if (!(test-path "$IDEA_INSTALL_DIR\bin\phpstorm.exe"))
 {
-  Invoke-Expression "&'$SCOOP_EXE' install idea"
-  Invoke-Expression "&'$SCOOP_EXE' virustotal *"
-  Invoke-Expression "&'$SCOOP_EXE' cleanup *"
-  Invoke-Expression "&'$SCOOP_EXE' cache rm *"
+  If (!(test-path "$IDEA_INSTALL_DIR"))
+  {
+    New-Item -ItemType Directory -Force -Path "$IDEA_INSTALL_DIR" *>$null
+  }
+
+  $IDEA_ZIP_FILE='idea.zip'
+  $IDEA_ZIP_PATH="$PSScriptRoot\app\extern\$IDEA_ZIP_FILE"
+  If (!(test-path "$IDEA_ZIP_PATH")) {
+    $IDEA_URL='https://data.services.jetbrains.com/products/download?code=PS&platform=windows'
+    $ideaZipDownloadUrl = [System.Net.HttpWebRequest]::Create($IDEA_URL).GetResponse().ResponseUri.AbsoluteUri.replace('.exe', '.zip')
+    Start-Process $global:ARIA2_EXE -NoNewWindow -Wait -ArgumentList "--dir=$PSScriptRoot\app\extern", "--out=$IDEA_ZIP_FILE", $ideaZipDownloadUrl
+  }
+
+  Unzip "$IDEA_ZIP_PATH" "$IDEA_INSTALL_DIR"
 
   # Remove unused default plugins
 
@@ -194,17 +172,43 @@ InstallIdeaPlugin 11478 # https://plugins.jetbrains.com/plugin/11478-deep-js-com
 InstallIdeaPlugin 9927  # https://plugins.jetbrains.com/plugin/9927-deep-assoc-completion
 InstallIdeaPlugin 5834  # https://plugins.jetbrains.com/plugin/5834-cmd-support
 InstallIdeaPlugin 4230  # https://plugins.jetbrains.com/plugin/4230-bashsupport
+InstallIdeaPlugin 6610  # https://plugins.jetbrains.com/plugin/6610-php
+InstallIdeaPlugin 6098  # https://plugins.jetbrains.com/plugin/6098-nodejs
 
-# Restory old context
+# Configure local version
 
-[environment]::setEnvironmentVariable('PATH_USER', $null, 'User')
-[environment]::setEnvironmentVariable('PHP_INI_SCAN_DIR', $null, 'User')
-[environment]::setEnvironmentVariable('COMPOSER_HOME', $null, 'User')
-[environment]::setEnvironmentVariable('SCOOP', $null, 'User')
-[environment]::setEnvironmentVariable('SCOOP_GLOBAL', $null, 'Machine')
+$IDEA_PERSIST_DIR = "$PSScriptRoot\app\local\persist\idea"
+If (!(test-path "$IDEA_PERSIST_DIR"))
+{
+    New-Item -ItemType Directory -Force -Path "$IDEA_PERSIST_DIR" *>$null
+}
 
-[environment]::setEnvironmentVariable('PATH_USER', $OLD_PATH, 'User')
-[environment]::setEnvironmentVariable('PHP_INI_SCAN_DIR', $OLD_PHP_INI_SCAN_DIR, 'User')
-[environment]::setEnvironmentVariable('COMPOSER_HOME', $OLD_COMPOSER_HOME_DIR, 'User')
-[environment]::setEnvironmentVariable('SCOOP', $OLD_SCOOP, 'User')
-[environment]::setEnvironmentVariable('SCOOP_GLOBAL', $OLD_SCOOP_GLOBAL, 'Machine')
+If (!(test-path "$IDEA_INSTALL_DIR\bin\idea.properties.old"))
+{
+    Rename-Item -Path "$IDEA_INSTALL_DIR\bin\idea.properties" -NewName "idea.properties.old"
+}
+
+$ideaIniContent = Get-Content "$IDEA_INSTALL_DIR\bin\idea.properties.old"
+$IDEA_PERSIST_DIR = $IDEA_PERSIST_DIR.replace('\', '/')
+$ideaIniContent = $ideaIniContent.replace('# idea.config.path=${user.home}/.PhpStorm/config', "idea.config.path=$IDEA_PERSIST_DIR/config")
+$ideaIniContent = $ideaIniContent.replace('# idea.system.path=${user.home}/.PhpStorm/system', "idea.system.path=$IDEA_PERSIST_DIR/system")
+$ideaIniContent | Set-Content "$IDEA_INSTALL_DIR\bin\idea.properties" -Force
+
+# Create file for run
+
+$IDEA_RUN_SCRIPT_PATH = "$PSScriptRoot\..\run_idea.bat"
+If (!(test-path "$IDEA_RUN_SCRIPT_PATH"))
+{
+  $ideaRunScript = (
+    '@echo off',
+    'cd %~dp0',
+    'call .\init_env.bat',
+    'reg Query "HKLM\Hardware\Description\System\CentralProcessor\0" | find /i "x86" > NUL && set OS_BIT=32BIT || set OS_BIT=64BIT',
+    'if %OS_BIT%==32BIT start "" "%~dp0\windows\app\extern\idea\bin\phpstorm.exe"',
+    'if %OS_BIT%==64BIT start "" "%~dp0\windows\app\extern\idea\bin\phpstorm64.exe"',
+    ''
+  )
+  $ideaRunScript -join "`n" | Set-Content "$IDEA_RUN_SCRIPT_PATH" -Force -NoNewline
+}
+
+

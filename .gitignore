@@ -38,6 +38,7 @@
 /web/sites/default/services.yml
 /init_env
 /init_env.bat
+/run_idea.bat
 /node_modules/
 
 

@@ -1,5 +1,6 @@
 @{
   ExcludeRules=@(
-  'PSAvoidUsingInvokeExpression'
+    'PSAvoidUsingInvokeExpression',
+    'PSAvoidGlobalVars'
   )
 }

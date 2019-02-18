@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace DrupalProject\composer;
 
 use Composer\Script\Event;
+use Composer\Semver\Comparator;
 use DrupalFinder\DrupalFinder;
 use RuntimeException;
 use Symfony\Component\Filesystem\Filesystem;
@@ -81,7 +82,8 @@ class ScriptHandler {
     if (!$fileSystem->exists($syncPath)) {
       $fileSystem->mkdir($syncPath);
       $fileSystem->chmod($syncPath, 0777);
-      $event->getIO()->write('Create a "' . $syncPath . '" directory with chmod 0777');
+      $event->getIO()
+        ->write('Create a "' . $syncPath . '" directory with chmod 0777');
     }
 
     // Prepare the settings file for installation.
@@ -91,7 +93,8 @@ class ScriptHandler {
       $fileSystem->copy($defaultSettingsPath, $settingsPath);
       self::createSettings($drupalRoot, $syncPath);
       $fileSystem->chmod($settingsPath, 0666);
-      $event->getIO()->write('Create a "' . $settingsPath . '" file with chmod 0666');
+      $event->getIO()
+        ->write('Create a "' . $settingsPath . '" file with chmod 0666');
     }
 
     // Create the files directory with chmod 0777.
@@ -99,7 +102,8 @@ class ScriptHandler {
     if (!$fileSystem->exists($filesPath)) {
       $fileSystem->mkdir($filesPath);
       $fileSystem->chmod($filesPath, 0777);
-      $event->getIO()->write('Create a "' . $filesPath . '" directory with chmod 0777');
+      $event->getIO()
+        ->write('Create a "' . $filesPath . '" directory with chmod 0777');
     }
 
     $globalCodeSnifferConfigPath = $drupalFinder->getComposerRoot() . '/vendor/squizlabs/php_codesniffer/CodeSniffer.conf';
@@ -108,7 +112,8 @@ class ScriptHandler {
       $configFile = str_replace('\\', '/', $configFile);
       $globalConfig = '<?php' . PHP_EOL . '$phpCodeSnifferConfig=[\'default_standard\'=>\'' . $configFile . '\'];' . PHP_EOL;
       $fileSystem->dumpFile($globalCodeSnifferConfigPath, $globalConfig);
-      $event->getIO()->write('Create a codesniffer global config file: "' . $globalCodeSnifferConfigPath . '"');
+      $event->getIO()
+        ->write('Create a codesniffer global config file: "' . $globalCodeSnifferConfigPath . '"');
     }
 
     self::createInitEnvFile($fileSystem, $drupalFinder, $event);
@@ -141,7 +146,8 @@ class ScriptHandler {
     $phpPath = dirname($phpPath);
 
     $initEnvContent = $isWindows ?
-      'set COMPOSER_HOME=' . $drupalFinder->getComposerRoot() . '\windows\app\local\persist\composer\home' . PHP_EOL
+      '@echo off' . PHP_EOL
+      . 'set COMPOSER_HOME=' . $drupalFinder->getComposerRoot() . '\windows\app\local\persist\composer\home' . PHP_EOL
       . 'set PHP_INI_SCAN_DIR=' . $drupalFinder->getComposerRoot() . '\windows\app\local\apps\php-nts\current\cli' . PHP_EOL
       . 'set SCOOP=' . $drupalFinder->getComposerRoot() . '\windows\app\local' . PHP_EOL
       . 'set SCOOP_GLOBAL=' . $drupalFinder->getComposerRoot() . '\windows\app\global' . PHP_EOL
@@ -149,7 +155,9 @@ class ScriptHandler {
       . 'set PATH='
       . $drupalFinder->getComposerRoot() . '\vendor\bin;'
       . $drupalFinder->getComposerRoot() . '\node_modules\.bin;'
-      . $drupalFinder->getComposerRoot() . '\windows\app\local\shims;%PATH%'
+      . $drupalFinder->getComposerRoot() . '\windows\app\local\shims;'
+      . $drupalFinder->getComposerRoot() . '\windows\app\local\shims;'
+      . $drupalFinder->getComposerRoot() . '\windows\app\extern\idea\bin;%PATH%'
       . PHP_EOL :
       'export PHAN_DISABLE_XDEBUG_WARN=1' . PHP_EOL
       . 'PATH="'
@@ -201,6 +209,49 @@ class ScriptHandler {
 
     $event->getIO()->write('Call npm install (without dev dependencies)');
     exec('npm install --only=prod');
+  }
+
+  /**
+   * Checks if the installed version of Composer is compatible.
+   *
+   * Composer 1.0.0 and higher consider a `composer install` without having a
+   * lock file present as equal to `composer update`. We do not ship with a lock
+   * file to avoid merge conflicts downstream, meaning that if a project is
+   * installed with an older version of Composer the scaffolding of Drupal will
+   * not be triggered. We check this here instead of in drupal-scaffold to be
+   * able to give immediate feedback to the end user, rather than failing the
+   * installation after going through the lengthy process of compiling and
+   * downloading the Composer dependencies.
+   *
+   * @param \Composer\Script\Event $event
+   *   Event.
+   *
+   * @see https://github.com/composer/composer/pull/5035
+   */
+  public static function checkComposerVersion(Event $event): void {
+    $composer = $event->getComposer();
+    $output = $event->getIO();
+
+    $version = $composer::VERSION;
+
+    // The dev-channel of composer uses the git revision as version number,
+    // try to the branch alias instead.
+    if (preg_match('/^[0-9a-f]{40}$/i', $version) === 1) {
+      $version = $composer::BRANCH_ALIAS_VERSION;
+    }
+
+    // If Composer is installed through git we have no easy way to determine if
+    // it is new enough, just display a warning.
+    if ($version === '@package_version@' || $version === '@package_branch_alias_version@') {
+      $output->writeError('<warning>You are running a development version of Composer. If you experience problems, please update Composer to the latest stable version.</warning>');
+      return;
+    }
+
+    if (Comparator::lessThan($version, '1.0.0')) {
+      $msg = '<error>Drupal-project requires Composer version 1.0.0 or higher. Please update your Composer before continuing</error>.';
+      $output->writeError($msg);
+      throw new \RuntimeException($msg);
+    }
   }
 
 }

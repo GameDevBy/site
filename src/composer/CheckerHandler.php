@@ -5,7 +5,6 @@ declare(strict_types = 1);
 namespace DrupalProject\composer;
 
 use Composer\Script\Event;
-use Composer\Semver\Comparator;
 use DrupalFinder\DrupalFinder;
 use RuntimeException;
 use Symfony\Component\Finder\Finder;
@@ -151,10 +150,14 @@ class CheckerHandler {
    * @see https://www.robvanderwoude.com/battech_batcodecheck.php
    */
   public static function runBatCheck(Event $event): void {
+    $event->getIO()->write('BatCodeCheck now disabled!');
+    /*
+    // TODO find some move usable
+
     $isWindows = (stripos(PHP_OS, 'WIN') === 0);
 
     if (!$isWindows) {
-      return;
+    return;
     }
 
     $drupalFinder = new DrupalFinder();
@@ -164,32 +167,36 @@ class CheckerHandler {
     $rootDir = $drupalFinder->getComposerRoot();
 
     $finder->files()
-      ->in($rootDir)
-      ->exclude('.git')
-      ->exclude('.idea')
-      ->exclude('node_modules')
-      ->exclude('vendor')
-      ->exclude('windows/app')
-      ->exclude('common')
-      // ->exclude('web/core')
-      // ->exclude('web/modules/contrib')
-      // ->exclude('web/themes/contrib')
-      // ->exclude('web/profiles/contrib')
-      ->name('*.bat')
-      ->name('*.cmd')
-      ->notName('init_env.bat');
+    ->in($rootDir)
+    ->exclude('.git')
+    ->exclude('.idea')
+    ->exclude('node_modules')
+    ->exclude('vendor')
+    ->exclude('windows/app')
+    ->exclude('common')
+    // ->exclude('web/core')
+    // ->exclude('web/modules/contrib')
+    // ->exclude('web/themes/contrib')
+    // ->exclude('web/profiles/contrib')
+    ->name('*.bat')
+    ->name('*.cmd')
+    ->notName('init_env.bat')
+    ->notName('run_idea.bat');
     foreach ($finder as $file) {
-      $filePath = $file->getRealPath();
-      $event->getIO()->write('BatCodeCheck checking: ' . $filePath);
-      $execStr = 'call ' . $rootDir . '/windows/app/local/shims/BatCodeCheck.exe ' . $filePath;
-      $output = [];
-      $returnValue = 1;
-      exec($execStr, $output, $returnValue);
-      if ($returnValue != 0) {
-        $output = implode(PHP_EOL, $output);
-        throw new RuntimeException('Error with style in BatCodeCheck: ' . $filePath . PHP_EOL . $output);
-      }
+    $filePath = $file->getRealPath();
+    $event->getIO()->write('BatCodeCheck checking: ' . $filePath);
+    $execStr = 'call ' . $rootDir
+    . '/windows/app/local/shims/BatCodeCheck.exe ' . $filePath;
+    $output = [];
+    $returnValue = 1;
+    exec($execStr, $output, $returnValue);
+    if ($returnValue != 0) {
+    $output = implode(PHP_EOL, $output);
+    throw new RuntimeException('Error with style in BatCodeCheck: '
+    . $filePath . PHP_EOL . $output);
     }
+    }
+     */
   }
 
   /**
@@ -305,45 +312,34 @@ class CheckerHandler {
   }
 
   /**
-   * Checks if the installed version of Composer is compatible.
+   * Run check twig.
    *
-   * Composer 1.0.0 and higher consider a `composer install` without having a
-   * lock file present as equal to `composer update`. We do not ship with a lock
-   * file to avoid merge conflicts downstream, meaning that if a project is
-   * installed with an older version of Composer the scaffolding of Drupal will
-   * not be triggered. We check this here instead of in drupal-scaffold to be
-   * able to give immediate feedback to the end user, rather than failing the
-   * installation after going through the lengthy process of compiling and
-   * downloading the Composer dependencies.
-   *
-   * @param \Composer\Script\Event $event
-   *   Event.
-   *
-   * @see https://github.com/composer/composer/pull/5035
+   * @see https://github.com/adrienrn/twig-lint/tree/feature/sniffs_system
    */
-  public static function checkComposerVersion(Event $event): void {
-    $composer = $event->getComposer();
-    $output = $event->getIO();
+  public static function runTwigCheck(): void {
+    /*
+     *  TODO:
+     *    php twig-lint twigcs .
+     */
+    $isWindows = (stripos(PHP_OS, 'WIN') === 0);
 
-    $version = $composer::VERSION;
+    $drupalFinder = new DrupalFinder();
+    $drupalFinder->locateRoot(getcwd());
 
-    // The dev-channel of composer uses the git revision as version number,
-    // try to the branch alias instead.
-    if (preg_match('/^[0-9a-f]{40}$/i', $version) === 1) {
-      $version = $composer::BRANCH_ALIAS_VERSION;
+    if ($isWindows) {
+      $pathLint = str_replace('/', '\\', $drupalFinder->getComposerRoot()) . '\\vendor\\asm89\\twig-lint\\bin\\twig-lint';
+      $execStr = 'php ' . $pathLint . ' lint . --exclude=vendor\\\\ --exclude=web\\\\core\\\\modules\\\\system\\\\tests --stub-tag=trans --stub-tag=plural 2>&1';
+      // Echo $execStr . PHP_EOL;.
+      exec($execStr, $output, $returnValue);
+    }
+    else {
+      $pathLint = $drupalFinder->getComposerRoot() . '/vendor/asm89/twig-lint/bin/twig-lint';
+      $execStr = 'php ' . $pathLint . ' lint . --exclude=vendor/ --exclude=web/core/modules/system/tests --stub-tag=trans --stub-tag=plural 2>&1';
+      exec($execStr, $output, $returnValue);
     }
 
-    // If Composer is installed through git we have no easy way to determine if
-    // it is new enough, just display a warning.
-    if ($version === '@package_version@' || $version === '@package_branch_alias_version@') {
-      $output->writeError('<warning>You are running a development version of Composer. If you experience problems, please update Composer to the latest stable version.</warning>');
-      return;
-    }
-
-    if (Comparator::lessThan($version, '1.0.0')) {
-      $msg = '<error>Drupal-project requires Composer version 1.0.0 or higher. Please update your Composer before continuing</error>.';
-      $output->writeError($msg);
-      throw new \RuntimeException($msg);
+    if ($returnValue != 0) {
+      throw new RuntimeException(implode(PHP_EOL, $output));
     }
   }
 
