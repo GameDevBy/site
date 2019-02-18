@@ -164,7 +164,7 @@ if (!(test-path "$PHP_DEF_EXT_DIR\php_xdebug.dll"))
     $BIT = ''
   }
   $XDEBUG_URL = "$XDEBUG_URL_PREFIX/php_xdebug-$XDEBUG_VERSION-7.3-vc15-nts$BIT.dll"
-  Start-Process $ARIA2_EXE -NoNewWindow -Wait -ArgumentList "--split=16", "--dir=$PHP_DEF_EXT_DIR", "--out=php_xdebug.dll", $XDEBUG_URL
+  Start-Process $ARIA2_EXE -NoNewWindow -Wait -ArgumentList "--dir=$PHP_DEF_EXT_DIR", "--out=php_xdebug.dll", $XDEBUG_URL
 
   $XDEBUG_INI = @"
 zend_extension=xdebug
@@ -203,7 +203,7 @@ if (!(test-path "$PHP_DEF_EXT_DIR\php_ast.dll"))
     New-Item -ItemType Directory -Force -Path "$AST_DIR" *>$null
   }
   $AST_ZIP = "php_ast.zip"
-  Start-Process $ARIA2_EXE -NoNewWindow -Wait -ArgumentList "--split=16", "--dir=$AST_DIR", "--out=$AST_ZIP", $AST_URL
+  Start-Process $ARIA2_EXE -NoNewWindow -Wait -ArgumentList "--dir=$AST_DIR", "--out=$AST_ZIP", $AST_URL
 
   Unzip "$AST_DIR\$AST_ZIP" "$AST_DIR"
 
@@ -268,7 +268,7 @@ if (!(test-path "$SCRIPT_DIR_LOCAL\shims\BatCodeCheck.exe"))
     New-Item -ItemType Directory -Force -Path "$BAD_CODE_CHECK_DIR" *>$null
   }
   $BAD_CODE_CHECK_ZIP = "batcodecheck.zip"
-  Start-Process $ARIA2_EXE -NoNewWindow -Wait -ArgumentList "--split=16", "--dir=$BAD_CODE_CHECK_DIR", "--out=$BAD_CODE_CHECK_ZIP", $BAD_CODE_CHECK_URL
+  Start-Process $ARIA2_EXE -NoNewWindow -Wait -ArgumentList "--dir=$BAD_CODE_CHECK_DIR", "--out=$BAD_CODE_CHECK_ZIP", $BAD_CODE_CHECK_URL
 
   Unzip "$BAD_CODE_CHECK_DIR\$BAD_CODE_CHECK_ZIP" "$BAD_CODE_CHECK_DIR"
 
@@ -280,6 +280,11 @@ if (!(test-path "$SCRIPT_DIR_LOCAL\shims\BatCodeCheck.exe"))
 # Check all istalled application by virus
 
 Invoke-Expression "&'$SCOOP_EXE' virustotal *"
+
+# Clean-up
+
+Invoke-Expression "&'$SCOOP_EXE' cleanup *"
+Invoke-Expression "&'$SCOOP_EXE' cache rm *"
 
 # Install composer parallel install plugin (https://github.com/hirak/prestissimo)
 
