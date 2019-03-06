@@ -30,6 +30,7 @@ class PhpUnitConfigurationTask extends Task {
    * Directories containing tests to run.
    *
    * @var array
+   * @phan-var array<string>
    */
   private $directories = [];
 
@@ -37,6 +38,7 @@ class PhpUnitConfigurationTask extends Task {
    * Test files to run.
    *
    * @var array
+   * @phan-var array<string>
    */
   private $files = [];
 

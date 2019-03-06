@@ -60,7 +60,7 @@ function InstallIdeaPlugin
   $IDEA_PLUGINS_URL = "https://plugins.jetbrains.com/api/plugins/$pluginId/updates?channel="
 
   $r = Invoke-WebRequest -ContentType "application/json; charset=utf-8" -Uri "$IDEA_PLUGINS_URL"
-  # $r.Content now contains the *misinterpreted* JSON string, so we must 
+  # $r.Content now contains the *misinterpreted* JSON string, so we must
   # obtain its byte representation and re-interpret the bytes as UTF-8.
   # Encoding 28591 represents the ISO-8859-1 encoding - see https://docs.microsoft.com/en-us/windows/desktop/Intl/code-page-identifiers
   $jsonCorrected = [Text.Encoding]::UTF8.GetString(
@@ -79,7 +79,7 @@ function InstallIdeaPlugin
     {
         $compatibleVersions = $pluginInfo.compatibleVersions
         $compatibleVersion = $compatibleVersions.PHPSTORM
-        
+
         $p = $compatibleVersion.IndexOf('+')
         if ($p -ge 0) {
             $cv1 = [System.Version]$compatibleVersion.substring(0, $p)
@@ -99,8 +99,8 @@ function InstallIdeaPlugin
     }
 
     if($cv1 -le $global:IDEA_VERSION)
-    {  
-        if($cv2 -eq $null)
+    {
+        if($null -eq $cv2)
         {
             $find = $true
             break
@@ -112,13 +112,13 @@ function InstallIdeaPlugin
         }
     }
   }
-  
+
   if (!$find)
   {
     Write-Warning "Can not find support version for '$pluginName'"
     return
   }
-  
+
   Write-Output "", "Installing '$pluginName' [$pluginVersion - $pluginDate]"
 
   $downloadUrl = "https://plugins.jetbrains.com/files/$pluginUrl"
@@ -155,20 +155,20 @@ $global:IDEA_VERSION=''
 function CopyIdeaConfigFiles
 {
   param([string]$srcDir, [string]$destDir)
-  
+
   # remove dest dir if exist
   If ((test-path "$destDir"))
   {
     Remove-Item "$destDir" -Recurse -Force
   }
-  
+
   # create dest dir
   New-Item -ItemType Directory -Force -Path "$destDir" *>$null
-  
+
   Write-Output "", "Copy config files from '$srcDir' to '$destDir'"
 
   # recursive copy files
-  Get-ChildItem "$srcDir" -Recurse | ForEach {
+  Get-ChildItem "$srcDir" -Recurse | ForEach-Object {
     if ($_.PSIsContainer)
     {
         return
@@ -178,16 +178,16 @@ function CopyIdeaConfigFiles
     Write-Output "$fullPath"
 
     # Load content
-    $configContent = Get-Content $_.FullName -Raw 
-    
+    $configContent = Get-Content $_.FullName -Raw
+
     If (!(Test-Path "$path"))
     {
         New-Item -ItemType Directory -Force -Path "$path" *>$null
     }
-    
+
     # Change content
     #   Add there if need change content logic
-    
+
     # Save content
     New-Item -ItemType File -Force -Path "$fullPath" *>$null
     $configContent | Set-Content "$fullPath" -Force -NoNewline

@@ -123,7 +123,7 @@
             "@composer drupal:scaffold"
         ],
         "drupal:update": [
-            "@composer update drupal/core webflo/drupal-core-require-dev symfony/* --with-dependencies"
+            "@composer update drupal/core webflo/drupal-core-require-dev \"symfony/*\" --with-dependencies"
         ],
         "drupal:check-phpmd": [
             "phpmd ./drush,./src,./tests,./.phan,./web/themes,./web/profiles,./web/modules text ./phpmd-ruleset.xml --exclude web/modules/contrib/*,web\\modules\\contrib\\*,web/themes/contrib/*,web\\themes\\contrib\\*,web/profiles/contrib/*,web\\profiles\\contrib\\*"
@@ -197,6 +197,9 @@
             "@drupal:fix-phpcs",
             "@drupal:fix-eslint",
             "@drupal:fix-stylelint"
+        ],
+        "drupal:delete-dangerous-files": [
+            "DrupalProject\\composer\\ScriptHandler::deletePossiblyDangerousFiles"
         ],
         "pre-install-cmd": [
             "@pre-cmd"

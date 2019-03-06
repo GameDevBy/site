@@ -9,6 +9,7 @@ use Composer\Semver\Comparator;
 use DrupalFinder\DrupalFinder;
 use RuntimeException;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Webmozart\PathUtil\Path;
 
@@ -83,7 +84,7 @@ class ScriptHandler {
       $fileSystem->mkdir($syncPath);
       $fileSystem->chmod($syncPath, 0777);
       $event->getIO()
-        ->write('Create a "' . $syncPath . '" directory with chmod 0777');
+        ->write('Created a "' . $syncPath . '" directory with chmod 0777');
     }
 
     // Prepare the settings file for installation.
@@ -94,7 +95,7 @@ class ScriptHandler {
       self::createSettings($drupalRoot, $syncPath);
       $fileSystem->chmod($settingsPath, 0666);
       $event->getIO()
-        ->write('Create a "' . $settingsPath . '" file with chmod 0666');
+        ->write('Created a "' . $settingsPath . '" file with chmod 0666');
     }
 
     // Create the files directory with chmod 0777.
@@ -103,7 +104,7 @@ class ScriptHandler {
       $fileSystem->mkdir($filesPath);
       $fileSystem->chmod($filesPath, 0777);
       $event->getIO()
-        ->write('Create a "' . $filesPath . '" directory with chmod 0777');
+        ->write('Created a "' . $filesPath . '" directory with chmod 0777');
     }
 
     $globalCodeSnifferConfigPath = $drupalFinder->getComposerRoot() . '/vendor/squizlabs/php_codesniffer/CodeSniffer.conf';
@@ -113,7 +114,7 @@ class ScriptHandler {
       $globalConfig = '<?php' . PHP_EOL . '$phpCodeSnifferConfig=[\'default_standard\'=>\'' . $configFile . '\'];' . PHP_EOL;
       $fileSystem->dumpFile($globalCodeSnifferConfigPath, $globalConfig);
       $event->getIO()
-        ->write('Create a codesniffer global config file: "' . $globalCodeSnifferConfigPath . '"');
+        ->write('Created a codesniffer global config file: "' . $globalCodeSnifferConfigPath . '"');
     }
 
     self::createInitEnvFile($fileSystem, $drupalFinder, $event);
@@ -172,7 +173,7 @@ class ScriptHandler {
       $fileSystem->chmod($initEnvPath, 0755);
     }
 
-    $event->getIO()->write('Create init environment file');
+    $event->getIO()->write('Created init environment file');
   }
 
   /**
@@ -209,6 +210,60 @@ class ScriptHandler {
 
     $event->getIO()->write('Call npm install (without dev dependencies)');
     exec('npm install --only=prod');
+  }
+
+  /**
+   * Remove text files that would possibly be used by a hacker.
+   *
+   * @param \Composer\Script\Event $event
+   *   Event.
+   */
+  public static function deletePossiblyDangerousFiles(Event $event): void {
+    $fileSystem = new Filesystem();
+    $drupalFinder = new DrupalFinder();
+    $drupalFinder->locateRoot(getcwd());
+
+    // Remove directories.
+    $finder = new Finder();
+    $finder->directories()
+      ->in($drupalFinder->getDrupalRoot())
+      ->name('test')
+      ->name('tests');
+
+    foreach ($finder as $file) {
+      $dirPath = $file->getRealPath();
+      $event->getIO()->write('Remove directory: "' . $dirPath . '"');
+      $fileSystem->remove($dirPath);
+    }
+
+    // Remove files.
+    $finder = new Finder();
+    $finder->files()
+      ->in($drupalFinder->getDrupalRoot());
+
+    $files = [
+      'CHANGELOG.txt',
+      'COPYRIGHT.txt',
+      'INSTALL.mysql.txt',
+      'INSTALL.mysql.txt',
+      'INSTALL.pgsql.txt',
+      'INSTALL.sqlite.txt',
+      'INSTALL.txt',
+      'LICENSE.txt',
+      'MAINTAINERS.txt',
+      'UPDATE.txt',
+      'README.txt',
+    ];
+
+    foreach ($files as $file) {
+      $finder->name($file);
+    }
+
+    foreach ($finder as $file) {
+      $filePath = $file->getRealPath();
+      $event->getIO()->write('Remove file: "' . $filePath . '"');
+      $fileSystem->remove($filePath);
+    }
   }
 
   /**

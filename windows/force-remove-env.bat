@@ -7,6 +7,8 @@ if exist "%~dp0\app\extern\idea" (
     )
 )
 
-if exist %~dp0\app rmdir /S /Q %~dp0\app
+if exist %~dp0\app (
+    rmdir /S /Q %~dp0\app
+)
 
 echo All was removed.
