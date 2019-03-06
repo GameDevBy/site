@@ -41,12 +41,12 @@ function InstallIdeaPlugin
 
   if ((test-path "$pluginZip"))
   {
-    Write-Output "Already installed plugin: $pluginId"
+    # Write-Output "", "Already installed plugin: $pluginId"
     return
   }
   if ((test-path "$global:IDEA_PLUGINS_DIR\$pluginId.jar"))
   {
-    Write-Output "Already installed plugin: $pluginId"
+    # Write-Output "", "Already installed plugin: $pluginId"
     return
   }
 
@@ -57,16 +57,69 @@ function InstallIdeaPlugin
   $pluginName = $pluginInfo.name
   # $pluginVendor = $pluginInfo.vendor
 
-  $IDEA_PLUGINS_URL = "https://plugins.jetbrains.com/api/plugins/$pluginId/updates?channel=&start=0&size=1"
+  $IDEA_PLUGINS_URL = "https://plugins.jetbrains.com/api/plugins/$pluginId/updates?channel="
 
-  $pluginInfo = (Invoke-WebRequest -Uri "$IDEA_PLUGINS_URL" | ConvertFrom-Json)
+  $r = Invoke-WebRequest -ContentType "application/json; charset=utf-8" -Uri "$IDEA_PLUGINS_URL"
+  # $r.Content now contains the *misinterpreted* JSON string, so we must 
+  # obtain its byte representation and re-interpret the bytes as UTF-8.
+  # Encoding 28591 represents the ISO-8859-1 encoding - see https://docs.microsoft.com/en-us/windows/desktop/Intl/code-page-identifiers
+  $jsonCorrected = [Text.Encoding]::UTF8.GetString(
+    [Text.Encoding]::GetEncoding(28591).GetBytes($r.Content)
+  )
+  $pluginInfos = $jsonCorrected | ConvertFrom-Json
 
-  $pluginInfo = $pluginInfo[0]
-  $pluginUrl = $pluginInfo.file
-  $pluginVersion = $pluginInfo.version
-  $pluginDate = $pluginInfo.cdate
+  $find = $false
+  foreach ($pluginInfo in $pluginInfos)
+  {
+    $pluginUrl = $pluginInfo.file
+    $pluginVersion = $pluginInfo.version
+    $pluginDate = $pluginInfo.cdate
 
-  Write-Output "Installing '$pluginName' [$pluginVersion - $pluginDate]"
+    try
+    {
+        $compatibleVersions = $pluginInfo.compatibleVersions
+        $compatibleVersion = $compatibleVersions.PHPSTORM
+        
+        $p = $compatibleVersion.IndexOf('+')
+        if ($p -ge 0) {
+            $cv1 = [System.Version]$compatibleVersion.substring(0, $p)
+            # Write-Output $cv1
+            $cv2 = $null
+        } else {
+            $compatibleVersion = $compatibleVersion.split('-')
+            # Write-Output $compatibleVersion
+
+            $cv1 = [System.Version]$compatibleVersion[0]
+            $cv2 = [System.Version]$compatibleVersion[1]
+        }
+    }
+    catch
+    {
+        continue
+    }
+
+    if($cv1 -le $global:IDEA_VERSION)
+    {  
+        if($cv2 -eq $null)
+        {
+            $find = $true
+            break
+        }
+        if($cv2 -ge $global:IDEA_VERSION)
+        {
+            $find = $true
+            break
+        }
+    }
+  }
+  
+  if (!$find)
+  {
+    Write-Warning "Can not find support version for '$pluginName'"
+    return
+  }
+  
+  Write-Output "", "Installing '$pluginName' [$pluginVersion - $pluginDate]"
 
   $downloadUrl = "https://plugins.jetbrains.com/files/$pluginUrl"
 
@@ -97,6 +150,8 @@ function InstallIdeaPlugin
 
 # Function for copy idea config files
 
+$global:IDEA_VERSION=''
+
 function CopyIdeaConfigFiles
 {
   param([string]$srcDir, [string]$destDir)
@@ -111,7 +166,7 @@ function CopyIdeaConfigFiles
   New-Item -ItemType Directory -Force -Path "$destDir" *>$null
   
   Write-Output "", "Copy config files from '$srcDir' to '$destDir'"
-      
+
   # recursive copy files
   Get-ChildItem "$srcDir" -Recurse | ForEach {
     if ($_.PSIsContainer)
@@ -135,7 +190,7 @@ function CopyIdeaConfigFiles
     
     # Save content
     New-Item -ItemType File -Force -Path "$fullPath" *>$null
-    $configContent | Set-Content "$fullPath" -Force
+    $configContent | Set-Content "$fullPath" -Force -NoNewline
   }
 
 }
@@ -184,7 +239,20 @@ if (!(test-path "$IDEA_INSTALL_DIR\bin\phpstorm.exe"))
   }
   New-Item -ItemType Directory -Force -Path "$IDEA_PLUGINS_TEMP_DIR" *>$null
 
-  $PLUGINS_FOR_SAFE = @("git4idea", "github", "terminal", "xpath", "yaml")
+  $PLUGINS_FOR_SAFE = @(
+    "git4idea",
+    "github",
+    "terminal",
+    "xpath",
+    "yaml",
+    "CSS",
+    "php",
+    "JSIntentionPowerPack",
+    "NodeJS",
+    "JavaScriptLanguage",
+    "JavaScriptDebugger",
+    "DatabaseTools"
+    )
 
   foreach ($pluginName in $PLUGINS_FOR_SAFE)
   {
@@ -202,18 +270,23 @@ if (!(test-path "$IDEA_INSTALL_DIR\bin\phpstorm.exe"))
   Remove-Item $IDEA_PLUGINS_TEMP_DIR -Recurse -Force
 }
 
+# Get Idea Version
+$global:IDEA_VERSION = (Get-Content "$IDEA_INSTALL_DIR\product-info.json" -Raw | Out-String | ConvertFrom-Json)
+$global:IDEA_VERSION = [System.Version]$global:IDEA_VERSION.version
+Write-Output 'PhpShtorm Version:', $global:IDEA_VERSION
+
 # Install plugins
 
 InstallIdeaPlugin 7303  # https://plugins.jetbrains.com/plugin/7303-twig-support
 InstallIdeaPlugin 7793  # https://plugins.jetbrains.com/plugin/7793-markdown-support
-InstallIdeaPlugin 264   # https://plugins.jetbrains.com/plugin/264-jsintentionpowerpack
+# InstallIdeaPlugin 264   # https://plugins.jetbrains.com/plugin/264-jsintentionpowerpack
 InstallIdeaPlugin 6981  # https://plugins.jetbrains.com/plugin/6981-ini4idea
 InstallIdeaPlugin 10275 # https://plugins.jetbrains.com/plugin/10275-hunspell
 InstallIdeaPlugin 9164  # https://plugins.jetbrains.com/plugin/9164-gherkin
 InstallIdeaPlugin 7177  # https://plugins.jetbrains.com/plugin/7177-file-watchers
 InstallIdeaPlugin 7352  # https://plugins.jetbrains.com/plugin/7352-drupal-support
 InstallIdeaPlugin 7724  # https://plugins.jetbrains.com/plugin/7724-docker-integration
-InstallIdeaPlugin 10925 # https://plugins.jetbrains.com/plugin/10925-database-tools-and-sql
+# InstallIdeaPlugin 10925 # https://plugins.jetbrains.com/plugin/10925-database-tools-and-sql
 InstallIdeaPlugin 6630  # https://plugins.jetbrains.com/plugin/6630-command-line-tool-support
 InstallIdeaPlugin 7512  # https://plugins.jetbrains.com/plugin/7512-behat-support
 InstallIdeaPlugin 6834  # https://plugins.jetbrains.com/plugin/6834-apache-config--htaccess-support
@@ -227,8 +300,8 @@ InstallIdeaPlugin 11478 # https://plugins.jetbrains.com/plugin/11478-deep-js-com
 InstallIdeaPlugin 9927  # https://plugins.jetbrains.com/plugin/9927-deep-assoc-completion
 InstallIdeaPlugin 5834  # https://plugins.jetbrains.com/plugin/5834-cmd-support
 InstallIdeaPlugin 4230  # https://plugins.jetbrains.com/plugin/4230-bashsupport
-InstallIdeaPlugin 6610  # https://plugins.jetbrains.com/plugin/6610-php
-InstallIdeaPlugin 6098  # https://plugins.jetbrains.com/plugin/6098-nodejs
+# InstallIdeaPlugin 6610  # https://plugins.jetbrains.com/plugin/6610-php
+# InstallIdeaPlugin 6098  # https://plugins.jetbrains.com/plugin/6098-nodejs
 
 # Configure local version
 
@@ -264,8 +337,8 @@ If (!(test-path "$IDEA_RUN_SCRIPT_PATH"))
     'cd %~dp0',
     'call .\init_env.bat',
     'reg Query "HKLM\Hardware\Description\System\CentralProcessor\0" | find /i "x86" > NUL && set OS_BIT=32BIT || set OS_BIT=64BIT',
-    'if %OS_BIT%==32BIT start "" "%~dp0\windows\app\extern\idea\bin\phpstorm.exe"',
-    'if %OS_BIT%==64BIT start "" "%~dp0\windows\app\extern\idea\bin\phpstorm64.exe"',
+    'if %OS_BIT%==32BIT start "" "%~dp0\windows\app\extern\idea\bin\phpstorm.exe" %~dp0',
+    'if %OS_BIT%==64BIT start "" "%~dp0\windows\app\extern\idea\bin\phpstorm64.exe" %~dp0',
     ''
   )
   $ideaRunScript -join "`n" | Set-Content "$IDEA_RUN_SCRIPT_PATH" -Force -NoNewline
