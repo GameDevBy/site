@@ -92,6 +92,14 @@ if (!(test-path "$SCRIPT_DIR_LOCAL\apps\aria2\current"))
   Invoke-Expression "&'$SCOOP_EXE' install aria2"
 }
 
+# Set extern app dir
+
+$EXTERN_APP_DIR = "$PSScriptRoot\app\extern"
+If (!(test-path "$EXTERN_APP_DIR"))
+{
+    New-Item -ItemType Directory -Force -Path "$EXTERN_APP_DIR" *>$null
+}
+
 # Install php
 
 $PHP_INI_SCAN_DIR = "$SCRIPT_DIR_LOCAL\apps\php-nts\current\cli"
@@ -275,6 +283,19 @@ if (!(test-path "$SCRIPT_DIR_LOCAL\shims\BatCodeCheck.exe"))
   Copy-Item "$BAD_CODE_CHECK_DIR\BatCodeCheck.exe" "$SCRIPT_DIR_LOCAL\shims\BatCodeCheck.exe"
 
   Remove-Item $BAD_CODE_CHECK_DIR -Recurse -Force
+}
+
+# Install phing (https://www.phing.info/)
+
+if (!(test-path "$EXTERN_APP_DIR\phing\phing-latest.phar"))
+{
+  $PHING_URL = "https://www.phing.info/get/phing-latest.phar"
+  $PHING_DIR = "$EXTERN_APP_DIR\phing"
+  If (!(test-path "$PHING_DIR"))
+  {
+    New-Item -ItemType Directory -Force -Path "$PHING_DIR" *>$null
+  }
+  Start-Process $ARIA2_EXE -NoNewWindow -Wait -ArgumentList "--dir=$PHING_DIR", "--out=phing-latest.phar", $PHING_URL
 }
 
 # Check all istalled application by virus

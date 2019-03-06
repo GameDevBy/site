@@ -50,17 +50,23 @@ function InstallIdeaPlugin
     return
   }
 
-  $IDEA_PLUGINS_URL = 'https://plugins.jetbrains.com/plugin/updates?channel=&start=0&size=1&pluginId='
+  $IDEA_PLUGINS_URL = "https://plugins.jetbrains.com/plugin/getPluginInfo?pluginId=$pluginId"
 
-  $pluginInfo = (Invoke-WebRequest -Uri "$IDEA_PLUGINS_URL$pluginId" | ConvertFrom-Json)
+  $pluginInfo = (Invoke-WebRequest -Uri "$IDEA_PLUGINS_URL" | ConvertFrom-Json)
 
-  $pluginName = $pluginInfo.pluginName
-  $pluginVendor = $pluginInfo.vendor
-  $pluginVersion = $pluginInfo.updates[0].version
-  $pluginDate = $pluginInfo.updates[0].cdate
-  $pluginUrl = $pluginInfo.updates[0].file
+  $pluginName = $pluginInfo.name
+  # $pluginVendor = $pluginInfo.vendor
 
-  Write-Output "Installing '$pluginName' (by '$pluginVendor') [$pluginVersion - $pluginDate]"
+  $IDEA_PLUGINS_URL = "https://plugins.jetbrains.com/api/plugins/$pluginId/updates?channel=&start=0&size=1"
+
+  $pluginInfo = (Invoke-WebRequest -Uri "$IDEA_PLUGINS_URL" | ConvertFrom-Json)
+
+  $pluginInfo = $pluginInfo[0]
+  $pluginUrl = $pluginInfo.file
+  $pluginVersion = $pluginInfo.version
+  $pluginDate = $pluginInfo.cdate
+
+  Write-Output "Installing '$pluginName' [$pluginVersion - $pluginDate]"
 
   $downloadUrl = "https://plugins.jetbrains.com/files/$pluginUrl"
 
@@ -89,11 +95,60 @@ function InstallIdeaPlugin
 
 ################
 
+# Function for copy idea config files
+
+function CopyIdeaConfigFiles
+{
+  param([string]$srcDir, [string]$destDir)
+  
+  # remove dest dir if exist
+  If ((test-path "$destDir"))
+  {
+    Remove-Item "$destDir" -Recurse -Force
+  }
+  
+  # create dest dir
+  New-Item -ItemType Directory -Force -Path "$destDir" *>$null
+  
+  Write-Output "", "Copy config files from '$srcDir' to '$destDir'"
+      
+  # recursive copy files
+  Get-ChildItem "$srcDir" -Recurse | ForEach {
+    if ($_.PSIsContainer)
+    {
+        return
+    }
+    $path = ($_.DirectoryName + "\") -Replace [Regex]::Escape("$srcDir"), "$destDir"
+    $fullPath = ($_.FullName) -Replace [Regex]::Escape("$srcDir"), "$destDir"
+    Write-Output "$fullPath"
+
+    # Load content
+    $configContent = Get-Content $_.FullName -Raw 
+    
+    If (!(Test-Path "$path"))
+    {
+        New-Item -ItemType Directory -Force -Path "$path" *>$null
+    }
+    
+    # Change content
+    #   Add there if need change content logic
+    
+    # Save content
+    New-Item -ItemType File -Force -Path "$fullPath" *>$null
+    $configContent | Set-Content "$fullPath" -Force
+  }
+
+}
+
+################
+
 # PowerShell must be enabled for your user account
 
 Set-ExecutionPolicy RemoteSigned -scope CurrentUser
 
 # Set envarenment
+
+$ROOT_DIR = [IO.Path]::GetFullPath("$PSScriptRoot\..")
 
 $IDEA_INSTALL_DIR="$PSScriptRoot\app\extern\idea"
 $global:IDEA_PLUGINS_DIR = "$IDEA_INSTALL_DIR\plugins"
@@ -188,11 +243,16 @@ If (!(test-path "$IDEA_INSTALL_DIR\bin\idea.properties.old"))
     Rename-Item -Path "$IDEA_INSTALL_DIR\bin\idea.properties" -NewName "idea.properties.old"
 }
 
-$ideaIniContent = Get-Content "$IDEA_INSTALL_DIR\bin\idea.properties.old"
+$ideaIniContent = Get-Content "$IDEA_INSTALL_DIR\bin\idea.properties.old" -Raw
 $IDEA_PERSIST_DIR = $IDEA_PERSIST_DIR.replace('\', '/')
 $ideaIniContent = $ideaIniContent.replace('# idea.config.path=${user.home}/.PhpStorm/config', "idea.config.path=$IDEA_PERSIST_DIR/config")
 $ideaIniContent = $ideaIniContent.replace('# idea.system.path=${user.home}/.PhpStorm/system', "idea.system.path=$IDEA_PERSIST_DIR/system")
 $ideaIniContent | Set-Content "$IDEA_INSTALL_DIR\bin\idea.properties" -Force
+
+# Copy config files
+
+CopyIdeaConfigFiles "$PSScriptRoot\idea-preconf\global" "$IDEA_PERSIST_DIR\config"
+CopyIdeaConfigFiles "$PSScriptRoot\idea-preconf\local" "$ROOT_DIR\.idea"
 
 # Create file for run
 
@@ -210,5 +270,3 @@ If (!(test-path "$IDEA_RUN_SCRIPT_PATH"))
   )
   $ideaRunScript -join "`n" | Set-Content "$IDEA_RUN_SCRIPT_PATH" -Force -NoNewline
 }
-
-

@@ -2,7 +2,7 @@
 
 SET POWER_SHELL_EXE="%SystemRoot%\Sysnative\WindowsPowerShell\v1.0\powershell.exe"
 
-rem Check power shell version
+rem Check PowerShell version
 
 for /f "delims=" %%a in ('%%POWER_SHELL_EXE%% -command "(Get-Variable PSVersionTable -ValueOnly).PSVersion.Major"') do @set POWER_SHELL_VERSION_MAJOR=%%a
 set POWER_SHELL_VERSION_MAJOR=%POWER_SHELL_VERSION_MAJOR%
@@ -35,7 +35,7 @@ IF %NET_VERSION% LSS 378389 (
 )
 echo Founded .Net Framework version: %NET_VERSION%
 
-rem For PowerShell version 5.1.14393.206 or newer, before installing PSScriptAnalyzer, need install the latest Nuget provider
+rem Before installing PSScriptAnalyzer, need install the Nuget provider
 
 %POWER_SHELL_EXE% -Command "if ((Get-PackageProvider -Name NuGet).version -lt 2.8.5.201 ) { Install-PackageProvider Nuget -MinimumVersion 2.8.5.201 -Force } else { Write-Host 'Version of NuGet installed: ' (Get-PackageProvider -Name NuGet).version}"
 

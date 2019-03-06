@@ -1,0 +1,26 @@
+<application>
+  <component name="ProjectManager">
+    <defaultProject>
+      <component name="ComposerSettings" executionDataType="PHAR" phpInterpreterId="964e7164-4652-4c12-b182-f9781fe94811">
+        <pharPath>$PROJECT_DIR$\windows\app\local\apps\composer\current\composer.phar</pharPath>
+      </component>
+      <component name="Encoding" addBOMForNewFiles="with NO BOM" />
+      <component name="JsFlowSettings">
+        <service-enabled>true</service-enabled>
+        <exe-path />
+        <other-services-enabled>true</other-services-enabled>
+        <auto-save>true</auto-save>
+      </component>
+      <component name="NodePackageJsonFileManager">
+        <packageJsonPaths />
+      </component>
+      <component name="PhingConfiguration">
+        <phingPath>$PROJECT_DIR$\windows\app\extern\phing\phing-latest.phar</phingPath>
+      </component>
+      <component name="PropertiesComponent">
+        <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+        <property name="settings.editor.selected.configurable" value="Settings.JavaScript" />
+      </component>
+    </defaultProject>
+  </component>
+</application>

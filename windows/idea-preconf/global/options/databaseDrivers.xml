@@ -1,0 +1,8 @@
+<application>
+  <component name="LocalDatabaseDriverManager" version="163">
+    <driver id="mysql">
+      <artifact name="MySQL Connector/J" use="true" />
+      <option name="auto-sync" value="true" />
+    </driver>
+  </component>
+</application>
