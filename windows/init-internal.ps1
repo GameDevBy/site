@@ -298,6 +298,16 @@ if (!(test-path "$EXTERN_APP_DIR\phing\phing-latest.phar"))
   Start-Process $ARIA2_EXE -NoNewWindow -Wait -ArgumentList "--dir=$PHING_DIR", "--out=phing-latest.phar", $PHING_URL
 }
 
+# Install common platform for PowerShell development support (https://github.com/PowerShell/PowerShellEditorServices)
+if (!(test-path "$EXTERN_APP_DIR\PowerShellEditorServices"))
+{
+  $PSES_VER = "v2.0.0-preview.1"
+  $PSES_URL = "https://github.com/PowerShell/PowerShellEditorServices/releases/download/$PSES_VER/PowerShellEditorServices.zip"
+  Start-Process $ARIA2_EXE -NoNewWindow -Wait -ArgumentList "--dir=$EXTERN_APP_DIR", "--out=PowerShellEditorServices.zip", $PSES_URL
+  Unzip "$EXTERN_APP_DIR\PowerShellEditorServices.zip" "$EXTERN_APP_DIR"
+  Remove-Item "$EXTERN_APP_DIR\PowerShellEditorServices.zip" -Recurse -Force
+}
+
 # Check all istalled application by virus
 
 Invoke-Expression "&'$SCOOP_EXE' virustotal *"

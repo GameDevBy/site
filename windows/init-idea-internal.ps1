@@ -166,6 +166,8 @@ function CopyIdeaConfigFiles
   New-Item -ItemType Directory -Force -Path "$destDir" *>$null
 
   Write-Output "", "Copy config files from '$srcDir' to '$destDir'"
+  
+  $ROOT_DIR = [IO.Path]::GetFullPath("$PSScriptRoot\..")
 
   # recursive copy files
   Get-ChildItem "$srcDir" -Recurse | ForEach-Object {
@@ -185,12 +187,19 @@ function CopyIdeaConfigFiles
         New-Item -ItemType Directory -Force -Path "$path" *>$null
     }
 
-    # Change content
-    #   Add there if need change content logic
-
-    # Save content
-    New-Item -ItemType File -Force -Path "$fullPath" *>$null
-    $configContent | Set-Content "$fullPath" -Force -NoNewline
+    if ("" -eq "$configContent")
+    {
+        # Create empy file
+        New-Item -ItemType File -Force -Path "$fullPath" *>$null
+    }
+    else
+    {
+        # Change content
+        $configContent = $configContent.replace("@@PROJECT_DIR@@", $ROOT_DIR)
+        
+        # Save content
+        $configContent | Set-Content "$fullPath" -Force -NoNewline
+    }
   }
 
 }

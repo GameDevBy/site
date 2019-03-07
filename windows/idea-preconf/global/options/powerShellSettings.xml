@@ -1,0 +1,7 @@
+<application>
+  <component name="PowerShellSettings">
+    <option name="editorServicesModuleVersion" value="2.0.0" />
+    <option name="editorServicesStartupScript" value="$APPLICATION_PLUGINS_DIR$/PowerShell/lib/LanguageHost/modules/PowerShellEditorServices/Start-EditorServices.ps1" />
+    <option name="powerShellExtensionPath" value="@@PROJECT_DIR@@\windows\app\extern\PowerShellEditorServices" />
+  </component>
+</application>
