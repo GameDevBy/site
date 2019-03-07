@@ -58,7 +58,7 @@ If (!(test-path $SCRIPT_DIR_GLOBAL))
 
 # Save old context
 
-$OLD_PATH = [environment]::getEnvironmentVariable('PATH_USER', 'User')
+$OLD_PATH = [environment]::getEnvironmentVariable('PATH', 'User')
 $OLD_PHP_INI_SCAN_DIR = [environment]::getEnvironmentVariable('PHP_INI_SCAN_DIR', 'User')
 $OLD_COMPOSER_HOME_DIR = [environment]::getEnvironmentVariable('COMPOSER_HOME', 'User')
 $OLD_SCOOP = [environment]::getEnvironmentVariable('SCOOP', 'User')
@@ -79,6 +79,11 @@ If (!(test-path $SCOOP_EXE))
   Invoke-Expression (new-object net.webclient).DownloadString('https://get.scoop.sh')
   Invoke-Expression "&'$SCOOP_EXE' bucket add extras"
 }
+
+$NEW_PATH = "$SCRIPT_DIR_LOCAL\shims;$OLD_PATH;" + [environment]::getEnvironmentVariable('PATH', 'Machine')
+[environment]::setEnvironmentVariable('PATH', "$SCRIPT_DIR_LOCAL\shims;$OLD_PATH", 'User')
+[environment]::setEnvironmentVariable('PATH', "$NEW_PATH", 'Process')
+
 [environment]::setEnvironmentVariable('SCOOP_GLOBAL', $SCRIPT_DIR_GLOBAL, 'Machine')
 
 # Check
@@ -298,14 +303,25 @@ if (!(test-path "$EXTERN_APP_DIR\phing\phing-latest.phar"))
   Start-Process $ARIA2_EXE -NoNewWindow -Wait -ArgumentList "--dir=$PHING_DIR", "--out=phing-latest.phar", $PHING_URL
 }
 
+# Install Visual Studio Code (https://code.visualstudio.com/)
+
+if (!(test-path "$SCRIPT_DIR_LOCAL\apps\vscode\current"))
+{
+  Invoke-Expression "&'$SCOOP_EXE' install vscode"
+}
+
 # Install common platform for PowerShell development support (https://github.com/PowerShell/PowerShellEditorServices)
 if (!(test-path "$EXTERN_APP_DIR\PowerShellEditorServices"))
 {
-  $PSES_VER = "v2.0.0-preview.1"
-  $PSES_URL = "https://github.com/PowerShell/PowerShellEditorServices/releases/download/$PSES_VER/PowerShellEditorServices.zip"
+  $PSES_VER = "1.11.0"
+  $PSES_URL = "https://github.com/PowerShell/PowerShellEditorServices/releases/download/v$PSES_VER/PowerShellEditorServices.zip"
   Start-Process $ARIA2_EXE -NoNewWindow -Wait -ArgumentList "--dir=$EXTERN_APP_DIR", "--out=PowerShellEditorServices.zip", $PSES_URL
   Unzip "$EXTERN_APP_DIR\PowerShellEditorServices.zip" "$EXTERN_APP_DIR"
   Remove-Item "$EXTERN_APP_DIR\PowerShellEditorServices.zip" -Recurse -Force
+
+  $PSES_URL = "https://github.com/PowerShell/vscode-powershell/releases/download/v$PSES_VER/PowerShell-$PSES_VER.vsix"
+  Start-Process $ARIA2_EXE -NoNewWindow -Wait -ArgumentList "--dir=$EXTERN_APP_DIR", "--out=PowerShell.vsix", $PSES_URL
+  Start-Process "$SCRIPT_DIR_LOCAL\shims\code.cmd" -NoNewWindow -Wait -ArgumentList "--extensions-dir $SCRIPT_DIR_LOCAL\apps\vscode\current\resources\app\extensions", "--install-extension $EXTERN_APP_DIR\PowerShell.vsix"
 }
 
 # Check all istalled application by virus
@@ -335,13 +351,13 @@ Invoke-Expression "&'$COMPOSER_EXE' install"
 
 # Restory old context
 
-[environment]::setEnvironmentVariable('PATH_USER', $null, 'User')
+[environment]::setEnvironmentVariable('PATH', $null, 'User')
 [environment]::setEnvironmentVariable('PHP_INI_SCAN_DIR', $null, 'User')
 [environment]::setEnvironmentVariable('COMPOSER_HOME', $null, 'User')
 [environment]::setEnvironmentVariable('SCOOP', $null, 'User')
 [environment]::setEnvironmentVariable('SCOOP_GLOBAL', $null, 'Machine')
 
-[environment]::setEnvironmentVariable('PATH_USER', $OLD_PATH, 'User')
+[environment]::setEnvironmentVariable('PATH', $OLD_PATH, 'User')
 [environment]::setEnvironmentVariable('PHP_INI_SCAN_DIR', $OLD_PHP_INI_SCAN_DIR, 'User')
 [environment]::setEnvironmentVariable('COMPOSER_HOME', $OLD_COMPOSER_HOME_DIR, 'User')
 [environment]::setEnvironmentVariable('SCOOP', $OLD_SCOOP, 'User')

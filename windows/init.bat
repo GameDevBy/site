@@ -43,6 +43,10 @@ rem Install PSScriptAnalyzer
 
 %POWER_SHELL_EXE% -Command "if (Get-Module -ListAvailable -Name PSScriptAnalyzer) { Write-Host 'PSScriptAnalyzer already installed.' } else { Set-PSRepository -Name 'PSGallery' -InstallationPolicy Trusted; Install-Module -Name PSScriptAnalyzer -Force }"
 
+rem Install PowerShellGet
+
+%POWER_SHELL_EXE% -Command "if (Get-Module -ListAvailable -Name PowerShellGet) { Write-Host 'PowerShellGet already installed.' } else { Set-PSRepository -Name 'PSGallery' -InstallationPolicy Trusted; Install-Module -Name PowerShellGet -Force }"
+
 rem Run main init script
 
 %POWER_SHELL_EXE% -f %~dp0\init-internal.ps1

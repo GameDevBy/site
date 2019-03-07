@@ -30,21 +30,24 @@ function Unzip
 
 # Function for idea plugin setup
 
-$global:IDEA_PLUGINS_DIR=''
+$global:IDEA_GLOBAL_PLUGINS_DIR=''
+$global:IDEA_LOCAL_PLUGINS_DIR=''
 $global:ARIA2_EXE=''
 
 function InstallIdeaPlugin
 {
-  param([int]$pluginId)
+  param([int]$pluginId, [bool]$isLocal = $true)
 
-  $pluginZip = "$global:IDEA_PLUGINS_DIR\$pluginId.zip"
+  $IDEA_PLUGINS_DIR = if ($isLocal) { $global:IDEA_LOCAL_PLUGINS_DIR } else { $global:IDEA_GLOBAL_PLUGINS_DIR }
+
+  $pluginZip = "$IDEA_PLUGINS_DIR\$pluginId.zip"
 
   if ((test-path "$pluginZip"))
   {
     # Write-Output "", "Already installed plugin: $pluginId"
     return
   }
-  if ((test-path "$global:IDEA_PLUGINS_DIR\$pluginId.jar"))
+  if ((test-path "$IDEA_PLUGINS_DIR\$pluginId.jar"))
   {
     # Write-Output "", "Already installed plugin: $pluginId"
     return
@@ -123,9 +126,9 @@ function InstallIdeaPlugin
 
   $downloadUrl = "https://plugins.jetbrains.com/files/$pluginUrl"
 
-  Start-Process $global:ARIA2_EXE -NoNewWindow -Wait -ArgumentList "--dir=$global:IDEA_PLUGINS_DIR", "--out=$pluginId.zip", $downloadUrl
+  Start-Process $global:ARIA2_EXE -NoNewWindow -Wait -ArgumentList "--dir=$IDEA_PLUGINS_DIR", "--out=$pluginId.zip", $downloadUrl
 
-  $IDEA_PLUGINS_TEMP_DIR = get-item $global:IDEA_PLUGINS_DIR
+  $IDEA_PLUGINS_TEMP_DIR = get-item $IDEA_PLUGINS_DIR
   $IDEA_PLUGINS_TEMP_DIR = $IDEA_PLUGINS_TEMP_DIR.parent.FullName
   $IDEA_PLUGINS_TEMP_DIR = "$IDEA_PLUGINS_TEMP_DIR\temp"
   If ((test-path "$IDEA_PLUGINS_TEMP_DIR"))
@@ -140,7 +143,7 @@ function InstallIdeaPlugin
   {
     Rename-Item -Path "$pluginZip" -NewName "$pluginId.jar"
   } else {
-    Unzip "$pluginZip" "$global:IDEA_PLUGINS_DIR"
+    Unzip "$pluginZip" "$IDEA_PLUGINS_DIR"
   }
 
   Remove-Item $IDEA_PLUGINS_TEMP_DIR -Recurse -Force
@@ -215,7 +218,7 @@ Set-ExecutionPolicy RemoteSigned -scope CurrentUser
 $ROOT_DIR = [IO.Path]::GetFullPath("$PSScriptRoot\..")
 
 $IDEA_INSTALL_DIR="$PSScriptRoot\app\extern\idea"
-$global:IDEA_PLUGINS_DIR = "$IDEA_INSTALL_DIR\plugins"
+$global:IDEA_GLOBAL_PLUGINS_DIR = "$IDEA_INSTALL_DIR\plugins"
 $global:ARIA2_EXE = "$PSScriptRoot\app\local\shims\aria2c.exe"
 
 # Install idea
@@ -239,7 +242,7 @@ if (!(test-path "$IDEA_INSTALL_DIR\bin\phpstorm.exe"))
 
   # Remove unused default plugins
 
-  $IDEA_PLUGINS_TEMP_DIR = get-item $global:IDEA_PLUGINS_DIR
+  $IDEA_PLUGINS_TEMP_DIR = get-item $global:IDEA_GLOBAL_PLUGINS_DIR
   $IDEA_PLUGINS_TEMP_DIR = $IDEA_PLUGINS_TEMP_DIR.parent.FullName
   $IDEA_PLUGINS_TEMP_DIR = "$IDEA_PLUGINS_TEMP_DIR\temp"
   If ((test-path "$IDEA_PLUGINS_TEMP_DIR"))
@@ -265,15 +268,15 @@ if (!(test-path "$IDEA_INSTALL_DIR\bin\phpstorm.exe"))
 
   foreach ($pluginName in $PLUGINS_FOR_SAFE)
   {
-    Copy-Item "$global:IDEA_PLUGINS_DIR\$pluginName" $IDEA_PLUGINS_TEMP_DIR -Recurse
+    Copy-Item "$global:IDEA_GLOBAL_PLUGINS_DIR\$pluginName" $IDEA_PLUGINS_TEMP_DIR -Recurse
   }
 
-  Remove-Item $global:IDEA_PLUGINS_DIR -Recurse -Force
-  New-Item -ItemType Directory -Force -Path "$global:IDEA_PLUGINS_DIR" *>$null
+  Remove-Item $global:IDEA_GLOBAL_PLUGINS_DIR -Recurse -Force
+  New-Item -ItemType Directory -Force -Path "$global:IDEA_GLOBAL_PLUGINS_DIR" *>$null
 
   foreach ($pluginName in $PLUGINS_FOR_SAFE)
   {
-    Copy-Item "$IDEA_PLUGINS_TEMP_DIR\$pluginName" $global:IDEA_PLUGINS_DIR -Recurse
+    Copy-Item "$IDEA_PLUGINS_TEMP_DIR\$pluginName" $global:IDEA_GLOBAL_PLUGINS_DIR -Recurse
   }
 
   Remove-Item $IDEA_PLUGINS_TEMP_DIR -Recurse -Force
@@ -283,34 +286,6 @@ if (!(test-path "$IDEA_INSTALL_DIR\bin\phpstorm.exe"))
 $global:IDEA_VERSION = (Get-Content "$IDEA_INSTALL_DIR\product-info.json" -Raw | Out-String | ConvertFrom-Json)
 $global:IDEA_VERSION = [System.Version]$global:IDEA_VERSION.version
 Write-Output 'PhpShtorm Version:', $global:IDEA_VERSION
-
-# Install plugins
-
-InstallIdeaPlugin 7303  # https://plugins.jetbrains.com/plugin/7303-twig-support
-InstallIdeaPlugin 7793  # https://plugins.jetbrains.com/plugin/7793-markdown-support
-# InstallIdeaPlugin 264   # https://plugins.jetbrains.com/plugin/264-jsintentionpowerpack
-InstallIdeaPlugin 6981  # https://plugins.jetbrains.com/plugin/6981-ini4idea
-InstallIdeaPlugin 10275 # https://plugins.jetbrains.com/plugin/10275-hunspell
-InstallIdeaPlugin 9164  # https://plugins.jetbrains.com/plugin/9164-gherkin
-InstallIdeaPlugin 7177  # https://plugins.jetbrains.com/plugin/7177-file-watchers
-InstallIdeaPlugin 7352  # https://plugins.jetbrains.com/plugin/7352-drupal-support
-InstallIdeaPlugin 7724  # https://plugins.jetbrains.com/plugin/7724-docker-integration
-# InstallIdeaPlugin 10925 # https://plugins.jetbrains.com/plugin/10925-database-tools-and-sql
-InstallIdeaPlugin 6630  # https://plugins.jetbrains.com/plugin/6630-command-line-tool-support
-InstallIdeaPlugin 7512  # https://plugins.jetbrains.com/plugin/7512-behat-support
-InstallIdeaPlugin 6834  # https://plugins.jetbrains.com/plugin/6834-apache-config--htaccess-support
-InstallIdeaPlugin 7219  # https://plugins.jetbrains.com/plugin/7219-symfony-plugin
-InstallIdeaPlugin 10249 # https://plugins.jetbrains.com/plugin/10249-powershell
-InstallIdeaPlugin 8133  # https://plugins.jetbrains.com/plugin/8133-php-toolbox
-InstallIdeaPlugin 7622  # https://plugins.jetbrains.com/plugin/7622-php-inspections-ea-extended-
-InstallIdeaPlugin 7320  # https://plugins.jetbrains.com/plugin/7320-php-annotations
-InstallIdeaPlugin 7294  # https://plugins.jetbrains.com/plugin/7294-editorconfig
-InstallIdeaPlugin 11478 # https://plugins.jetbrains.com/plugin/11478-deep-js-completion
-InstallIdeaPlugin 9927  # https://plugins.jetbrains.com/plugin/9927-deep-assoc-completion
-InstallIdeaPlugin 5834  # https://plugins.jetbrains.com/plugin/5834-cmd-support
-InstallIdeaPlugin 4230  # https://plugins.jetbrains.com/plugin/4230-bashsupport
-# InstallIdeaPlugin 6610  # https://plugins.jetbrains.com/plugin/6610-php
-# InstallIdeaPlugin 6098  # https://plugins.jetbrains.com/plugin/6098-nodejs
 
 # Configure local version
 
@@ -331,10 +306,43 @@ $ideaIniContent = $ideaIniContent.replace('# idea.config.path=${user.home}/.PhpS
 $ideaIniContent = $ideaIniContent.replace('# idea.system.path=${user.home}/.PhpStorm/system', "idea.system.path=$IDEA_PERSIST_DIR/system")
 $ideaIniContent | Set-Content "$IDEA_INSTALL_DIR\bin\idea.properties" -Force
 
+$global:IDEA_LOCAL_PLUGINS_DIR = "$IDEA_PERSIST_DIR\config\plugins"
+
 # Copy config files
 
 CopyIdeaConfigFiles "$PSScriptRoot\idea-preconf\global" "$IDEA_PERSIST_DIR\config"
 CopyIdeaConfigFiles "$PSScriptRoot\idea-preconf\local" "$ROOT_DIR\.idea"
+
+# Install global plugins
+
+InstallIdeaPlugin -isLocal $false -pluginId    7303  # https://plugins.jetbrains.com/plugin/7303-twig-support
+InstallIdeaPlugin -isLocal $false -pluginId   10275  # https://plugins.jetbrains.com/plugin/10275-hunspell
+InstallIdeaPlugin -isLocal $false -pluginId    9164  # https://plugins.jetbrains.com/plugin/9164-gherkin
+InstallIdeaPlugin -isLocal $false -pluginId    7177  # https://plugins.jetbrains.com/plugin/7177-file-watchers
+InstallIdeaPlugin -isLocal $false -pluginId    7352  # https://plugins.jetbrains.com/plugin/7352-drupal-support
+InstallIdeaPlugin -isLocal $false -pluginId    7724  # https://plugins.jetbrains.com/plugin/7724-docker-integration
+InstallIdeaPlugin -isLocal $false -pluginId    6630  # https://plugins.jetbrains.com/plugin/6630-command-line-tool-support
+InstallIdeaPlugin -isLocal $false -pluginId    7512  # https://plugins.jetbrains.com/plugin/7512-behat-support
+InstallIdeaPlugin -isLocal $false -pluginId    6834  # https://plugins.jetbrains.com/plugin/6834-apache-config--htaccess-support
+# InstallIdeaPlugin -isLocal $false -pluginId   264  # https://plugins.jetbrains.com/plugin/264-jsintentionpowerpack
+# InstallIdeaPlugin -isLocal $false -pluginId 10925  # https://plugins.jetbrains.com/plugin/10925-database-tools-and-sql
+# InstallIdeaPlugin -isLocal $false -pluginId  6610  # https://plugins.jetbrains.com/plugin/6610-php
+# InstallIdeaPlugin -isLocal $false -pluginId  6098  # https://plugins.jetbrains.com/plugin/6098-nodejs
+
+# Install local plugins
+
+InstallIdeaPlugin -pluginId  7793  # https://plugins.jetbrains.com/plugin/7793-markdown-support
+InstallIdeaPlugin -pluginId  6981  # https://plugins.jetbrains.com/plugin/6981-ini4idea
+InstallIdeaPlugin -pluginId  7219  # https://plugins.jetbrains.com/plugin/7219-symfony-plugin
+InstallIdeaPlugin -pluginId 10249  # https://plugins.jetbrains.com/plugin/10249-powershell
+InstallIdeaPlugin -pluginId  8133  # https://plugins.jetbrains.com/plugin/8133-php-toolbox
+InstallIdeaPlugin -pluginId  7622  # https://plugins.jetbrains.com/plugin/7622-php-inspections-ea-extended-
+InstallIdeaPlugin -pluginId  7320  # https://plugins.jetbrains.com/plugin/7320-php-annotations
+InstallIdeaPlugin -pluginId  7294  # https://plugins.jetbrains.com/plugin/7294-editorconfig
+InstallIdeaPlugin -pluginId 11478  # https://plugins.jetbrains.com/plugin/11478-deep-js-completion
+InstallIdeaPlugin -pluginId  9927  # https://plugins.jetbrains.com/plugin/9927-deep-assoc-completion
+InstallIdeaPlugin -pluginId  5834  # https://plugins.jetbrains.com/plugin/5834-cmd-support
+InstallIdeaPlugin -pluginId  4230  # https://plugins.jetbrains.com/plugin/4230-bashsupport
 
 # Create file for run
 

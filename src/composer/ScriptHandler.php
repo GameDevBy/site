@@ -156,7 +156,7 @@ class ScriptHandler {
       . 'set PATH='
       . $drupalFinder->getComposerRoot() . '\vendor\bin;'
       . $drupalFinder->getComposerRoot() . '\node_modules\.bin;'
-      . $drupalFinder->getComposerRoot() . '\windows\app\local\shims;'
+      . $drupalFinder->getComposerRoot() . '\windows\app\local\apps\vscode\current\bin;'
       . $drupalFinder->getComposerRoot() . '\windows\app\local\shims;'
       . $drupalFinder->getComposerRoot() . '\windows\app\extern\idea\bin;%PATH%'
       . PHP_EOL :
