@@ -77,11 +77,18 @@ $env:SCOOP = $SCRIPT_DIR_LOCAL
 If (!(test-path $SCOOP_EXE))
 {
   Invoke-Expression (new-object net.webclient).DownloadString('https://get.scoop.sh')
+
+  # Remove "min-tls-version" from install aria2c
+  $PATH_INSTALL_SCRIPT = "$SCRIPT_DIR_LOCAL\apps\scoop\current\lib\"
+  $INSTALL_SCRIPT = Get-Content "$PATH_INSTALL_SCRIPT\install.ps1" -Raw
+  $INSTALL_SCRIPT = $INSTALL_SCRIPT.replace('"--min-tls-version=TLSv1.2"', "")
+  $INSTALL_SCRIPT | Set-Content "$PATH_INSTALL_SCRIPT\install.ps1" -Force -NoNewline
+
   Invoke-Expression "&'$SCOOP_EXE' bucket add extras"
 }
 
 $NEW_PATH = "$SCRIPT_DIR_LOCAL\shims;$OLD_PATH;" + [environment]::getEnvironmentVariable('PATH', 'Machine')
-[environment]::setEnvironmentVariable('PATH', "$SCRIPT_DIR_LOCAL\shims;$OLD_PATH", 'User')
+[environment]::setEnvironmentVariable('PATH', "$NEW_PATH", 'User')
 [environment]::setEnvironmentVariable('PATH', "$NEW_PATH", 'Process')
 
 [environment]::setEnvironmentVariable('SCOOP_GLOBAL', $SCRIPT_DIR_GLOBAL, 'Machine')
@@ -322,6 +329,31 @@ if (!(test-path "$EXTERN_APP_DIR\PowerShellEditorServices"))
   $PSES_URL = "https://github.com/PowerShell/vscode-powershell/releases/download/v$PSES_VER/PowerShell-$PSES_VER.vsix"
   Start-Process $ARIA2_EXE -NoNewWindow -Wait -ArgumentList "--dir=$EXTERN_APP_DIR", "--out=PowerShell.vsix", $PSES_URL
   Start-Process "$SCRIPT_DIR_LOCAL\shims\code.cmd" -NoNewWindow -Wait -ArgumentList "--extensions-dir $SCRIPT_DIR_LOCAL\apps\vscode\current\resources\app\extensions", "--install-extension $EXTERN_APP_DIR\PowerShell.vsix"
+}
+
+# Install MariaDb (https://mariadb.org/)
+
+if (!(test-path "$SCRIPT_DIR_LOCAL\apps\mariadb\current"))
+{
+  Invoke-Expression "&'$SCOOP_EXE' install mariadb"
+}
+
+# Install MySQL Workbench (Only for x64) (https://www.mysql.com/products/workbench/)
+If ([intptr]::size -eq 8)
+{
+  if (!(test-path "$SCRIPT_DIR_LOCAL\apps\mysql-workbench\current"))
+  {
+    Invoke-Expression "&'$SCOOP_EXE' install mysql-workbench"
+  }
+}
+
+# Install Apache HTTP Server (https://httpd.apache.org/)
+
+if (!(test-path "$SCRIPT_DIR_LOCAL\apps\apache\current"))
+{
+  Invoke-Expression "&'$SCOOP_EXE' install apache"
+
+  $APACH_CONF_PATH = "$SCRIPT_DIR_LOCAL\apps\apache\current\conf\httpd.conf"
 }
 
 # Check all istalled application by virus

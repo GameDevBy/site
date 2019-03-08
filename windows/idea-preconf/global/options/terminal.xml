@@ -1,5 +1,0 @@
-<application>
-  <component name="TerminalOptionsProvider">
-    <option name="myShellPath" value="cmd.exe /K &quot;mode con:cols=500 lines=9999&amp;cmd.exe&quot;" />
-  </component>
-</application>
